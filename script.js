@@ -462,19 +462,18 @@ function initCarsTab() {
     if (!grid) return;
 
     grid.innerHTML = f1Cars2026.map(car => {
-        const photoCount = 5; 
+        const photoCount = 5;
         let imgHtml = '';
-        
-        // Loop 1 to 5 for the angles
+
         for (let i = 1; i <= photoCount; i++) {
-            // We start by trying .avif (best quality)
-            // If it fails, tryNextExt will automatically try .jpg then .webp
             imgHtml += `
-                <img src="./Cars/${car.id}-${i}.avif"
-                     id="img-${car.id}-${i}" 
-                     data-ext="avif" 
-                     onerror="tryNextExt(this, '${car.id}', ${i})" 
-                     alt="${car.team} Angle ${i}">`;
+                <picture>
+                    <source srcset="./Cars/${car.id.toLowerCase()}-${i}.avif" type="image/avif">
+                    <source srcset="./Cars/${car.id.toLowerCase()}-${i}.webp" type="image/webp">
+                    <img src="./Cars/${car.id.toLowerCase()}-${i}.jpg"
+                         alt="${car.team} Angle ${i}">
+                </picture>
+            `;
         }
 
         return `
@@ -966,6 +965,7 @@ async function updateF1Weather() {
  */
 
 window.addEventListener('DOMContentLoaded', updateF1Weather);
+
 
 
 
