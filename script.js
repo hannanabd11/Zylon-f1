@@ -467,7 +467,22 @@ function initCarsTab() {
         
         for (let i = 1; i <= photoCount; i++) {
             imgHtml += `
-                <img src="./Cars/${car.id}-${i}.avif" 
+                <img src="./Cars/${car.id}-${i}.avif"
+                
+                     id="img-${car.id}-${i}" 
+                     data-ext="avif" 
+                     onerror="tryNextExt(this, '${car.id}', ${i})" 
+                     alt="Angle ${i}">`;
+        }
+                        <img src="./Cars/${car.id}-${i}.jpg"
+                
+                     id="img-${car.id}-${i}" 
+                     data-ext="avif" 
+                     onerror="tryNextExt(this, '${car.id}', ${i})" 
+                     alt="Angle ${i}">`;
+        }
+                        <img src="./Cars/${car.id}-${i}.webp"
+                
                      id="img-${car.id}-${i}" 
                      data-ext="avif" 
                      onerror="tryNextExt(this, '${car.id}', ${i})" 
@@ -963,6 +978,7 @@ async function updateF1Weather() {
  */
 
 window.addEventListener('DOMContentLoaded', updateF1Weather);
+
 
 
 
