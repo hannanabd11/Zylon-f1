@@ -1,0 +1,2528 @@
+
+/* Ensure the base page is black */
+body, html {
+    margin: 0;
+    padding: 0;
+    background-color: #000000 !important; /* Force black background */
+    color: #ffffff;
+    font-family: 'F1 Bold', sans-serif;}
+:root {
+    --f1-red: #e10600;
+    --f1-red-glow: rgba(225, 6, 0, 0.6);
+}
+
+.main-header {
+    background: #000;
+    width: 100%;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    background-image: repeating-linear-gradient(45deg, #0a0a0a 0px, #0a0a0a 2px, #000 2px, #000 4px);
+}
+
+.header-main-row {
+    height: 110px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    padding: 0 50px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+/* --- THE FIXED ZENITH LOGO --- */
+.zenith-logo-wrap { 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 12px; 
+    cursor: pointer;
+    width: max-content; /* Fixes the "glowing from far away" issue */
+}
+
+.z-badge {
+    position: relative;
+    width: 50px; 
+    height: 50px;
+    background: linear-gradient(135deg, #e10600, #900000);
+    /* Slant the box, not the character */
+    transform: skewX(-12deg); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 15px rgba(225, 6, 0, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+}
+
+.z-char { 
+    color: #fff; 
+    font-size: 2.2rem; 
+    font-weight: 950; 
+    font-family: 'Formula1-Bold', sans-serif;
+    /* UN-SKEW the letter so it doesn't look weird or tilted */
+    transform: skewX(12deg); 
+    display: block;
+    font-style: italic;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* --- THE INTENSE GLOW ON HOVER --- */
+.zenith-logo-wrap:hover .z-badge {
+    /* Keep the skew while scaling */
+    transform: skewX(-12deg) scale(1.1); 
+    background: #ff0000;
+    box-shadow: 
+        0 0 10px #fff,               
+        0 0 30px #ff0000,            
+        0 0 60px rgba(255, 0, 0, 0.6); 
+    border-color: #fff;
+}
+
+.zenith-logo-wrap:hover .brand-title {
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+/* THE "RED F1" GLOW */
+.red-f1 {
+    color: #e10600;
+    transition: all 0.3s ease;
+}
+
+.zenith-logo-wrap:hover .red-f1 {
+    color: #ff2e2e;
+    text-shadow: 0 0 15px #ff0000;
+}
+
+/* --- ANIMATIONS --- */
+@keyframes z-box-breathing {
+    0%, 100% { box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); }
+    50% { box-shadow: 0 0 25px rgba(255, 0, 0, 0.7); }
+}
+/* --- BRANDING TEXT --- */
+.brand-info { display: flex; flex-direction: column; justify-content: center; }
+
+.brand-title { 
+    font-size: 2.2rem; 
+    font-weight: 950; 
+    font-style: italic; 
+    color: #fff; 
+    letter-spacing: -1.5px; 
+    line-height: 0.8; 
+}
+
+.brand-tagline { 
+    font-size: 0.6rem; 
+    color: rgba(255,255,255,0.5); 
+    letter-spacing: 3px; 
+    font-weight: 800; 
+    margin-top: 5px;
+    text-transform: uppercase;
+}
+/* --- BLINKING TIMER DESIGN --- */
+.header-center-timer { display: flex; justify-content: center; }
+
+/* --- UPDATED ZENITH TIMER BLOCK --- */
+/* --- THE ELITE ZENITH TIMER BOX --- */
+.broadcast-timer-box {
+    background: rgba(10, 10, 10, 0.5) !important;
+    backdrop-filter: blur(15px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(15px) saturate(180%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-top: 3px solid #e10600; 
+    padding: 12px 30px;
+    min-width: 320px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* --- THE HEADER: FLAG + LABEL --- */
+.timer-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 6px;
+    transition: transform 0.3s ease;
+}
+
+.country-flag {
+    width: 24px;
+    height: 16px;
+    object-fit: cover;
+    border-radius: 2px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    transition: all 0.3s ease;
+}
+
+.timer-label { 
+    font-size: 0.8rem; 
+    color: #e10600; 
+    font-weight: 950; 
+    letter-spacing: 3px; 
+    text-transform: uppercase;
+    font-family: 'Formula1-Bold', sans-serif;
+    transition: all 0.3s ease;
+}
+
+/* --- THE TYPOGRAPHY (ORBITRON GLOW) --- */
+.timer-value { 
+    font-family: 'Orbitron', sans-serif; 
+    font-size: 1.9rem; 
+    font-weight: 900; 
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 4px;
+    transition: all 0.3s ease;
+    text-shadow: 0 0 10px rgba(255,255,255,0.1);
+}
+
+.timer-unit {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: 600;
+    margin-right: 10px;
+    font-family: 'Formula1-Regular', sans-serif;
+}
+
+/* --- INTERACTIVE: POINT TO GLOW & LARGEN --- */
+.broadcast-timer-box:hover {
+    transform: translateY(-5px) scale(1.02);
+    background: rgba(255, 255, 255, 0.03) !important;
+    border-color: rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9), 0 0 20px rgba(225, 6, 0, 0.3);
+}
+
+/* Largen Label on Hover */
+.broadcast-timer-box:hover .timer-label {
+    transform: scale(1.1);
+    color: #ff2e2e;
+    text-shadow: 0 0 15px rgba(225, 6, 0, 0.5);
+}
+
+/* Intensify Digit Glow on Hover */
+.broadcast-timer-box:hover .timer-value {
+    text-shadow: 0 0 15px rgba(255, 255, 255, 0.7), 0 0 30px rgba(255, 255, 255, 0.3);
+}
+
+/* --- LAST LAP WARNING STATE --- */
+.state-warning { border-top-color: #ffda00 !important; }
+.state-warning .timer-label { color: #ffda00 !important; }
+
+.state-warning::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at center, rgba(255, 218, 0, 0.1), transparent);
+    animation: last-lap-pulse 1.5s infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes last-lap-pulse {
+    from { opacity: 0.2; }
+    to { opacity: 0.8; }
+}
+
+/* --- LIVE BUTTON --- */
+.live-btn-link {
+    color: #00ff41;
+    text-decoration: none;
+    font-weight: 900;
+    font-size: 1.1rem;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+}
+
+.live-btn-link:hover {
+    filter: brightness(1.2);
+    text-shadow: 0 0 20px #00ff41;
+}
+/* --- BUTTONS & NAV (SAME AS PREVIOUS) --- */
+.header-utils { display: flex; justify-content: flex-end; gap: 20px; }
+.btn-shop, .user-login { padding: 10px 25px; border-radius: 50px; font-weight: 900; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+.btn-shop { background: transparent; border: 1.5px solid var(--f1-red); color: #fff; box-shadow: 0 0 15px var(--f1-red-glow); }
+.btn-shop:hover { background: var(--f1-red); box-shadow: 0 0 30px var(--f1-red-glow); }
+.user-login { background: transparent; border: 1.5px solid rgba(255,255,255,0.2); color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+.user-login:hover { background: #fff; color: #000; box-shadow: 0 0 30px rgba(255,255,255,0.6); }
+
+.header-nav-bar { height: 50px; background: #000; border-bottom: 4px solid var(--f1-red); display: flex; justify-content: center; }
+.nav-tabs { display: flex; list-style: none; margin: 0; padding: 0; }
+.tab-item { padding: 0 30px; display: flex; align-items: center; font-size: 0.9rem; font-weight: 800; color: #888; cursor: pointer; font-style: italic; position: relative; transition: 0.4s; }
+.tab-item:hover, .tab-item.active { color: #fff; background: rgba(225,6,0,0.1); }
+.tab-item.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 4px; background: var(--f1-red); box-shadow: 0 -5px 15px var(--f1-red); }
+
+
+/* --- HEADER CORE --- */
+
+:root {
+    --f1-red: #e10600;
+    --glass: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+#standings {
+    display: none; 
+    padding: 60px 20px; /* Reduced from 5% to 20px for tighter edges */
+    background: #000000 !important; 
+    width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden; /* Safety lock: prevents horizontal scrolling */
+}
+
+/* Updated Bento Grid */
+.standings-grid {
+    display: grid;
+    /* Forces 2 columns on desktop, but drops to 1 on small screens */
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+    gap: 25px; /* Reduced gap to keep cards closer together */
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.standings-card {
+    background: rgba(25, 25, 25, 0.7); /* Slightly lighter for contrast on pure black */
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px;
+    width: 100%; /* Ensures card stays inside the grid cell */
+    box-sizing: border-box; /* Includes padding in the width calculation */
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+.card-header {
+    font-family: 'Formula1-Wide', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 4px;
+    color: #555;
+    margin-bottom: 30px;
+    border-left: 3px solid var(--f1-red);
+    padding-left: 15px;
+}
+
+
+/* The Row Design */
+.standings-entry {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.01);
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid transparent;
+}
+
+/* Neon Glow on Hover */
+.standings-entry:hover {
+    background: rgba(255,255,255,0.04);
+    transform: scale(1.02) translateX(10px);
+    border-color: var(--team-glow);
+    box-shadow: -10px 0 20px -5px var(--team-glow), 
+                inset 0 0 15px rgba(255,255,255,0.02);
+}
+
+.pos-num {
+    font-family: 'Formula1-Bold', sans-serif;
+    font-size: 1.5rem;
+    color: #5f5c5c; /* Ghost number effect */
+    width: 40px;
+}
+
+.team-strip {
+    width: 3px;
+    height: 40px;
+    border-radius: 10px;
+    margin-right: 20px;
+    box-shadow: 0 0 15px var(--team-glow);
+}
+
+/* Neon Text Effects */
+.team-label {
+    font-size: 0.6rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--team-glow) !important;
+    text-shadow: 0 0 10px var(--team-glow);
+    opacity: 0.9;
+}
+
+.driver-text {
+    color: #fff;
+    font-size: 1.1rem;
+    /* Subtle glow for the name */
+    text-shadow: 0 0 5px rgba(255,255,255,0.1);
+}
+
+.driver-text strong {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.tiny-flag {
+    width: 22px;
+    height: auto;
+    border-radius: 3px;
+    margin-right: 10px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+}
+
+.entry-pts {
+    margin-left: auto;
+font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+font-weight: 800;
+letter-spacing: -1px;
+    font-size: 1.3rem;
+    color: #fff;
+    text-shadow: 0 0 10px rgba(255,255,255,0.2);
+}
+
+/* 1. Prevent the individual tab from expanding the page width */
+.tab-content {
+    overflow-x: hidden; /* This kills the horizontal 'bleed' */
+    max-width: 100vw;    /* Ensures it never exceeds the screen width */
+    position: relative; 
+}
+
+/* 2. Safety lock for the whole website */
+body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* 3. Refine the sliding row so it doesn't 'push' the container */
+.standings-entry {
+    box-sizing: border-box; /* Ensures padding doesn't add to width */
+    width: 100%;
+}
+/* Reset link colors so they don't turn blue */
+.team-link, .driver-link {
+    color: inherit;
+    cursor: pointer;
+    display: inline-block;
+}
+
+/* Maintain glow on hover for the links */
+.team-link:hover .team-label {
+    text-shadow: 0 0 15px var(--team-glow);
+    filter: brightness(1.2);
+}
+
+.driver-link:hover .driver-text {
+    text-shadow: 0 0 10px #fff;
+}
+
+/* Schedule Row Design */
+.schedule-row-container {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    transition: 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+/* Green Row Logic */
+.schedule-row-container.completed {
+    border-left: 4px solid #00ff88;
+    background: linear-gradient(90deg, rgba(0, 255, 136, 0.05) 0%, transparent 100%);
+}
+
+.schedule-main-row {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+}
+
+/* Expansion Effect */
+.schedule-row-container.expanded {
+    transform: scale(1.02);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.schedule-details {
+    max-height: 0;
+    opacity: 0;
+    transition: all 0.4s ease;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.schedule-row-container.expanded .schedule-details {
+    max-height: 200px;
+    opacity: 1;
+    padding: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Grid for Practice Times */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    text-align: center;
+}
+
+.session-item span { display: block; font-size: 0.6rem; color: #888; margin-bottom: 4px; }
+.session-item strong { font-size: 1rem; color: #fff; }
+.session-item.highlight strong { color: #e10600; text-shadow: 0 0 10px rgba(225, 6, 0, 0.4); }
+
+/* Mirror the exact Grid of your Header */
+.schedule-main-row {
+    display: grid;
+    /* This matches your HTML inline style exactly */
+    grid-template-columns: 60px 100px 1.5fr 1.5fr 1.2fr; 
+    align-items: center;
+    padding: 15px 25px;
+    gap: 10px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Column Styling */
+.col-rd { font-weight: bold; color: #555; }
+
+.col-date {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.1;
+}
+.col-date .day { font-size: 1.2rem; font-weight: 900; color: #fff; }
+.col-date .month { font-size: 0.7rem; color: #888; font-weight: bold; }
+
+.col-gp { font-weight: 800; color: #fff; padding-right: 10px; }
+.col-circuit { font-size: 0.8rem; color: #777; text-transform: uppercase; }
+
+.col-status { text-align: right; }
+
+/* Read More Button Styling */
+.read-more-btn {
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #fff;
+    background: rgba(225, 6, 0, 0.2);
+    padding: 6px 12px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Expansion Logic */
+.schedule-row-container.completed {
+    border-left: 4px solid #00ff88;
+}
+
+.schedule-details {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s ease-out;
+    background: #111;
+}
+
+.schedule-row-container.expanded .schedule-details {
+    max-height: 250px;
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 15px;
+    text-align: center;
+}
+
+/* Green Row Logic: Past Races */
+.schedule-row-container.completed {
+    border-left: 4px solid #00ff88;
+    background: linear-gradient(90deg, rgba(0, 255, 136, 0.08) 0%, transparent 100%);
+    box-shadow: inset 5px 0 15px -5px rgba(0, 255, 136, 0.3);
+}
+
+.schedule-row-container.completed .status-done {
+    color: #00ff88;
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    font-weight: 900;
+}
+
+/* Maintain alignment for the expanded sessions */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    text-align: center;
+    padding: 15px 0;
+}
+
+.session-item span { display: block; font-size: 0.65rem; color: #888; margin-bottom: 5px; }
+.session-item strong { font-size: 1rem; color: #fff; }
+.session-item.highlight strong { color: #e10600; } /* Qualifying in F1 Red */
+/* Winner Label in the Main Row */
+.winner-label {
+    color: #ffd700; /* Gold for the winner */
+    font-weight: 900;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+    letter-spacing: 1px;
+}
+
+/* Expansion Details Styling */
+.session-item small {
+    display: block;
+    font-size: 0.6rem;
+    color: #00ff88; /* Green for results */
+    margin-top: 5px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+.session-item.highlight small {
+    color: #e10600; /* Red for Qualifying results */
+}
+
+/* Make the whole row look like a button */
+.schedule-main-row:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.schedule-row-container.expanded {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(1.01);
+}
+/* Sprint Badge in Main Row */
+.sprint-badge {
+    background: #e10600;
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 3px;
+    margin-left: 10px;
+    vertical-align: middle;
+    font-weight: 900;
+}
+
+/* Highlight Sprint Sessions in Expansion */
+.session-item.sprint-highlight strong {
+    color: #ff8c00; /* Orange/Gold for Sprint sessions */
+}
+
+.session-item.sprint-highlight span {
+    color: #ff8c00;
+    font-weight: bold;
+}
+
+/* Color for the Winner's name in the Status column */
+.winner-label {
+    color: #ffd700;
+    font-weight: 900;
+    text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+}
+
+.upcoming-label {
+    color: #888;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+/* Sprint winner styling inside the expanded view */
+.session-item small {
+    display: block;
+    font-size: 0.65rem;
+    color: #00ff88;
+    margin-top: 4px;
+    font-weight: 800;
+}
+/* Styling for when a Winner name replaces the Time */
+.result-text {
+    color: #00ff88 !important; /* Neon green for finished sessions */
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(0, 255, 136, 0.2);
+}
+
+/* Red for Qualifying Winner (Pole) */
+.session-item.highlight .result-text {
+    color: #e10600 !important;
+}
+
+/* Make sure the details grid stays aligned */
+.details-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    text-align: center;
+    padding: 10px 0;
+}
+/* Loading State Styles */
+.loading-container {
+    text-align: center;
+    padding: 50px;
+    color: #e10600;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.f1-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(225, 6, 0, 0.1);
+    border-left-color: #e10600;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Result Styling */
+.result-text {
+    color: #00ff88 !important;
+    text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+}
+
+.session-item.highlight .result-text {
+    color: #ff3e3e !important; /* Red for Pole Sitter */
+} 
+
+/* Link Styling */
+.session-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: transform 0.2s ease;
+}
+
+.session-link:hover {
+    transform: translateY(-2px);
+}
+
+.view-icon {
+    font-size: 0.55rem;
+    color: #888;
+    margin-top: 4px;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+.session-link:hover .view-icon {
+    color: #e10600;
+}
+
+/* Result specific colors */
+.result-text {
+    color: #00ff88;
+}
+
+.session-item.highlight .result-text {
+    color: #ff1e1e; /* Red for Pole position */
+}
+/* 1. Base Row Container Styling */
+.schedule-row-container {
+    background: rgba(255, 255, 255, 0.03);
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border-left: 4px solid transparent; /* Hidden by default */
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: pointer;
+    overflow: hidden;
+}
+
+/* 2. The Hover Effect */
+.schedule-row-container:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: translateX(5px) scale(1.005); /* Slight "push" to the right */
+    border-left: 4px solid #e10600; /* F1 Red highlight */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 
+                inset 50px 0 30px -30px rgba(225, 6, 0, 0.1); /* Subtle internal red glow */
+}
+
+/* 3. Special Case: Already Completed (Green) Rows Hover */
+.schedule-row-container.completed:hover {
+    border-left: 4px solid #00ff88; /* Keep the green theme for past races */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3), 
+                inset 50px 0 30px -30px rgba(0, 255, 136, 0.1);
+}
+
+/* 4. Smooth Icon Rotation for the Arrow */
+.schedule-main-row span:last-child {
+    transition: transform 0.3s ease;
+}
+
+.schedule-row-container:hover .upcoming-label {
+    color: #fff;
+    transform: translateX(3px);
+}
+/* 3. Cleanup: Remove any old telemetry status styling */
+.sync-indicator, #sync-status {
+    display: none !important;
+}/* Update this part of your CSS */
+#Standings {
+    display: none; /* Keep hidden by default */
+}
+
+/* This targets the section when it is the target of a link or has the active class */
+#Standings:target, 
+#Standings.active, 
+.tab-content.active #Standings {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+/* Force all tab contents to be hidden by default */
+.tab-content {
+    display: none !important;
+    width: 100%;
+    animation: fadeIn 0.4s ease;
+}
+
+/* This is the only way a tab should show */
+.tab-content[style*="display: block"], 
+.tab-content.active {
+    display: block !important;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.telemetry-card {
+    background: rgba(20, 20, 25, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.tel-header {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.tel-body {
+    display: flex;
+    justify-content: space-between;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+}
+
+.small-label { font-size: 0.6rem; color: #888; font-weight: bold; }
+.big-value { font-size: 1.4rem; font-weight: 900; color: #fff; }
+
+.track-highlight .big-value { color: #e10600; }
+
+/* Pulse Animation */
+.pulse-dot {
+    height: 8px;
+    width: 8px;
+    background-color: #e10600;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 6, 0, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(225, 6, 0, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 6, 0, 0); }
+}
+
+/* Timer Button Styling */
+.live-btn {
+    background: #e10600;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    display: inline-block;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+.live-btn:hover { background: #ff1e1e; }
+
+/* Container for the Live Tower */
+.tower-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 15px;
+}
+
+.live-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--f1-red);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* The Data Table */
+.timing-tower {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 5px; /* Creates the "row gap" look */
+}
+
+.timing-tower th {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 10px;
+}
+
+.tower-row {
+    background-color: var(--card-bg);
+    transition: transform 0.2s ease;
+}
+
+.tower-row:hover {
+    transform: scale(1.01);
+    background-color: #1f1f27;
+}
+
+.tower-row td {
+    padding: 15px 10px;
+    text-align: center;
+    font-weight: 600;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Sector Color Logic */
+.purple { color: var(--purple); text-shadow: 0 0 10px rgba(183, 0, 255, 0.3); }
+.green { color: var(--green); }
+.yellow { color: var(--yellow); }
+
+/* Timer Wrapper */
+.timer-display {
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 15px;
+    border-left: 5px solid var(--f1-red);
+    display: inline-block;
+}
+
+.session-next {
+    color: var(--f1-red);
+    font-weight: 800;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+}
+
+.digits {
+    font-size: 3rem;
+    font-weight: 900;
+    font-family: monospace; /* Keeps numbers from jumping */
+    margin-top: 10px;
+}
+
+/* The Live CTA Button */
+.live-cta {
+    background: linear-gradient(135deg, #e10600 0%, #a50400 100%);
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(225, 6, 0, 0.3);
+}
+
+.live-btn {
+    display: inline-block;
+    background: white;
+    color: var(--f1-red);
+    padding: 15px 40px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-top: 20px;
+    animation: pulse-white 2s infinite;
+}
+
+@keyframes pulse-white {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+    70% { box-shadow: 0 0 0 20px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+/* Cars grid layout */
+.cars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 25px;
+  padding: 20px;
+}
+/* Car card with hover effect */
+.car-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+.car-card:hover {
+  transform: scale(1.08);
+  z-index: 10;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+/* Car badge for branding */
+.car-badge {
+  position: absolute;
+  top: 0; left: 0; z-index: 5;
+  font-size: 0.6rem;
+  padding: 10px;
+  letter-spacing: 2px;
+  color: #888;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+  width: 100%;
+}
+/* Car slider for images */
+.car-slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none; /* Hide scrollbar */
+  height: 200px;
+}
+.car-slider::-webkit-scrollbar {
+  display: none;
+}
+.car-slider img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  scroll-snap-align: start;
+}
+/* Car info section with hover effect */
+.car-info {
+  padding: 15px;
+  background: #1a1a1a;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.car-info:hover {
+  background: #252525;
+}
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.car-info h3 {
+  margin: 0;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: white;
+}
+.expand-icon {
+  color: #e10600;
+  font-size: 1.2rem;
+}
+.car-info p {
+  font-size: 0.7rem;
+  color: #888;
+  margin-top: 5px;
+}
+.action-hint {
+  font-size: 0.55rem;
+  color: #555;
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+/* View button style for car detail */
+.view-btn {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px;
+  background: #e10600;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  font-size: 0.7rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* Gallery overlay styles for full-screen images */
+.gallery-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: #000;
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+}
+.gallery-slider {
+  display: flex;
+  width: 100%;
+  height: 80vh;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.gallery-slider::-webkit-scrollbar {
+  display: none;
+}
+.gallery-slider img {
+  flex: 0 0 100vw;
+  width: 100vw;
+  height: 80vh;
+  object-fit: contain; /* Shows the whole car without cropping */
+  scroll-snap-align: center;
+}
+.close-gallery {
+  position: absolute;
+  top: 20px; right: 30px;
+  font-size: 50px; color: white;
+  cursor: pointer; z-index: 10001;
+}
+.gallery-instruction {
+  position: absolute;
+  bottom: 30px; color: #555;
+  font-size: 0.8rem; letter-spacing: 2px;
+}
+/* Highlight for the winning driver's row */
+.winner-row {
+  background-color: rgba(0, 255, 57, 0.15); /* F1 Neon Green with 15% opacity */
+  border-left: 4px solid #00ff39; /* The "Speed Strip" on the left */
+}
+/* Optional: Badge for winners */
+.winner-tag {
+  background-color: #00ff39;
+  color: #000;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+/* Layout for home page grid */
+
+/* Rules container for guidelines and info */
+.rules-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+.rule-box {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 3px solid #444;
+}
+.rule-box h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #fff;
+}
+.rule-box p {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: 5px;
+  line-height: 1.4;
+}
+.rule-box.override {
+  border-left-color: #e10600; /* Red highlight for override rules */
+  background: rgba(225, 6, 0, 0.05);
+}
+.rule-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/* Layout fix for columns side-by-side */
+.home-layout {
+  display: flex;
+  gap: 25px;
+  align-items: flex-start;
+  margin-top: 20px;
+  padding-bottom: 50px; /* Space above footer */
+}
+.main-col {
+  flex: 3;
+}
+.side-col {
+  flex: 1;
+  min-width: 320px;
+}
+/* Tech card container styling */
+.tech-card-container {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+.tech-header {
+  color: #e10600;
+  font-size: 0.9rem;
+  font-weight: 900;
+  border-bottom: 2px solid #e10600;
+  margin-bottom: 20px;
+  padding-bottom: 5px;
+  letter-spacing: 1px;
+}
+/* Override style for last rule box */
+.rule-box.override {
+  border-left-color: #e10600;
+  background: rgba(225, 6, 0, 0.08);
+}
+.rule-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+.rule-header h4 {
+  font-size: 0.8rem;
+  color: #fff;
+  margin: 0;
+}
+/* Text style for rule box */
+.rule-box p {
+  font-size: 0.75rem;
+  color: #bbb;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* 1. The 2-Column Layout */
+.home-layout {
+    display: flex;
+    gap: 20px;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 20px;
+    align-items: flex-start;
+}
+
+.main-col { flex: 3; }
+.side-col { flex: 1; min-width: 300px; }
+
+/* 2. The News Grid (Fixes the giant image) */
+
+.schedule-row:hover {
+    background: rgba(255, 255, 255, 0.07) !important;
+    transform: translateX(5px);
+    cursor: default;
+}
+
+/* If it's a winner row, make the hover glow green */
+.schedule-row[style*="border-left: 5px solid #00ff00"]:hover {
+    background: rgba(0, 255, 0, 0.1) !important;
+}
+/* Modern Glass Row */
+.glass-row {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+    margin-bottom: 8px;
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: 80px 1.5fr 1fr 100px;
+    align-items: center;
+    padding: 15px 25px;
+}
+
+.results-wrapper {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.result-row {
+    display: grid;
+    /* Adjusted for: POS | DRIVER | TEAM | TIME/GAP | PTS */
+    grid-template-columns: 50px 1.5fr 1fr 120px 80px; 
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 6px;
+    padding: 15px 25px;
+    transition: all 0.3s ease;
+}
+
+.result-row:hover {
+    background: rgba(255, 255, 255, 0.07);
+    transform: scale(1.01);
+    border-left: 4px solid #e10600;
+}
+
+.time-cell {
+    font-family: 'Courier New', Courier, monospace;
+    font-weight: bold;
+    color: #00ff00; /* Neon green for timing */
+    text-align: right;
+    font-size: 0.95rem;
+}
+
+.winner-highlight {
+    background: linear-gradient(90deg, rgba(0, 255, 0, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%);
+    border-left: 8px solid #00ff00 !important;
+    padding: 40px 25px;
+    margin-bottom: 25px;
+}
+
+.pos-number {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #444;
+}
+
+.winner-highlight .pos-number {
+    color: #00ff00;
+    font-size: 2.5rem;
+}
+
+
+
+.pulse-dot {
+    width: 10px;
+    height: 10px;
+    background: #ff0000;
+    border-radius: 50%;
+    box-shadow: 0 0 0 rgba(255, 0, 0, 0.4);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+/* Fastest Lap Styling */
+.fastest-lap-row {
+    position: relative;
+    border-left: 4px solid #b700ff !important; /* The Purple Line */
+    background: rgba(183, 0, 255, 0.05) !important; /* Subtle purple tint */
+}
+
+/* Optional: Add a small purple "FL" badge inside the row */
+.fl-badge {
+    background: #b700ff;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+
+    .blink-text {
+    animation: f1-blink 1s steps(5, start) infinite;
+}
+
+@keyframes f1-blink {
+    to { visibility: hidden; }
+}
+
+}
+/* 1. Main Widget Container - Bound to Parent Tab */
+
+
+/* 5. LIVE STATUS & REFRESH */
+#weather-widget {
+    min-height: 200px;
+    background: radial-gradient(circle at top left, #121214, #050505);
+    padding: 50px 40px 30px 40px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+}
+
+/* Distribution Grid */
+.weather-data-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr 1fr; /* Distributes weight across the tab */
+    align-items: center;
+    gap: 20px;
+    z-index: 2;
+}
+
+/* Side Zones (Left & Right) */
+.side-zone {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.align-right { text-align: right; align-items: flex-end; }
+
+/* Elegant Data Cards */
+.tel-card {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 12px 20px;
+    border-radius: 8px;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+    transition: 0.3s ease;
+}
+.align-right .tel-card { border-left: none; border-right: 2px solid rgba(255, 255, 255, 0.1); }
+.tel-card:hover { background: rgba(255, 255, 255, 0.05); border-color: #e10600; }
+
+/* Center HUD Focus */
+.center-zone {
+    display: flex;
+    justify-content: center;
+}
+
+.hud-bracket {
+    text-align: center;
+    padding: 20px 40px;
+    border: 1px solid rgba(225, 6, 0, 0.3);
+    background: rgba(225, 6, 0, 0.02);
+    position: relative;
+    clip-path: polygon(0 15%, 15% 0, 85% 0, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0 85%);
+}
+
+.temp-main {
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: #fff;
+    font-style: italic;
+    letter-spacing: -2px;
+}
+
+.center-label { color: #e10600 !important; letter-spacing: 2px; }
+
+/* Scanning Animation Effect */
+#weather-widget {
+    min-height: 180px;
+    background: #050505;
+    padding: 40px 30px 20px 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Three-Zone Distribution */
+.weather-data-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    z-index: 2;
+}
+
+.tel-wing {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 120px;
+}
+.wing-right { text-align: right; }
+
+/* Center HUD Box */
+.weather-center-hud {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 15px 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+    position: relative;
+}
+
+.temp-display {
+    font-size: 3rem;
+    font-weight: 900;
+    color: #fff;
+    font-style: italic;
+    display: block;
+}
+
+.hud-line {
+    height: 2px;
+    background: #e10600;
+    width: 40px;
+    margin: 5px auto 10px auto;
+}
+
+/* Circular Refresh Button with Arrow Spin */
+.refresh-circle-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    color: #888;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.refresh-circle-btn:hover {
+    background: #e10600;
+    color: #fff;
+    transform: rotate(180deg) scale(1.1); /* Circular arrow spin effect */
+    box-shadow: 0 0 15px rgba(225, 6, 0, 0.5);
+}
+
+/* Blinking Live Indicator */
+.live-status-bar {
+    position: absolute;
+    top: 15px;
+    left: 25px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 3;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    animation: f1-blink 1s infinite;
+}
+
+@keyframes f1-blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(0.8); }
+}
+
+.live-text {
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: #888;
+    letter-spacing: 1px;
+}
+
+/* Fixed Watermark Ignite */
+.track-watermark {
+    position: absolute;
+    bottom: -15px;
+    right: -5px;
+    font-size: 5.5rem;
+    font-weight: 900;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.015);
+    letter-spacing: -4px;
+    pointer-events: none;
+    z-index: 1;
+    transition: color 0.5s ease;
+}
+
+#weather-widget:hover .track-watermark {
+    color: rgba(225, 6, 0, 0.4) !important;
+    text-shadow: 0 0 20px rgba(225, 6, 0, 0.3);
+    transform: scale(1) !important; /* Strictly no zoom */
+}
+
+.weather-label { color: #666; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; }
+.weather-value { color: #fff; font-weight: 900; font-size: 1.1rem; }
+.fa-spin { animation: fa-spin 1s infinite linear; }
+
+@keyframes scan {
+    0% { top: 10%; opacity: 0; }
+    50% { opacity: 1; }
+    100% { top: 90%; opacity: 0; }
+}
+
+/* Footer Distribution */
+.tel-footer {
+    margin-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 15px;
+    display: flex;
+    justify-content: center;
+}
+
+/* Watermark: Deep Glow */
+.track-watermark {
+    position: absolute;
+    bottom: -15px;
+    right: 20px;
+    font-size: 6rem;
+    font-weight: 900;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.01);
+    pointer-events: none;
+    transition: 0.5s;
+}
+
+#weather-widget:hover .track-watermark {
+    color: rgba(225, 6, 0, 0.3) !important;
+}
+
+/* Grid Setup */
+.flip-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px; /* Reduced gap to bring them closer */
+    perspective: 1000px;
+    max-width: 1200px; /* Keeps cards from spreading too far on big screens */
+    margin: 0 auto;    /* Centers the whole grid on the page */
+    width: 95%;        /* Gives a little breathing room at the edges */
+}
+
+/* 2. Updated Scene: No more fixed 580px */
+.card-scene {
+    height: 250px;
+    cursor: pointer;
+    width: 100%; /* Card will now perfectly fill its 50% grid slot */
+    max-width: 550px; /* Keeps cards from getting TOO huge */
+}
+
+.card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+/* This class is toggled by JS */
+.card-inner.is-flipped {
+    transform: rotateY(180deg);
+}
+
+.card-front, .card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 0 0 15px 0;
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+/* Front Design (Original Side-by-Side) */
+.card-front {
+    background: #15151e;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid var(--team-color);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Back Design (History) */
+.card-back {
+    background: #1a1a24;
+    border: 1px solid var(--team-color);
+    transform: rotateY(180deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #ccc;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* Hover Effects */
+.card-scene:hover .card-front {
+    transform: translateY(-5px) scale(1.02);
+    /* Boosted glow: using 2 layers for thickness */
+    box-shadow: 0 10px 30px var(--glow-color), 0 0 15px var(--team-color);
+    border-color: var(--team-color);
+}
+
+/* Side-by-Side Helpers */
+.flex-between { display: flex; justify-content: space-between; align-items: flex-start; }
+.text-right { text-align: right; }
+.stat-val { font-size: 1.4rem; font-weight: 900; color: #fff; display: block; }
+.stat-lab { font-size: 0.6rem; color: #666; text-transform: uppercase; }
+
+.driver-pill {
+    background: #222;
+    padding: 4px 12px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+    border-right: 4px solid; /* Color is set in JS */
+    color: #fff;
+    display: inline-block;
+}
+
+.principal-link {
+    color: #ff0000;
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.principal-link:hover {
+    color: #fff;
+}
+/* Remove all default link underlines */
+.clickable-name, .principal-link, .driver-pill {
+    text-decoration: none !important;
+    transition: all 0.2s ease;
+}
+
+/* Hover effects without underlines */
+.clickable-name:hover {
+    color: var(--team-color);
+}
+.team-title-link {
+    font-size: 2.6rem; /* Large and bold like V1 */
+    font-weight: 900;
+    color: #ffffff;
+    text-decoration: none !important;
+    letter-spacing: -2px;
+    line-height: 1;
+    display: block;
+    margin-bottom: 5px;
+    transition: color 0.3s ease;
+}
+
+.team-title-link:hover {
+    color: var(--team-color);
+}
+.driver-pill {
+    text-decoration: none !important;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 6px 15px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+    border-right: 4px solid var(--team-color);
+    color: #fff;
+    display: inline-block;
+    transition: all 0.2s ease;
+}
+
+.driver-pill:hover {
+    background: var(--team-color);
+    color: #000;
+}
+
+.principal-link:hover {
+    color: #fff;
+    opacity: 0.8;
+}
+
+
+
+/* 1. THE GRID */
+#drivers-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    padding: 50px;
+    background: #050505;
+}
+
+/* 2. THE HERO CARD */
+.driver-card-new {
+    position: relative;
+    background: #0a0a0c;
+    height: 620px; 
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.5s cubic-bezier(0.2, 1, 0.2, 1);
+}
+
+.driver-card-new:hover {
+    transform: translateY(-10px);
+    border-color: var(--team-color);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 30px rgba(var(--team-color-rgb), 0.1);
+}
+
+/* 3. FULL BACKGROUND IMAGE */
+.driver-image-area {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 1;
+}
+
+.driver-portrait {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    object-position: center 10%;
+    filter: brightness(0.8);
+    transition: 0.6s ease;
+}
+
+.driver-card-new:hover .driver-portrait {
+    filter: brightness(00.75rem);
+    transform: scale(1.05);
+}
+
+/* 4. THE FLOATING GLOW NUMBER */
+.driver-number-overlay {
+    position: absolute;
+    top: 10%;
+    right: 5%;
+    font-size: 10rem;
+    font-weight: 900;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--team-color);
+    filter: drop-shadow(0 0 20px var(--team-color));
+    opacity: 0.3;
+    z-index: 2;
+    font-style: italic;
+    transition: 0.4s ease;
+}
+
+.driver-card-new:hover .driver-number-overlay {
+    opacity: 0.7;
+    transform: scale(1.1) rotate(-5deg);
+}
+
+/* 5. DUAL-ANCHOR INFO AREA (Left Name / Right Flag) */
+.driver-info-area {
+    position: absolute;
+    bottom: 0; 
+    left: 0;
+    width: 100%;
+    /* Added 30px padding on left/right to keep the flag away from the edge */
+    padding: 25px 30px; 
+    background: linear-gradient(to top, #0a0a0c 70%, transparent 100%);
+    z-index: 3;
+    /* Ensure padding is included in the width calculation */
+    box-sizing: border-box; 
+}
+
+.driver-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
+    margin-bottom: 20px;
+    /* This ensures nothing pushes past the padding we set above */
+    box-sizing: border-box; 
+}
+
+/* TEAM TAG: Speed-Cut Design */
+.driver-team-tag {
+    font-size: 0.75rem;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    background: var(--team-color);
+    display: inline-block;
+    padding: 4px 12px;
+    margin-bottom: 10px;
+    clip-path: polygon(0 0, 92% 0, 100% 100%, 0% 100%);
+    font-weight: 800;
+}
+
+.driver-name-stack {
+    flex: 1;               /* Takes up all available space */
+    min-width: 0;          /* Prevents overflow in flex containers */
+}
+.driver-name-stack h3 {
+    margin: 0;
+    font-size: 2.2rem;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1;
+}
+
+.driver-name-stack b {
+    display: block;
+    color: var(--team-color);
+    font-weight: 900;
+}
+
+.driver-flag-side {
+    flex-shrink: 0; /* Prevents the name from squishing the flag */
+    margin-left: 15px; /* Adds a gap between the name and flag */
+    display: flex;
+    align-items: center;
+}
+
+.mini-flag {
+    width: 40px; /* Slightly smaller to ensure fit */
+    height: auto;
+    display: block;
+    border-radius: 2px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    /* Prevent any CSS from clipping the image */
+    object-fit: contain; 
+}
+
+/* 6. STATS BAR: Full-Width Glassmorphism */
+.driver-stats-container {
+    display: flex;
+    justify-content: space-around;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 4px solid var(--team-color);
+    padding: 18px 0;
+    border-radius: 6px;
+}
+
+.stat-n {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: #fff;
+    display: block;
+}
+
+.stat-l {
+    font-size: 0.6rem;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* --- FOOTER: PREVIOUS LARGE ICON DESIGN --- */
+.f1-footer {
+    background: #050505;
+    padding: 80px 20px 40px;
+    border-top: 2px solid rgba(255, 255, 255, 0.05);
+    text-align: center;
+    margin-top: 100px;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* THE CONTAINER FOR ICONS */
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 40px; /* Big spacing between big icons */
+    margin-bottom: 40px;
+}
+
+/* THE ANCHOR TAGS */
+.social-links a {
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* THE ACTUAL ICONS (FontAwesome) */
+.social-links a i {
+    font-size: 2.8rem; /* Large size as requested */
+    color: #444;       /* Starting dim color */
+    transition: all 0.3s ease;
+}
+
+/* --- THE HOVER EFFECTS --- */
+.social-links a:hover {
+    transform: translateY(-15px); /* Big float-up effect */
+}
+
+/* Different Glow Colors for each platform on hover */
+.social-links a[title="Gmail"]:hover i { 
+    color: #ea4335; 
+    filter: drop-shadow(0 0 15px rgba(234, 67, 53, 0.6)); 
+}
+
+.social-links a[title="LinkedIn"]:hover i { 
+    color: #0077b5; 
+    filter: drop-shadow(0 0 15px rgba(0, 119, 181, 0.6)); 
+}
+
+.social-links a[title="GitHub"]:hover i { 
+    color: #fff; 
+    filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.5)); 
+}
+
+.social-links a[title="Instagram"]:hover i { 
+    color: #e4405f; 
+    filter: drop-shadow(0 0 15px rgba(228, 64, 95, 0.6)); 
+}
+
+.social-links a[title="Facebook"]:hover i { 
+    color: #1877f2; 
+    filter: drop-shadow(0 0 15px rgba(24, 119, 242, 0.6)); 
+}
+
+/* THE SEPARATOR LINE */
+.footer-line {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #333, transparent);
+    margin: 30px 0;
+}
+
+/* COPYRIGHT TEXT */
+.copyright-text {
+    font-size: 0.8rem;
+    color: #555;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* STANDINGS MASTER CONTAINER */
+.standings-wrapper {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Titillium Web', sans-serif;
+}
+
+/* CHAMPIONSHIP CARD DESIGN */
+.standings-table {
+    background: rgba(10, 10, 10, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 60px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+
+.standings-header {
+    display: grid;
+    grid-template-columns: 80px 1fr 100px 100px;
+    background: #151515;
+    padding: 15px 25px;
+    color: #666;
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* THE INDIVIDUAL ROW */
+.standings-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 100px 100px;
+    align-items: center;
+    padding: 15px 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.standings-row:hover {
+    background: rgba(255, 255, 255, 0.03);
+    transform: translateX(10px);
+}
+
+/* RANK & POINTS GLOW */
+.rank-num {
+    font-size: 1.5rem;
+    font-weight: 900;
+    font-style: italic;
+    color: #444;
+}
+
+.standings-row:nth-child(-n+4) .rank-num { color: #fff; } /* Top 3 glow */
+
+.driver-info-main {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.team-color-strip {
+    width: 4px;
+    height: 30px;
+    border-radius: 2px;
+}
+
+.points-display {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #e10600;
+    text-shadow: 0 0 15px rgba(225, 6, 0, 0.4);
+}
+
+.constructor-logo-small {
+    height: 25px;
+    filter: brightness(0) invert(1);
+    opacity: 0.8;
+}
+.classy-header {
+    position: relative;
+    padding: 60px 0 30px 0;
+    margin-bottom: 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    overflow: hidden;
+}
+
+.classy-header .watermark {
+    position: absolute;
+    top: 0;
+    left: -10px;
+    font-size: 7rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.02);
+    font-style: italic;
+    letter-spacing: -5px;
+    user-select: none;
+    z-index: 0;
+}
+
+.classy-header h2 {
+    position: relative;
+    z-index: 1;
+    font-size: 3rem;
+    font-weight: 900;
+    margin: 0;
+    color: #fff;
+    font-style: italic;
+    letter-spacing: -1px;
+    line-height: 1;
+}
+
+.classy-header h2 span {
+    color: #e10600; /* F1 Red */
+    text-shadow: 0 0 20px rgba(225, 6, 0, 0.3);
+}
+
+.classy-header .header-line {
+    width: 60px;
+    height: 4px;
+    background: #e10600;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.classy-header p {
+    position: relative;
+    z-index: 1;
+    color: #666;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-top: 10px;
+    text-transform: uppercase;
+}
+
+.classy-header p i {
+    color: #e10600;
+    margin-right: 8px;
+}
+
+.home-layout {
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+    margin-top: 30px;
+}
+
+.main-col {
+    flex: 3; /* News takes up more space */
+}
+
+.side-col {
+    flex: 1.2; /* Sidebox is narrower */
+    position: sticky;
+    top: 20px; /* Stays on screen when you scroll */
+}
+
+/* Ensure images don't break the layout */
+/* --- HOME COMMAND LAYOUT --- */
+.home-layout {
+    display: flex;
+    gap: 30px;
+    margin-top: 30px;
+    align-items: stretch; /* Aligns top of news and rules */
+}
+
+.main-col {
+    flex: 3;
+    min-width: 0;
+}
+
+/* --- DESIGNED LATEST NEWS TEXT + RED BAR --- */
+.section-title {
+    font-family: 'Formula1-Bold', sans-serif;
+    font-size: 1.8rem;
+    color: #ffffff;
+    text-transform: uppercase;
+    margin: 0 0 25px 0;
+    padding-left: 20px;
+    border-left: 6px solid #e10600; /* The Red Bar beside text */
+    display: flex;
+    align-items: center;
+    line-height: 1;
+}
+
+/* --- GLOWING NEWS CARDS --- */
+.news-card {
+    background: #111;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    border: 1px solid #222;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.news-card:hover {
+    border-color: #e10600;
+    box-shadow: 0 0 20px rgba(225, 6, 0, 0.2); /* Red Glow */
+    transform: translateY(-5px);
+}
+
+.news-img-container {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    position: relative;
+}
+
+.news-pic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* --- NEWS SOURCE TAG --- */
+.news-source-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: #e10600;
+    background: rgba(225, 6, 0, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 800;
+    margin-top: 10px;
+    display: inline-block;
+}
+/* --- 1. THE LAYOUT & SYMMETRICAL OFFSET --- */
+.home-layout {
+    display: flex;
+    gap: 40px;
+    margin-top: 50px;
+    align-items: flex-start;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 20px;
+}
+
+.main-col { flex: 3; min-width: 0; }
+
+/* The downward offset for the Rules column to start lower */
+.side-col { 
+    flex: 1.2; 
+    min-width: 320px; 
+    padding-top: 65px; 
+}
+
+/* --- 2. THE REALISTIC HUD HEADERS (UNIFIED) --- */
+.section-title, .tech-header {
+    position: relative;
+    font-family: 'Formula1-Bold', sans-serif;
+    font-size: 1.25rem;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 4px;
+    margin: 0 0 45px 0;
+    padding-bottom: 15px;
+    line-height: 1;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Horizon Line */
+}
+
+/* The Glowing Precision Axis */
+.section-title::after, .tech-header::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 70px;
+    height: 3px;
+    background: #e10600;
+    box-shadow: 0 0 15px rgba(225, 6, 0, 0.8);
+    z-index: 2;
+}
+
+/* Technical Telemetry Metadata */
+.section-title::before { content: "STRAT.FEED // NWS.026"; position: absolute; right: 0; bottom: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: #444; letter-spacing: 1px; }
+.tech-header::before { content: "TECH.DIR // REGS.V2"; position: absolute; right: 0; bottom: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: #444; letter-spacing: 1px; }
+
+/* --- 3. THE UNIFIED 2-COLUMN NEWS GRID --- */
+.news-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Exact 2-column lock */
+    gap: 20px;
+}
+
+/* --- 4. UNIFIED CARD DESIGN (NEWS & RULES) --- */
+.news-card, .rule-box {
+    background: #080808;
+    border: 1px solid #1a1a1a;
+    border-radius: 2px; /* Precision sharp corners */
+    padding: 0; /* Let content handle internal spacing */
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Unified Neon Bloom on Hover */
+.news-card:hover, .rule-box:hover {
+    border-color: #e10600;
+    transform: translateY(-5px);
+    box-shadow: 0 0 10px #e10600, 
+                0 0 25px rgba(225, 6, 0, 0.4), 
+                0 0 50px rgba(225, 6, 0, 0.1);
+}
+
+/* --- 5. INTERNAL CARD SPACING (MATCHED) --- */
+.news-content, .rule-box {
+    padding: 18px;
+}
+
+/* Syncing News Headers to Rule Headers */
+.news-content h4, .rule-header h4 {
+    font-family: 'Formula1-Bold', sans-serif;
+    font-size: 0.85rem;
+    color: #ffffff;
+    line-height: 1.4;
+    margin: 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-decoration: none !important;
+}
+
+.news-card-link { text-decoration: none !important; color: inherit; }
+
+/* Styling for News Images inside the Card */
+.news-img-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-bottom: 1px solid #1a1a1a;
+    overflow: hidden;
+}
+
+.news-pic {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+    transition: 0.3s;
+}
+
+.news-card:hover .news-pic {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+/* Rule Text Refinement */
+.rule-box p {
+    font-size: 0.7rem;
+    color: #888;
+    line-height: 1.5;
+    margin-top: 5px;
+}
+
+/* Source Tag Meta */
+.news-source-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    color: #e10600;
+    background: rgba(225, 6, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 2px;
+    font-weight: 800;
+    margin-top: 10px;
+    display: inline-block;
+}
+/* --- SAME-TO-SAME HEADER DESIGN --- */
+/* --- THE ELITE RED BAR DESIGN --- */
+.section-title {
+    font-family: 'Formula1-Bold', sans-serif;
+    font-size: 1.1rem;
+    color: #fff;
+    text-transform: uppercase;
+    margin: 0 0 25px 0;
+    padding-left: 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    line-height: 1;
+}
+
+/* The Main Glowing Red Bar */
+.section-title::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px; /* Slightly thinner for elegance */
+    height: 100%;
+    background: #e10600;
+    box-shadow: 0 0 12px rgba(225, 6, 0, 0.8); /* High-Intensity Glow */
+    border-radius: 1px;
+    z-index: 2;
+}
+
+/* The "Classy" Technical Extension (Secondary Line) */
+.section-title::after {
+    content: "";
+    position: absolute;
+    left: 8px; /* Offset from the main bar */
+    top: 20%;
+    width: 2px;
+    height: 60%; /* Shorter than the main bar */
+    background: rgba(225, 6, 0, 0.3); /* Subtle, faded red */
+    border-radius: 1px;
+}
+
+
+
+
+.f1-footer {
+    background: #050505;
+    padding: 80px 6% 40px 6%;
+    border-top: 1px solid #1a1a1a;
+}
+
+/* --- PARTNERS SECTION --- */
+.partners-section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 60px;
+}
+
+/* HIGH-END DESIGNING FONT */
+.f1-large-title {
+    font-family: 'Formula1-Bold', 'Orbitron', sans-serif; 
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0;
+    letter-spacing: 8px; /* Extra wide cinematic spacing */
+    text-transform: uppercase;
+    line-height: 1;
+    font-stretch: expanded;
+    border-left: 6px solid #e10600; /* Sharp F1 Red Accent */
+    padding-left: 25px;
+}
+
+/* THE GRID: Indented and Spaced Downward */
+.brands-column {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 50px 80px;    /* Gap between individual logos */
+    margin-left: 120px; /* Gap from the left side */
+    margin-top: 80px;   /* SPACE BETWEEN TEXT AND LOGOS */
+}
+
+.logo-item {
+    width: 130px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-item img {
+    max-width: 100%;
+    max-height: 38px;
+    object-fit: contain;
+    /* SILHOUETTE: Pure white before hover */
+    filter: brightness(0) invert(1);
+    opacity: 0.7; /* Slightly dimmed baseline */
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* --- DIMMED BLOOM HOVER --- */
+.logo-item:hover img {
+    opacity: 1;
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.2)); /* Very soft white glow */
+}
+
+/* --- CENTERED SOCIAL LINKS --- */
+.social-links-container {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.social-links {
+    display: flex;
+    gap: 45px;
+}
+
+.social-links a {
+    color: #666;
+    font-size: 1.8rem;
+    transition: 0.3s ease;
+}
+
+.social-links a:hover {
+    color: #ffffff;
+    transform: translateY(-5px);
+}
+
+/* --- FOOTER ELEMENTS --- */
+.footer-line {
+    border: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+    margin: 40px 0;
+}
+
+.copyright-text {
+    color: #444;
+    font-size: 0.75rem;
+    text-align: center;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+/* Hides empty white boxes if images are missing */
+/* GOOD: This only affects the partner logos */
+.logo-item img:not([src]), 
+.logo-item img[src=""] {
+    display: none !important;
+}
+
+/* Apply this to your main hero/telemetry container */
+.telemetry-live-section {
+    overflow: hidden; /* This is the primary fix to hide the slider */
+    position: relative;
+    width: 100%;
+    /* Ensure height is set correctly to avoid pushing content out */
+    height: auto; 
+    min-height: 500px; 
+}
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+html {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
