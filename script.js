@@ -493,16 +493,20 @@ function initCarsTab() {
 function openGallery(teamId, photoCount = 5) {
     const overlay = document.getElementById('gallery-overlay');
     const content = document.getElementById('gallery-content');
-    if(!overlay || !content) return;
+    if (!overlay || !content) return;
 
     let galleryHtml = '';
-    
+
     for (let i = 1; i <= photoCount; i++) {
-        // Look at the image already on the page to see which extension worked (avif, webp, etc)
         const activeImg = document.getElementById(`img-${teamId}-${i}`);
-        const currentExt = activeImg ? activeImg.getAttribute('data-ext') : 'jpg';
-        
-        galleryHtml += `<img src="images/Cars/${teamId}-${i}.${currentExt}" onerror="this.src='https://placehold.co/800x450?text=Image+Missing'">`;
+        const currentExt = activeImg 
+            ? activeImg.getAttribute('data-ext') || 'jpg'
+            : 'jpg';
+
+        galleryHtml += `
+            <img src="images/Cars/${teamId}-${i}.${currentExt}" 
+                 onerror="this.onerror=null; this.src='https://placehold.co/800x450?text=Image+Missing'">
+        `;
     }
 
     content.innerHTML = galleryHtml;
@@ -511,14 +515,16 @@ function openGallery(teamId, photoCount = 5) {
 
 function tryNextExt(img, teamId, photoNum) {
     const formats = ['avif', 'webp', 'png', 'jpg'];
-    let currentExt = img.getAttribute('data-ext');
+
+    let currentExt = img.getAttribute('data-ext') || 'avif';
     let nextIndex = formats.indexOf(currentExt) + 1;
 
     if (nextIndex < formats.length) {
         let nextExt = formats[nextIndex];
-        img.setAttribute('data-ext', nextExt);
+
         img.src = `images/Cars/${teamId}-${photoNum}.${nextExt}`;
-    } else {
+        img.setAttribute('data-ext', nextExt);
+    }  else {
         img.src = 'https://placehold.co/400x225?text=2026+Car+Missing';
         img.onerror = null; 
     }
@@ -964,6 +970,7 @@ async function updateF1Weather() {
  */
 
 window.addEventListener('DOMContentLoaded', updateF1Weather);
+
 
 
 
