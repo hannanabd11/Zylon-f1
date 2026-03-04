@@ -510,20 +510,19 @@ function openGallery(teamId, photoCount = 5) {
 
 function tryNextExt(img, teamId, photoNum) {
     const formats = ['avif', 'webp', 'png', 'jpg'];
-
-    let currentExt = img.getAttribute('data-ext') || 'avif';
+    let currentExt = img.getAttribute('data-ext');
     let nextIndex = formats.indexOf(currentExt) + 1;
 
     if (nextIndex < formats.length) {
         let nextExt = formats[nextIndex];
-
-        img.src = `images/Cars/${teamId}-${photoNum}.${nextExt}`;
         img.setAttribute('data-ext', nextExt);
-    }  else {
+        img.src = `images/Cars/${teamId}-${photoNum}.${nextExt}`;
+    } else {
         img.src = 'https://placehold.co/400x225?text=2026+Car+Missing';
         img.onerror = null; 
     }
 }
+
 
 function closeGallery() {
     document.getElementById('gallery-overlay').style.display = 'none';
@@ -965,6 +964,7 @@ async function updateF1Weather() {
  */
 
 window.addEventListener('DOMContentLoaded', updateF1Weather);
+
 
 
 
