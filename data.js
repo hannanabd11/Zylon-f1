@@ -309,7 +309,7 @@ const f1Cars2026 = [
         id: "alpine", 
         name: "A526", 
         team: "BWT Alpine F1 Team", 
-        drivers: "E. Ocon & O. Bearman",
+        drivers: "P. Gasly & F.Colapinto",
         photos: ["alpine-1.jpg", "alpine-2.jpg", "alpine-3.jpg"]
     },
     { 
@@ -323,7 +323,7 @@ const f1Cars2026 = [
         id: "audi", 
         name: "C44", 
         team: "Audi F1 Team (formerly Sauber)", 
-        drivers: "N. Hülkenberg & G. Zhou",
+        drivers: "N. Hülkenberg & G. Bortoleto",
         photos: ["audi-1.jpg", "audi-2.jpg", "audi-3.jpg"]
     },
     { 
@@ -337,14 +337,14 @@ const f1Cars2026 = [
         id: "haas", 
         name: "VF-26", 
         team: "MoneyGram Haas F1 Team", 
-        drivers: "K. Magnussen & P. Doohan",
+        drivers: "E. Ocon & O. Bearman",
         photos: ["haas-1.jpg", "haas-2.jpg", "haas-3.jpg"]
     },
     { 
         id: "cadillac", 
         name: "CTF1", 
         team: "Cadillac F1 Team", 
-        drivers: "C. Colapinto & T. Pourchaire",
+        drivers: "S. Perez & V. Bottas",
         photos: ["cadillac-1.jpg", "cadillac-2.jpg", "cadillac-3.jpg"]
     }
 ];
@@ -364,7 +364,7 @@ const f1Teams2026 = [
         { name: "C. Leclerc", link: "https://www.formula1.com/en/drivers/charles-leclerc" },
         { name: "L. Hamilton", link: "https://www.formula1.com/en/drivers/lewis-hamilton" }
     ],
-    history: "Formula 1’s most legendary team enters a new era as Lewis Hamilton joins Charles Leclerc, blending unmatched experience with raw speed to chase glory under the 2026 regulations."
+    history: "The only team to compete in every season since 1950, the "Prancing Horse" is the most successful constructor in history with 16 Team Championships and 15 Drivers' Titles. Legends like Michael Schumacher and Niki Lauda defined their legacy, while their engineering is synonymous with the iconic V12 and modern hybrid power units developed in Maranello."
 },
 
 {
@@ -380,7 +380,7 @@ const f1Teams2026 = [
         { name: "L. Norris", link: "https://www.formula1.com/en/drivers/lando-norris" },
         { name: "O. Piastri", link: "https://www.formula1.com/en/drivers/oscar-piastri" }
     ],
-    history: "Fresh off their 2025 Constructors’ title, McLaren leads the grid with exceptional car balance, sharp strategy, and one of the strongest driver pairings in Formula 1."
+    history: "Founded by New Zealander Bruce McLaren in 1963, the team debuted in 1966 and has secured 8 Constructors' titles (plus a return to the top in 2024/25). They are famous for the dominance of Ayrton Senna and Alain Prost in the late 80s and for pioneering carbon-fiber chassis technology in F1."
 },
 
 {
@@ -396,7 +396,7 @@ const f1Teams2026 = [
         { name: "G. Russell", link: "https://www.formula1.com/en/drivers/george-russell" },
         { name: "K. Antonelli", link: "https://www.formula1.com/en/drivers/kimi-antonelli" }
     ],
-    history: "After dominating the hybrid era, Mercedes resets for the future with George Russell as team leader and prodigy Kimi Antonelli symbolizing the next generation."
+    history: "While their roots go back to the 1950s with Juan Manuel Fangio, the modern "Silver Arrows" returned in 2010 after acquiring Brawn GP. They achieved an unprecedented 8 consecutive Constructors' Championships (2014–2021), powered by their Brixworth-developed hybrid engines and the brilliance of Lewis Hamilton."
 },
 
 {
@@ -412,7 +412,7 @@ const f1Teams2026 = [
         { name: "M. Verstappen", link: "https://www.formula1.com/en/drivers/max-verstappen" },
         { name: "I. Hadjar", link: "https://www.formula1.com/en/drivers/isack-hadjar" }
     ],
-    history: "Red Bull enters a bold new chapter with its own power unit as Max Verstappen leads the team through the most ambitious transformation in its history."
+    history: "Debuting in 2005 after buying Jaguar, Red Bull transformed from a "party team" into a powerhouse with 6 Constructors' titles. Driven by design genius Adrian Newey and legends Sebastian Vettel and Max Verstappen, they enter 2026 as a full manufacturer via Red Bull Ford Powertrains."
 },
 
 {
@@ -428,7 +428,7 @@ const f1Teams2026 = [
         { name: "F. Alonso", link: "https://www.formula1.com/en/drivers/fernando-alonso" },
         { name: "L. Stroll", link: "https://www.formula1.com/en/drivers/lance-stroll" }
     ],
-    history: "Aston Martin continues its steady rise with world champion Fernando Alonso providing experience while long-term investment targets future championship contention."
+    history: "Operating under various names since Jordan’s debut in 1991, the team became Aston Martin in 2021. While yet to win a title, they carry the heritage of "the little team that could" (Force India) and are now a top-tier contender with a massive new campus in Silverstone."
 },
 
 {
@@ -444,7 +444,7 @@ const f1Teams2026 = [
         { name: "E. Ocon", link: "https://www.formula1.com/en/drivers/esteban-ocon" },
         { name: "F. Colapinto", link: "https://www.formula1.com/en/drivers/franco-colapinto" }
     ],
-    history: "Alpine blends its championship heritage with a renewed focus on youth as it looks to rebuild into a consistent front-running force."
+    history: "Representing the Renault Group, this team’s history flows from Toleman (1981) to Benetton and Renault. They hold 4 Constructors' titles (two as Benetton, two as Renault) and are known for bringing turbocharging to F1 and winning titles with Michael Schumacher and Fernando Alonso."
 },
 
 {
@@ -476,7 +476,7 @@ const f1Teams2026 = [
         { name: "L. Lawson", link: "https://www.formula1.com/en/drivers/liam-lawson" },
         { name: "A. Lindblad", link: "https://www.formula1.com/en/drivers/arvid-lindblad" }
     ],
-    history: "Known as Formula 1’s ultimate talent factory, Racing Bulls focuses on fearless racing and developing future stars for the top teams."
+    history: "Formerly Minardi, then Toro Rosso, this Faenza-based team has been Red Bull’s talent forge since 2006. They achieved historic upset wins with Sebastian Vettel (2008) and Pierre Gasly (2020), maintaining a proud Italian identity alongside their Austrian ownership."
 },
 
 {
@@ -492,7 +492,7 @@ const f1Teams2026 = [
         { name: "E. Ocon", link: "https://www.formula1.com/en/drivers/esteban-ocon" },
         { name: "O. Bearman", link: "https://www.formula1.com/en/drivers/oliver-bearman" }
     ],
-    history: "Haas continues to grow as America’s established Formula 1 team, combining experience and youth to push deeper into the midfield."
+    history: "Debuting in 2016, Haas is the first American-led team in decades. They utilize a unique business model by outsourcing major components to Ferrari and Dallara, proving that a lean, innovative approach can compete in the world’s most expensive sport."
 },
 
 {
@@ -508,7 +508,7 @@ const f1Teams2026 = [
         { name: "N. Hülkenberg", link: "https://www.formula1.com/en/drivers/nico-hulkenberg" },
         { name: "G. Bortoleto", link: "https://www.formula1.com/en/drivers/gabriel-bortoleto" }
     ],
-    history: "Audi launches its full factory Formula 1 program with German engineering precision and long-term ambition to fight at the front."
+    history: "Taking over the Sauber entry (which debuted in 1993), 2026 marks Audi's official debut as a full works factory team. They inherit Sauber’s reputation for Swiss precision engineering and a history of nurturing legends like Kimi Räikkönen and Sebastian Vettel.Audi launches its full factory Formula 1 program with German engineering precision and long-term ambition to fight at the front."
 },
 
 {
@@ -559,4 +559,5 @@ const zenithRaceSchedule = [
     { round: 22, gp: "Las Vegas Grand Prix", Qualifying: { iso: "2026-11-21T11:00:00+05:00" }, Race: { iso: "2026-11-22T11:00:00+05:00" }, hubUrl: "race-hub-vegas.html" },
     { round: 23, gp: "Qatar Grand Prix", Qualifying: { iso: "2026-11-28T21:00:00+05:00" }, Race: { iso: "2026-11-29T20:00:00+05:00" }, hubUrl: "race-hub-qat.html" },
     { round: 24, gp: "Abu Dhabi Grand Prix", Qualifying: { iso: "2026-12-05T19:00:00+05:00" }, Race: { iso: "2026-12-06T18:00:00+05:00" }, hubUrl: "race-hub-uae.html" }
+
 ];
