@@ -386,8 +386,8 @@ async function initStandings() {
 
     try {
         const [dRes, tRes] = await Promise.all([
-            fetch('https://api.jolpi.ca/ergast/f1/2025/driverStandings.json'),
-            fetch('https://api.jolpi.ca/ergast/f1/2025/constructorStandings.json')
+            fetch('https://api.jolpi.ca/ergast/f1/2026/driverStandings.json'),
+            fetch('https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json')
         ]);
 
         const dData = await dRes.json();
@@ -462,18 +462,16 @@ function initCarsTab() {
     if (!grid) return;
 
     grid.innerHTML = f1Cars2026.map(car => {
-        const photoCount = 5;
+        const photoCount = 5; // Restored to 5 angles
         let imgHtml = '';
-
+        
         for (let i = 1; i <= photoCount; i++) {
             imgHtml += `
-                <picture>
-                    <source srcset="./Cars/${car.id.toLowerCase()}-${i}.avif" type="image/avif">
-                    <source srcset="./Cars/${car.id.toLowerCase()}-${i}.webp" type="image/webp">
-                    <img src="./Cars/${car.id.toLowerCase()}-${i}.jpg"
-                         alt="${car.team} Angle ${i}">
-                </picture>
-            `;
+                <img src="images/Cars/${car.id}-${i}.avif" 
+                     id="img-${car.id}-${i}" 
+                     data-ext="avif" 
+                     onerror="tryNextExt(this, '${car.id}', ${i})" 
+                     alt="Angle ${i}">`;
         }
 
         return `
@@ -490,6 +488,7 @@ function initCarsTab() {
         </div>`;
     }).join('');
 }
+
 
 function openGallery(teamId, photoCount = 5) {
     const overlay = document.getElementById('gallery-overlay');
@@ -542,7 +541,7 @@ async function initSchedule() {
     `;
 
     try {
-        const response = await fetch('https://api.jolpi.ca/ergast/f1/2025.json');
+        const response = await fetch('https://api.jolpi.ca/ergast/f1/2026.json');
         const data = await response.json();
         const races = data.MRData.RaceTable.Races || [];
         const now = new Date();
@@ -557,14 +556,14 @@ async function initSchedule() {
             if (isFinished) {
                 try {
                     const [res, qRes] = await Promise.all([
-                        fetch(`https://api.jolpi.ca/ergast/f1/2025/${race.round}/results.json`).then(r => r.json()),
-                        fetch(`https://api.jolpi.ca/ergast/f1/2025/${race.round}/qualifying.json`).then(r => r.json())
+                        fetch(`https://api.jolpi.ca/ergast/f1/2026/${race.round}/results.json`).then(r => r.json()),
+                        fetch(`https://api.jolpi.ca/ergast/f1/2026/${race.round}/qualifying.json`).then(r => r.json())
                     ]);
                     raceWin = res.MRData.RaceTable.Races[0]?.Results[0]?.Driver.code;
                     poleSitter = qRes.MRData.RaceTable.Races[0]?.QualifyingResults[0]?.Driver.code;
 
                     if (isSprintWeekend) {
-                        const sRes = await fetch(`https://api.jolpi.ca/ergast/f1/2025/${race.round}/sprint.json`).then(r => r.json());
+                        const sRes = await fetch(`https://api.jolpi.ca/ergast/f1/2026/${race.round}/sprint.json`).then(r => r.json());
                         sprintWin = sRes.MRData.RaceTable.Races[0]?.SprintResults[0]?.Driver.code;
                         sqWin = sprintWin; 
                     }
@@ -965,6 +964,7 @@ async function updateF1Weather() {
  */
 
 window.addEventListener('DOMContentLoaded', updateF1Weather);
+
 
 
 
