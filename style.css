@@ -42,7 +42,7 @@ body, html {
 
 .z-badge {
     position: relative;
-    width: 50px; 
+    width: 70px; 
     height: 50px;
     background: linear-gradient(135deg, #e10600, #900000);
     /* Slant the box, not the character */
@@ -2540,3 +2540,4 @@ html, body {
     }
 
 }
+
