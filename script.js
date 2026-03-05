@@ -228,7 +228,7 @@ function renderTeams() {
     `).join('');
 }
 
-
+//we sssssss
 // --- 5. TABS & NAVIGATION ---
 function openTab(evt, tabName) {
     const targetId = tabName.toLowerCase();
@@ -964,6 +964,7 @@ async function updateF1Weather() {
  */
 
 window.addEventListener('DOMContentLoaded', updateF1Weather);
+
 
 
 
