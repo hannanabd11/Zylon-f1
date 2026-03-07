@@ -47,7 +47,6 @@ async function updateLiveDashboard() {
     const now = new Date();
     let upcomingRace = null;
 
-    // 1. Find the next valid race automatically
     for (let race of f1Calendar2026) {
         const raceEndTime = new Date(`${race.date.replace(/-/g, '/')} ${race.time}`);
         if (now < new Date(raceEndTime.getTime() + (3 * 60 * 60 * 1000))) {
@@ -58,7 +57,6 @@ async function updateLiveDashboard() {
 
     if (!upcomingRace) return;
 
-    // 2. Target the specific elements to prevent flickering
     const headerCountdown = document.getElementById('header-countdown');
     const headerLabel = document.getElementById('header-label');
 
@@ -71,7 +69,6 @@ async function updateLiveDashboard() {
     let target = (now < targetQuali) ? targetQuali : targetRace;
     let sessionType = (now < targetQuali) ? "QUALI" : "RACE";
     
-    // Automatic GP Name from Dataset
     const gpName = upcomingRace.gp.split(' ')[0].toUpperCase();
     headerLabel.innerText = `${gpName} ${sessionType}:`;
 
@@ -79,16 +76,15 @@ async function updateLiveDashboard() {
 
     if (diff <= 0 && now < new Date(target.getTime() + (2 * 60 * 60 * 1000))) {
         headerCountdown.innerText = "LIVE";
-        headerCountdown.style.color = "#00ff41"; // Neon green for live
+        headerCountdown.style.color = "#00ff41";
     } else {
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff / (1000 * 60 * 60)) % 24).toString().padStart(2, '0');
         const m = Math.floor((diff / 1000 / 60) % 60).toString().padStart(2, '0');
         const s = Math.floor((diff / 1000) % 60).toString().padStart(2, '0');
         
-        // Update text only - stops the "refresh" blink
         headerCountdown.innerText = `${d}D ${h}:${m}:${s}`;
-        headerCountdown.style.color = ""; // Reverts to CSS color
+        headerCountdown.style.color = "";
     }
 }
 
@@ -100,7 +96,6 @@ const flagCodes = {
 };
 
 function updateZenithTimer() {
-    // Force "now" to be a clean timestamp
     const now = new Date().getTime();
     const container = document.getElementById('zenith-timer-container');
     const label = document.getElementById('header-label');
@@ -109,11 +104,11 @@ function updateZenithTimer() {
 
     if (!container || !label || !display) return;
 
-    // 1. Find the active race
+    const QUALI_DURATION_MS = 2 * 60 * 60 * 1000; // 2 hours
+
     let race = zenithRaceSchedule.find(r => {
-        // Keeps the race active for 3 hours after start
         const raceStartTime = new Date(r.Race.iso).getTime();
-        return now < (raceStartTime + 10800000); 
+        return now < (raceStartTime + 10800000);
     });
 
     if (!race) {
@@ -122,29 +117,34 @@ function updateZenithTimer() {
         return;
     }
 
-    // 2. Setup Sessions
     const qualiTime = new Date(race.Qualifying.iso).getTime();
     const raceTime = new Date(race.Race.iso).getTime();
-    
+
     let targetTime, sessionName;
 
     if (now < qualiTime) {
+        // Counting down to Qualifying
         targetTime = qualiTime;
         sessionName = "QUALI";
+    } else if (now < qualiTime + QUALI_DURATION_MS) {
+        // Qualifying is currently LIVE
+        targetTime = qualiTime;
+        sessionName = "LIVE";
     } else if (now < raceTime) {
+        // Qualifying done, counting down to Race
         targetTime = raceTime;
         sessionName = "GRAND PRIX";
     } else {
+        // Race is currently LIVE
         targetTime = raceTime;
         sessionName = "LIVE";
     }
 
     const diff = targetTime - now;
 
-    // 3. UI State Management
     container.classList.remove('state-waiting', 'state-live', 'state-warning');
 
-    if (sessionName === "LIVE" || diff <= 0) {
+    if (sessionName === "LIVE") {
         container.classList.add('state-live');
         label.innerText = `${race.gp.split(' ')[0].toUpperCase()} LIVE`;
         display.innerHTML = `<a href="${race.hubUrl}" class="live-btn-link">ENTER COMMAND CENTER ➔</a>`;
@@ -154,7 +154,6 @@ function updateZenithTimer() {
 
         label.innerText = `${race.gp.split(' ')[0].toUpperCase()} ${sessionName}`;
 
-        // Math Calculations
         const d = Math.floor(diff / (1000 * 60 * 60 * 24));
         const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -964,6 +963,7 @@ async function updateF1Weather() {
  */
 
 window.addEventListener('DOMContentLoaded', updateF1Weather);
+
 
 
 
