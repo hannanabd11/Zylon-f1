@@ -147,7 +147,11 @@ function updateZenithTimer() {
     if (sessionName === "LIVE") {
         container.classList.add('state-live');
         label.innerText = `${race.gp.split(' ')[0].toUpperCase()} LIVE`;
-        display.innerHTML = `<a href="${race.hubUrl}" class="live-btn-link">ENTER COMMAND CENTER ➔</a>`;
+        // FIX: ensure the display element does not block clicks
+        display.style.pointerEvents = "auto";
+        display.style.overflow = "visible";
+        display.style.zIndex = "999";
+        display.innerHTML = `<a href="${race.hubUrl}" class="live-btn-link" target="_blank" rel="noopener noreferrer" style="pointer-events:auto; position:relative; z-index:999; display:inline-block;">ENTER COMMAND CENTER ➔</a>`;
     } else {
         if (diff < 3600000) container.classList.add('state-warning');
         else container.classList.add('state-waiting');
@@ -159,6 +163,9 @@ function updateZenithTimer() {
         const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
         const s = Math.floor((diff % (1000 * 60)) / 1000);
 
+        display.style.pointerEvents = "";
+        display.style.overflow = "";
+        display.style.zIndex = "";
         display.innerHTML = `
             ${d}<span class="timer-unit">D</span> 
             ${h.toString().padStart(2, '0')}<span class="timer-unit">H</span> 
@@ -227,7 +234,7 @@ function renderTeams() {
     `).join('');
 }
 
-//we sssssss
+
 // --- 5. TABS & NAVIGATION ---
 function openTab(evt, tabName) {
     const targetId = tabName.toLowerCase();
@@ -258,7 +265,6 @@ function openTab(evt, tabName) {
     }
 
     // --- NEW: RESET SCROLL TO TOP ---
-    // This ensures the new tab content starts from the top view
     window.scrollTo({
         top: 0,
         behavior: 'instant' 
@@ -269,7 +275,6 @@ function openTab(evt, tabName) {
 }
 
 // --- NEW: GLOBAL PAGE RELOAD RESET ---
-// Forces the browser to ignore previous scroll position on refresh
 if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
 }
@@ -292,7 +297,6 @@ function handleTabLoading(id) {
         if (typeof initStandings === "function") initStandings();
     } 
     else if (id === 'drivers') {
-        // Since we want 2 per row, let's ensure the render function is called
         if (typeof autoUpdateDriverStats === "function") autoUpdateDriverStats();
         if (typeof renderDrivers === "function") renderDrivers();
     } 
@@ -307,35 +311,31 @@ function handleTabLoading(id) {
         }
     }
 }
+
 // 2. RENDER DRIVERS (The Glow Design)
 function renderDrivers() {
     try {
         const container = document.getElementById('drivers-grid');
         if (!container) return;
 
-        // Clear existing content safely
         container.innerHTML = "";
 
         f1_2026_grid.forEach(d => {
-            // 1. FIX: Define Names inside the loop
             const nameParts = d.name.split(' ');
             const firstName = nameParts[0];
             const lastName = nameParts.slice(1).join(' ').toUpperCase();
 
-            // 2. FIX: Get correct color (Look in driver object first, then teamColors map)
             const accentColor = d.color || teamColors[d.team] || "#e10600";
 
             const card = document.createElement('div');
             card.className = "driver-card-new";
-            
-            // 3. FIX: Apply CSS variable correctly
             card.style.setProperty('--team-color', accentColor);
-        card.innerHTML = `
+            card.innerHTML = `
     <div class="driver-number-overlay">${d.no}</div>
     
     <a href="https://www.google.com/search?tbm=isch&q=${firstName}+${lastName}+F1+2026+Portrait" target="_blank" style="text-decoration: none; color: inherit; display: block;">
         <div class="driver-image-area">
-            <img src="./Drivers/${d.id}.PNG" class="driver-portrait" onerror="this.src='https://dummyimage.com/400x600/111/fff&text=DRIVER'">
+            <img src="images/Drivers/${d.id}.png" class="driver-portrait" onerror="this.src='https://dummyimage.com/400x600/111/fff&text=DRIVER'">
             <div class="image-gradient"></div>
         </div>
     </a>
@@ -385,8 +385,8 @@ async function initStandings() {
 
     try {
         const [dRes, tRes] = await Promise.all([
-            fetch('https://api.jolpi.ca/ergast/f1/2026/driverStandings.json'),
-            fetch('https://api.jolpi.ca/ergast/f1/2026/constructorStandings.json')
+            fetch('https://api.jolpi.ca/ergast/f1/2025/driverStandings.json'),
+            fetch('https://api.jolpi.ca/ergast/f1/2025/constructorStandings.json')
         ]);
 
         const dData = await dRes.json();
@@ -442,14 +442,14 @@ async function initStandings() {
 
     } catch (error) { console.error(error); }
 }
+
 // Global Team Color Helper
 function getTeamColor(team) {
     const colors = {
         "McLaren": "#FF8700", "Red Bull": "#3671C6", "Ferrari": "#E80020",
         "Mercedes": "#27F4D2", "Aston Martin": "#229971", "Williams": "#64C4FF",
         "VCARB": "#6692FF", "Haas F1 Team": "#B6BABD", "Alpine F1 Team": "#d816c2", "Audi": "#000000",
-        "Sauber": "#52E252", "Kick Sauber": "#52E252", "RB F1 Team": "#6692FF",    "Cadillac": "#FFD700"
-    
+        "Sauber": "#52E252", "Kick Sauber": "#52E252", "RB F1 Team": "#6692FF", "Cadillac": "#FFD700"
     };
     return colors[team] || "#444";
 }
@@ -461,12 +461,12 @@ function initCarsTab() {
     if (!grid) return;
 
     grid.innerHTML = f1Cars2026.map(car => {
-        const photoCount = 5; // Restored to 5 angles
+        const photoCount = 5;
         let imgHtml = '';
         
         for (let i = 1; i <= photoCount; i++) {
             imgHtml += `
-                <img src="./Cars/${car.id}-${i}.avif" 
+                <img src="images/Cars/${car.id}-${i}.avif" 
                      id="img-${car.id}-${i}" 
                      data-ext="avif" 
                      onerror="tryNextExt(this, '${car.id}', ${i})" 
@@ -496,10 +496,8 @@ function openGallery(teamId, photoCount = 5) {
     let galleryHtml = '';
     
     for (let i = 1; i <= photoCount; i++) {
-        // Look at the image already on the page to see which extension worked (avif, webp, etc)
         const activeImg = document.getElementById(`img-${teamId}-${i}`);
         const currentExt = activeImg ? activeImg.getAttribute('data-ext') : 'jpg';
-        
         galleryHtml += `<img src="images/Cars/${teamId}-${i}.${currentExt}" onerror="this.src='https://placehold.co/800x450?text=Image+Missing'">`;
     }
 
@@ -522,7 +520,6 @@ function tryNextExt(img, teamId, photoNum) {
     }
 }
 
-
 function closeGallery() {
     document.getElementById('gallery-overlay').style.display = 'none';
 }
@@ -535,7 +532,7 @@ async function initSchedule() {
     container.innerHTML = `
         <div class="loading-container">
             <div class="f1-spinner"></div>
-            <p>FETCHING 2026 SEASON DATA...</p>
+            <p>FETCHING 2025 SEASON DATA...</p>
         </div>
     `;
 
@@ -569,15 +566,8 @@ async function initSchedule() {
                 } catch (e) { console.warn("Results pending..."); }
             }
 
-            // HELPER: Generate F1.com link based on race name
             const getF1Link = (raceName) => {
-                const slug = raceName.toLowerCase()
-                    .replace(/grand prix/g, '')
-                    .trim()
-                    .replace(/\s+/g, '-');
                 return `https://www.formula1.com/en/results.html/2026/races.html`; 
-                // Note: Deep linking to specific practice tabs is restricted by F1's dynamic IDs,
-                // so linking to the 2025 results hub is the most reliable way to jump to the right tab.
             };
 
             const renderSession = (session, winner = null) => {
@@ -632,9 +622,11 @@ async function initSchedule() {
         container.innerHTML = `<p style="color:white; text-align:center;">Error loading schedule.</p>`;
     }
 }
+
 function toggleSchedule(element) {
     element.parentElement.classList.toggle('expanded');
 }
+
 // 1. THE NEWS ENGINE 
 async function fetchLiveF1News() {
     const newsGrid = document.getElementById('news-feed');
@@ -652,7 +644,6 @@ async function fetchLiveF1News() {
         newsGrid.innerHTML = data.items.slice(0, 8).map(item => {
             const image = item.thumbnail || (item.enclosure && item.enclosure.link) || "images/news-placeholder.jpg";
             
-            // This was the fix: ensuring the variable name matches below
             const formattedDate = new Date(item.pubDate).toLocaleDateString('en-GB', { 
                 day: '2-digit', month: 'short', year: 'numeric' 
             }).toUpperCase();
@@ -678,8 +669,9 @@ async function fetchLiveF1News() {
         console.error("News error:", e);
     }
 }
-// CRITICAL: Call the function when the page loads
+
 document.addEventListener('DOMContentLoaded', fetchLiveF1News);
+
 // 2. THE RESULTS ENGINE 
 async function updateLatestResults() {
     const container = document.getElementById('results-content');
@@ -688,7 +680,6 @@ async function updateLatestResults() {
     container.innerHTML = "<div style='color: white; padding: 20px; font-family: var(--f1-font);'>ACCESSING TIMING DATA...</div>";
 
     try {
-        // 1. Fetch both Race and Qualifying concurrently for speed
         const [raceResponse, qualyResponse] = await Promise.all([
             fetch("https://api.jolpi.ca/ergast/f1/2026/last/results.json"),
             fetch("https://api.jolpi.ca/ergast/f1/2026/last/qualifying.json")
@@ -700,14 +691,11 @@ async function updateLatestResults() {
         const race = raceData.MRData.RaceTable.Races[0];
         const qualy = qualyData.MRData.RaceTable.Races[0];
 
-        // 2. Determine which session is the "Latest"
-        // If there is no race yet, or if Qualifying happened after the last recorded race
         if (qualy && (!race || new Date(qualy.date + 'T' + qualy.time) > new Date(race.date + 'T' + race.time))) {
             renderResultsUI(qualy, "QUALIFYING");
         } else if (race) {
             renderResultsUI(race, "RACE");
         } else {
-            // Fallback to 2025 if 2026 hasn't started yet
             const fallback = await fetch("https://api.jolpi.ca/ergast/f1/2025/last/results.json");
             const fbData = await fallback.json();
             renderResultsUI(fbData.MRData.RaceTable.Races[0], "LATEST 2025 RACE");
@@ -717,6 +705,7 @@ async function updateLatestResults() {
         console.error("Results Load Fail:", e);
     }
 }
+
 function renderResultsUI(race, sessionType = "RACE") {
     const container = document.getElementById('results-content');
     if (!container) return;
@@ -728,7 +717,7 @@ function renderResultsUI(race, sessionType = "RACE") {
     };
 
     const isQualy = sessionType === "QUALIFYING";
-    const accentColor = isQualy ? "#b700ff" : "#e10600"; // Purple for Pole/Qualy, Red for Race
+    const accentColor = isQualy ? "#b700ff" : "#e10600";
     const badgeText = isQualy ? "QUALIFYING RESULT" : "LATEST RACE";
     
     const resultsData = isQualy ? race.QualifyingResults : race.Results;
@@ -768,7 +757,6 @@ function renderResultsUI(race, sessionType = "RACE") {
         const isFastestLap = r.FastestLap && r.FastestLap.rank === "1";
         const teamColor = teamColors[r.Constructor.constructorId] || "#fff";
         
-        // Color Logic: Purple for Pole/Fastest Lap, Green for Race Winner
         let highlightColor = teamColor;
         if (isFirst) {
             highlightColor = isQualy ? "#b700ff" : "#00ff00";
@@ -819,41 +807,36 @@ function renderResultsUI(race, sessionType = "RACE") {
 
     container.innerHTML = html + `</div>`;
 }
+
 async function autoUpdateDriverStats() {
     try {
-        // 1. Fetch 2026 Results (Wins & Standings)
         const response = await fetch('https://api.jolpi.ca/ergast/f1/2026/driverStandings.json');
         const data = await response.json();
         const liveStandings = data.MRData.StandingsTable.StandingsLists[0].DriverStandings;
 
-        // 2. Update the numbers in the browser's memory
         f1_2026_grid.forEach(localDriver => {
             const liveMatch = liveStandings.find(ls => 
                 ls.Driver.driverId.toLowerCase().includes(localDriver.id.toLowerCase())
             );
 
             if (liveMatch) {
-                // We ADD the 2026 wins to your data.js career wins
                 const seasonWins = parseInt(liveMatch.wins) || 0;
                 localDriver.wins = (localDriver.wins || 0) + seasonWins;
                 
-                // Update Titles if it's the end of the season
                 if (liveMatch.position === "1" && new Date().getMonth() > 10) { 
                     localDriver.champ += 1; 
                 }
             }
-        }); // <-- Closed the forEach loop here
+        });
 
         console.log("2026 Stats Updated!");
-        
-        // RE-RENDER HERE, after the loop finishes
         renderDrivers(); 
 
     } catch (error) {
         console.log("Using local data or API not yet available.");
-        renderDrivers(); // Still render even if API fails
+        renderDrivers();
     }
-} // <-- Closed the function here
+}
 
 async function fetchSpecificRace() {
     const year = document.getElementById('lookup-year').value;
@@ -869,7 +852,6 @@ async function fetchSpecificRace() {
         const raceData = data.MRData.RaceTable.Races[0];
 
         if (raceData) {
-            // Send the API data to your classy render function
             renderResultsUI(raceData);
         } else {
             container.innerHTML = `
@@ -884,18 +866,13 @@ async function fetchSpecificRace() {
     }
 }
 
-
-// Run the update 3 seconds after page load
 setTimeout(autoUpdateDriverStats, 3000);
 
-
-// Initialize on load
 async function updateF1Weather() {
     const icon = document.getElementById('refresh-icon');
     const gripEl = document.getElementById('track-grip');
     const watermarkEl = document.getElementById('dynamic-watermark');
     
-    // 1. Visual Feedback
     if(icon) icon.classList.add('fa-spin');
     if(gripEl) gripEl.innerText = "SYNCING...";
 
@@ -903,14 +880,12 @@ async function updateF1Weather() {
         const now = new Date();
         const currentRace = f1Calendar2026.find(race => new Date(race.date) >= now) || f1Calendar2026[0];
 
-        // 2. Update Watermark
         if (watermarkEl) {
             let fullName = currentRace.circuit; 
             let cleanName = fullName.replace(/GP|Circuit|Grand Prix/gi, "").trim();
             watermarkEl.innerText = cleanName.toUpperCase();
         }
 
-        // 3. Fetch Data
         const lat = currentRace.lat;
         const lon = currentRace.lon;
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&timezone=auto`;
@@ -919,17 +894,14 @@ async function updateF1Weather() {
         const data = await response.json();
         const live = data.current;
 
-        // 4. Update UI
         setTimeout(() => {
             const air = Math.round(live.temperature_2m);
             
-            // Check if element exists before updating to avoid console errors
             if(document.getElementById('air-temp')) document.getElementById('air-temp').innerText = `${air}°C`;
             if(document.getElementById('track-temp')) document.getElementById('track-temp').innerText = `${air + 5}°C`;
             if(document.getElementById('rain-risk')) document.getElementById('rain-risk').innerText = `${live.relative_humidity_2m}%`;
             if(document.getElementById('wind-speed')) document.getElementById('wind-speed').innerText = `${Math.round(live.wind_speed_10m)} km/h`;
 
-            // Status Logic
             const statusEl = document.getElementById('weather-status');
             if (statusEl) {
                 const code = live.weather_code;
@@ -938,7 +910,6 @@ async function updateF1Weather() {
                 else statusEl.innerText = "RAINY";
             }
 
-            // Grip Logic - Using classList for cleaner styling
             if (gripEl) {
                 if (live.precipitation > 0.1) {
                     gripEl.innerText = "SLIPPERY";
@@ -958,23 +929,5 @@ async function updateF1Weather() {
         if(icon) icon.classList.remove('fa-spin');
     }
 }
-/** * THIS IS THE FIX: 
- * It triggers the update automatically when the page finishes loading.
- */
 
 window.addEventListener('DOMContentLoaded', updateF1Weather);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
