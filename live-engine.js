@@ -52,16 +52,20 @@ function showError(msg) {
 // ================================
 async function detectSession() {
     try {
-        // Try 2026 first, fallback to 2025
+        // Fetch the most recent session directly (no year filter)
         let sessions = [];
         try {
-            const r1 = await fetch(`${API}/sessions?year=2026`);
-            sessions = await r1.json();
+            const r1 = await fetch(`${API}/sessions?session_type=Qualifying`);
+            const q = await r1.json();
+            const r2 = await fetch(`${API}/sessions?session_type=Race`);
+            const r = await r2.json();
+            sessions = [...(q || []), ...(r || [])];
         } catch(e) {}
 
         if (!sessions || sessions.length === 0) {
-            const r2 = await fetch(`${API}/sessions?year=2025`);
-            sessions = await r2.json();
+            // Last resort: get all sessions no filter
+            const r3 = await fetch(`${API}/sessions`);
+            sessions = await r3.json();
         }
 
         if (!sessions || sessions.length === 0) {
