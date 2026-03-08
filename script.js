@@ -260,7 +260,7 @@ function renderDrivers() {
             <div class="driver-number-overlay">${d.no}</div>
             <a href="https://www.google.com/search?tbm=isch&q=${firstName}+${lastName}+F1+2026" target="_blank" style="text-decoration:none;color:inherit;display:block;">
                 <div class="driver-image-area">
-                    <img src="./Drivers/${d.id}.PNG" class="driver-portrait" onerror="this.onerror=null;this.src='images/Drivers/placeholder.png'">
+                    <img src="./Drivers/${d.id}.png" class="driver-portrait" onerror="this.onerror=null;this.src='./Drivers/placeholder.png'">
                     <div class="image-gradient"></div>
                 </div>
             </a>
@@ -293,7 +293,7 @@ async function autoUpdateDriverStats() {
     try {
         let standingsData = null;
 
-        for (const year of ['2026']) {
+        for (const year of ['2026','2025']) {
             const res  = await fetch(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`);
             const json = await res.json();
             const list = json.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings;
@@ -348,7 +348,7 @@ async function initStandings() {
 
     let dList = [], tList = [];
 
-    for (const year of ['2026']) {
+    for (const year of ['2026','2025']) {
         try {
             const [dRes, tRes] = await Promise.all([
                 fetch(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`),
@@ -802,7 +802,7 @@ function initCarsTab() {
     grid.innerHTML = f1Cars2026.map(car => {
         let imgs = '';
         for (let i = 1; i <= 5; i++) {
-            imgs += `<img src="./Cars/${car.id}-${i}.avif" id="img-${car.id}-${i}" onerror="tryNextExt(this,'${car.id}',${i})" alt="Angle ${i}" style="object-fit:contain;">`;
+            imgs += `<img src="./Cars/${car.id}-${i}.avif" id="img-${car.id}-${i}" onerror="tryNextExt(this,'${car.id}',${i})" alt="Angle ${i}">`;
         }
         return `
         <div class="car-card" onclick="openGallery('${car.id}',5)">
@@ -822,7 +822,7 @@ function openGallery(teamId, photoCount = 5) {
     if (!overlay || !content) return;
     let html = '';
     for (let i = 1; i <= photoCount; i++) {
-        html += `<img src="./Cars/${teamId}-${i}.avif" onerror="this.onerror=null;this.src='https://placehold.co/800x450/111/333?text=No+Image'" style="object-fit:contain;">`;
+        html += `<img src="./Cars/${teamId}-${i}.avif" onerror="this.onerror=null;this.src='https://placehold.co/800x450/111/333?text=No+Image'">`;
     }
     content.innerHTML = html;
     overlay.style.display = 'flex';
