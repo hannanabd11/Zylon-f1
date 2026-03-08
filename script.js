@@ -334,10 +334,14 @@ async function autoUpdateDriverStats() {
                 driver.name.toLowerCase().includes(ls.Driver.familyName.toLowerCase())
             );
             if (match) {
+                // Only add 2026 season wins/poles on top of career stats (not cumulative on re-render)
                 const seasonWins = parseInt(match.wins) || 0;
-                if (seasonWins > 0) driver.wins = driver.wins + seasonWins;
+                // Store original career stats once to avoid double-adding on re-render
+                if (driver._baseWins === undefined) driver._baseWins = driver.wins;
+                if (driver._basePoles === undefined) driver._basePoles = driver.poles;
+                driver.wins  = driver._baseWins  + seasonWins;
                 const dId = match.Driver.driverId.toLowerCase();
-                if (polesMap[dId]) driver.poles = driver.poles + polesMap[dId];
+                driver.poles = driver._basePoles + (polesMap[dId] || 0);
             }
         });
 
@@ -361,6 +365,7 @@ async function initStandings() {
 
     let dList = [], tList = [];
 
+    // Try 2026 current standings first (after round 1+), fall back to 2025 only if NO 2026 data at all
     for (const year of ['2026','2025']) {
         try {
             const [dRes, tRes] = await Promise.all([
@@ -371,15 +376,29 @@ async function initStandings() {
             const tJson = await tRes.json();
             const dl = dJson.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings || [];
             const tl = tJson.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings || [];
-            if (dl.length > 0) { dList = dl; tList = tl; break; }
+            // Only accept 2025 data if 2026 truly has nothing
+            if (dl.length > 0) {
+                dList = dl; tList = tl;
+                // Show year label
+                const yr = dJson.MRData?.StandingsTable?.StandingsLists?.[0]?.season;
+                const rd = dJson.MRData?.StandingsTable?.StandingsLists?.[0]?.round;
+                if (yr) {
+                    ['drivers-list','teams-list'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.setAttribute('data-season', `${yr} • AFTER ROUND ${rd}`);
+                    });
+                }
+                break;
+            }
         } catch(e) { continue; }
     }
 
-    dContainer.innerHTML = dList.map(item => {
+    dContainer.innerHTML = dList.map((item, i) => {
         const teamColor = getTeamColor(item.Constructors[0].name);
         const driverInfo = f1_2026_grid.find(d => d.name.toLowerCase().includes(item.Driver.familyName.toLowerCase()));
         const flag = driverInfo?.flag || 'un';
-        return `
+        const seasonLabel = i === 0 ? `<div style="padding:10px 20px 0;color:#333;font-size:0.65rem;letter-spacing:2px;font-weight:900;">${dContainer.getAttribute('data-season') || ''}</div>` : '';
+        return seasonLabel + `
             <div class="standings-entry" style="--team-glow:${teamColor}">
                 <div class="pos-num">${item.position}</div>
                 <div class="team-strip" style="background:${teamColor}"></div>
@@ -576,6 +595,8 @@ function renderResultsUI(race, sessionType = "RACE") {
         const tc           = tcMap[r.Constructor?.constructorId] || "#888";
         const hl           = isFirst ? (isQualy ? "#b700ff" : "#00ff00") : isFastestLap ? "#b700ff" : tc;
 
+        const flTime = !isQualy && isFastestLap && r.FastestLap?.Time?.time
+            ? ` <span style="font-size:0.65rem;color:#b700ff;display:block;">${r.FastestLap.Time.time}</span>` : '';
         const timeDisplay = isQualy
             ? (r.Q3 || r.Q2 || r.Q1 || "No Time")
             : (isFirst ? (r.Time?.time || "—") : (r.Time ? `+${r.Time.time}` : r.status));
@@ -594,8 +615,9 @@ function renderResultsUI(race, sessionType = "RACE") {
                     <span>${r.Driver.givenName[0]}. <span style="color:${isFirst?hl:'#fff'}">${r.Driver.familyName.toUpperCase()}</span></span>
                     ${(isFastestLap||(isFirst&&isQualy))?`<span style="background:#b700ff;color:#fff;padding:2px 6px;font-size:0.6rem;border-radius:2px;">${isQualy?'POLE':'FL'}</span>`:''}
                 </div>
-                <div style="color:#666;font-size:0.8rem;font-weight:bold;text-transform:uppercase;">${r.Constructor?.name||'—'}</div>
-                <div class="time-cell" style="color:${isFirst?hl:isFastestLap?'#b700ff':'#888'}">${timeDisplay}</div>
+                <div style="color:#666;font-size:0.8rem;font-weight:bold;text-transform:uppercase;cursor:default;transition:color 0.2s;"
+                     onmouseover="this.style.color='${tc}'" onmouseout="this.style.color='#666'">${r.Constructor?.name||'—'}</div>
+                <div class="time-cell" style="color:${isFirst?hl:isFastestLap?'#b700ff':'#888'}">${timeDisplay}${flTime}</div>
                 <div style="text-align:right;color:#fff;font-weight:900;">${zone}</div>
             </div>`;
     });
