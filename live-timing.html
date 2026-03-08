@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zylon by A.H | F1 LIVE TIMING</title>
+<link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --red: #e10600;
+  --purple: #b700ff;
+  --green: #00ff88;
+  --yellow: #ffd200;
+  --bg: #060606;
+  --panel: #0f0f0f;
+  --border: #1a1a1a;
+  --dim: #555;
+}
+
+body {
+  background: var(--bg);
+  color: #fff;
+  font-family: 'Titillium Web', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── HEADER ── */
+.header {
+  background: #000;
+  border-bottom: 2px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.f1-badge {
+  background: var(--red);
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 1rem;
+  padding: 5px 12px;
+  letter-spacing: 1px;
+}
+
+.brand-text {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  color: #fff;
+}
+
+.brand-text span { color: var(--red); }
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn {
+  background: #111;
+  border: 1px solid #333;
+  color: #fff;
+  padding: 7px 18px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  cursor: pointer;
+  text-decoration: none;
+  font-family: 'Titillium Web', sans-serif;
+}
+
+/* ── CONNECTION STATUS ── */
+.conn-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 14px;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  transition: all 0.3s;
+}
+
+.conn-bar.connecting { background: #1a1400; border: 1px solid var(--yellow); color: var(--yellow); }
+.conn-bar.connected  { background: #001a0d; border: 1px solid var(--green);  color: var(--green);  }
+.conn-bar.offline    { background: #1a0000; border: 1px solid var(--red);    color: var(--red);    }
+
+.conn-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.conn-bar.connected .conn-dot { animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.2; } }
+
+/* ── STATUS STRIP ── */
+#status-strip {
+  padding: 9px;
+  text-align: center;
+  font-weight: 900;
+  font-size: 0.78rem;
+  letter-spacing: 3px;
+  transition: all 0.4s;
+}
+
+.strip-green  { background: var(--green);  color: #000; }
+.strip-yellow { background: var(--yellow); color: #000; }
+.strip-red    { background: var(--red);    color: #fff; }
+.strip-purple { background: var(--purple); color: #fff; }
+.strip-dark   { background: #111; color: var(--dim); }
+
+/* ── TELEMETRY BAR ── */
+.telem-bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 14px 24px;
+  background: #080808;
+  border-bottom: 1px solid var(--border);
+  gap: 20px;
+}
+
+.weather-row {
+  display: flex;
+  gap: 20px;
+  font-size: 0.75rem;
+  color: var(--dim);
+}
+
+.weather-row b { color: #fff; }
+
+.session-center {
+  text-align: center;
+}
+
+.sess-name {
+  font-size: 0.65rem;
+  color: var(--green);
+  font-weight: 900;
+  letter-spacing: 4px;
+  margin-bottom: 2px;
+}
+
+.sess-timer {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 2px;
+}
+
+.circuit-info { text-align: right; }
+
+.round-label {
+  font-size: 0.65rem;
+  color: var(--red);
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.circuit-name {
+  font-size: 1rem;
+  font-weight: 900;
+  color: #fff;
+}
+
+/* ── SESSION TABS ── */
+.session-tabs {
+  display: flex;
+  background: #000;
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.sess-tab {
+  padding: 11px 22px;
+  cursor: pointer;
+  font-weight: 900;
+  font-size: 0.72rem;
+  letter-spacing: 1px;
+  color: var(--dim);
+  border-bottom: 3px solid transparent;
+  transition: 0.2s;
+}
+
+.sess-tab.active {
+  color: #fff;
+  border-bottom-color: var(--red);
+  background: rgba(225,6,0,0.04);
+}
+
+/* ── TIMING TABLE ── */
+.timing-wrap {
+  padding: 16px 24px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  min-width: 860px;
+}
+
+thead th {
+  color: var(--dim);
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 8px 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+tbody tr {
+  background: var(--panel);
+  transition: transform 0.2s, background 0.3s;
+  cursor: default;
+}
+
+tbody tr:hover {
+  background: #161616;
+  transform: translateX(4px);
+}
+
+td {
+  padding: 11px 10px;
+  font-weight: 700;
+  border-top: 1px solid #111;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* position change arrows */
+.pos-change { font-size: 0.65rem; font-weight: 900; }
+.up   { color: var(--green); }
+.down { color: var(--red); }
+.same { color: #333; }
+
+/* driver cell */
+.driver-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 10px;
+}
+
+.team-stripe {
+  width: 3px;
+  height: 30px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.drv-code {
+  font-size: 0.95rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.drv-name {
+  font-size: 0.6rem;
+  color: var(--dim);
+  letter-spacing: 0.5px;
+}
+
+/* badges */
+.badge {
+  display: inline-block;
+  font-size: 0.5rem;
+  font-weight: 900;
+  padding: 1px 5px;
+  border-radius: 2px;
+  margin-left: 4px;
+  vertical-align: middle;
+  letter-spacing: 1px;
+}
+
+.badge-fl  { background: var(--purple); color: #fff; }
+.badge-drs { background: var(--green);  color: #000; }
+.badge-pit { background: var(--yellow); color: #000; }
+.badge-out { background: #333;          color: #888; }
+
+/* time cells */
+.mono {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.c-green  { color: var(--green); }
+.c-purple { color: var(--purple); }
+.c-yellow { color: var(--yellow); }
+.c-dim    { color: var(--dim); }
+.c-white  { color: #fff; }
+.c-red    { color: var(--red); }
+
+/* sector dots - animated when active */
+.sector-cell { display: flex; gap: 3px; align-items: center; }
+
+.s-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #222;
+  transition: background 0.3s;
+}
+
+.s-dot.done   { background: var(--green); }
+.s-dot.active { background: var(--yellow); animation: sector-pulse 0.6s infinite; }
+.s-dot.best   { background: var(--purple); }
+
+@keyframes sector-pulse { 50% { opacity: 0.3; transform: scale(1.4); } }
+
+/* tyre */
+.tyre-circle {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 900;
+  border: 2px solid currentColor;
+}
+
+/* ── NO SESSION SCREEN ── */
+#no-session {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  gap: 16px;
+}
+
+.no-sess-icon { font-size: 3.5rem; }
+
+.no-sess-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: 3px;
+  color: #fff;
+}
+
+.no-sess-sub {
+  color: var(--dim);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  line-height: 1.8;
+  max-width: 420px;
+}
+
+.retry-btn {
+  margin-top: 8px;
+  background: transparent;
+  border: 1px solid #333;
+  color: #888;
+  padding: 10px 28px;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  cursor: pointer;
+  font-family: 'Titillium Web', sans-serif;
+  transition: all 0.2s;
+}
+
+.retry-btn:hover { border-color: var(--red); color: #fff; }
+
+/* ── SERVER SETUP GUIDE (shown when offline) ── */
+#setup-guide {
+  display: none;
+  margin: 20px 24px;
+  background: #0a0a0a;
+  border: 1px solid #1e1e1e;
+  border-left: 3px solid var(--yellow);
+  padding: 20px 24px;
+  border-radius: 2px;
+}
+
+.guide-title {
+  color: var(--yellow);
+  font-weight: 900;
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+}
+
+.guide-step {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+
+.step-num {
+  background: var(--red);
+  color: #fff;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 900;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-text { font-size: 0.78rem; color: #aaa; line-height: 1.5; }
+
+.code-line {
+  background: #111;
+  border: 1px solid #222;
+  color: var(--green);
+  padding: 6px 12px;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+  display: inline-block;
+  border-radius: 2px;
+  font-family: monospace;
+}
+
+/* ── LEGEND ── */
+.legend {
+  display: flex;
+  gap: 20px;
+  padding: 10px 24px;
+  background: #080808;
+  border-top: 1px solid var(--border);
+  font-size: 0.65rem;
+  color: var(--dim);
+  flex-wrap: wrap;
+}
+
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: #222; }
+
+/* ── FLASH ANIMATION for new fastest lap ── */
+@keyframes flash-purple {
+  0%,100% { background: var(--panel); }
+  50% { background: rgba(183,0,255,0.12); }
+}
+.flash-purple { animation: flash-purple 0.8s ease; }
+
+@keyframes flash-green {
+  0%,100% { background: var(--panel); }
+  50% { background: rgba(0,255,136,0.08); }
+}
+.flash-green { animation: flash-green 0.8s ease; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="brand">
+    <div class="f1-badge">F1</div>
+    <div class="brand-text">ZYLON BY <span>A.H</span> — LIVE TIMING</div>
+  </div>
+  <div class="header-right">
+    <div class="conn-bar connecting" id="conn-bar">
+      <div class="conn-dot"></div>
+      <span id="conn-text">CONNECTING...</span>
+    </div>
+    <a href="index.html" class="back-btn">← DASHBOARD</a>
+  </div>
+</header>
+
+<!-- TRACK STATUS -->
+<div id="status-strip" class="strip-dark">⬛ WAITING FOR SESSION</div>
+
+<!-- TELEMETRY BAR -->
+<div class="telem-bar">
+  <div class="weather-row" id="weather-row">
+    <span>AIR <b id="w-air">—</b></span>
+    <span>TRACK <b id="w-track">—</b></span>
+    <span id="w-cond">—</span>
+    <span>WIND <b id="w-wind">—</b></span>
+    <span>HUM <b id="w-hum">—</b></span>
+  </div>
+  <div class="session-center">
+    <div class="sess-name" id="sess-name">● WAITING</div>
+    <div class="sess-timer" id="sess-timer">--:--</div>
+  </div>
+  <div class="circuit-info">
+    <div class="round-label" id="round-label">ROUND — • 2026</div>
+    <div class="circuit-name" id="circuit-name">—</div>
+  </div>
+</div>
+
+<!-- SESSION TABS -->
+<div class="session-tabs">
+  <div class="sess-tab active" id="tab-race" onclick="setView('RACE')">RACE</div>
+  <div class="sess-tab" id="tab-quali" onclick="setView('QUALIFYING')">QUALIFYING</div>
+  <div class="sess-tab" id="tab-practice" onclick="setView('PRACTICE')">PRACTICE</div>
+</div>
+
+<!-- SETUP GUIDE (shows when server offline) -->
+<div id="setup-guide">
+  <div class="guide-title">⚡ HOW TO ACTIVATE LIVE DATA</div>
+  <div class="guide-step">
+    <div class="step-num">1</div>
+    <div class="step-text">
+      Install Python requirements (one time only)
+      <div class="code-line">pip install fastf1 flask flask-cors</div>
+    </div>
+  </div>
+  <div class="guide-step">
+    <div class="step-num">2</div>
+    <div class="step-text">
+      Run the live server on your PC during any F1 session
+      <div class="code-line">python f1_live_server.py</div>
+    </div>
+  </div>
+  <div class="guide-step">
+    <div class="step-num">3</div>
+    <div class="step-text">
+      This page auto-connects and shows live data every second ✅
+    </div>
+  </div>
+</div>
+
+<!-- TIMING TABLE -->
+<div class="timing-wrap" id="timing-wrap">
+  <div id="no-session">
+    <div class="no-sess-icon">📡</div>
+    <div class="no-sess-title">NO LIVE SESSION</div>
+    <div class="no-sess-sub">
+      Live data streams during active F1 sessions only.<br>
+      Start the Python server on your PC to connect.
+    </div>
+    <button class="retry-btn" onclick="retryConnection()">↻ RETRY CONNECTION</button>
+  </div>
+  <table id="timing-table" style="display:none;">
+    <thead><tr id="t-headers"></tr></thead>
+    <tbody id="t-body"></tbody>
+  </table>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div> FASTEST LAP</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--green)"></div> LEADER / PB</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> ACTIVE SECTOR</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> TOP 3</div>
+  <div class="legend-item" style="margin-left:auto; color:#333;">UPDATES EVERY SECOND</div>
+</div>
+
+<script>
+// ============================================================
+// ZYLON LIVE TIMING — CLIENT
+// Connects to f1_live_server.py running on localhost:5000
+// ============================================================
+
+const SERVER = "https://zylon-f1-server.onrender.com";
+const POLL_MS = 1000; // fetch every second
+
+let currentView = "RACE";
+let state = null;         // full state from server
+let prevPositions = {};   // for position change arrows
+let pollTimer = null;
+let retryCount = 0;
+let sessionTimer = null;
+
+// ── TYRE COLOURS ──────────────────────────────────────────
+const TYRE_STYLE = {
+  "SOFT":        { color: "#ff1e1e", bg: "#1a0000" },
+  "MEDIUM":      { color: "#f9d71c", bg: "#1a1600" },
+  "HARD":        { color: "#ffffff", bg: "#1a1a1a" },
+  "INTERMEDIATE":{ color: "#39b54a", bg: "#001a07" },
+  "WET":         { color: "#0094ff", bg: "#00091a" },
+  "S":           { color: "#ff1e1e", bg: "#1a0000" },
+  "M":           { color: "#f9d71c", bg: "#1a1600" },
+  "H":           { color: "#ffffff", bg: "#1a1a1a" },
+  "I":           { color: "#39b54a", bg: "#001a07" },
+  "W":           { color: "#0094ff", bg: "#00091a" },
+};
+
+// ── START ─────────────────────────────────────────────────
+window.onload = () => {
+  setConnStatus("connecting");
+  startPolling();
+};
+
+// ── CONNECTION STATUS ──────────────────────────────────────
+function setConnStatus(s) {
+  const bar  = document.getElementById("conn-bar");
+  const text = document.getElementById("conn-text");
+  bar.className = "conn-bar " + s;
+  text.innerText = s === "connected" ? "LIVE" : s === "connecting" ? "CONNECTING..." : "SERVER OFFLINE";
+}
+
+// ── POLLING ───────────────────────────────────────────────
+function startPolling() {
+  fetchData();
+  pollTimer = setInterval(fetchData, POLL_MS);
+}
+
+async function fetchData() {
+  try {
+    const res = await fetch(`${SERVER}/api/live`, { signal: AbortSignal.timeout(2000) });
+    if (!res.ok) throw new Error("bad response");
+    const data = await res.json();
+
+    retryCount = 0;
+    setConnStatus("connected");
+    document.getElementById("setup-guide").style.display = "none";
+
+    processState(data);
+
+  } catch(e) {
+    retryCount++;
+    setConnStatus("offline");
+
+    if (retryCount === 3) {
+      // Show setup guide after 3 failed attempts
+      document.getElementById("setup-guide").style.display = "block";
+    }
+
+    // Keep showing last known state if we had one
+    if (!state) {
+      showNoSession();
+    }
+  }
+}
+
+function retryConnection() {
+  retryCount = 0;
+  setConnStatus("connecting");
+  fetchData();
+}
+
+// ── PROCESS STATE FROM SERVER ──────────────────────────────
+function processState(data) {
+  state = data;
+
+  // Session info
+  if (data.session) {
+    document.getElementById("sess-name").innerHTML = `<span style="animation:blink 1s infinite;display:inline-block">●</span> ${data.session.name || "LIVE"}`;
+    document.getElementById("round-label").innerText = `ROUND ${data.session.round || "—"} • ${data.session.year || "2026"}`;
+    document.getElementById("circuit-name").innerText = data.session.circuit || "—";
+  }
+
+  // Remaining time / lap count
+  if (data.session?.remaining) {
+    document.getElementById("sess-timer").innerText = data.session.remaining;
+  } else if (data.session?.lap && data.session?.total_laps) {
+    document.getElementById("sess-timer").innerText = `LAP ${data.session.lap} / ${data.session.total_laps}`;
+  }
+
+  // Weather
+  if (data.weather) {
+    document.getElementById("w-air").innerText   = data.weather.air   ? `${data.weather.air}°C`   : "—";
+    document.getElementById("w-track").innerText = data.weather.track ? `${data.weather.track}°C` : "—";
+    document.getElementById("w-wind").innerText  = data.weather.wind  ? `${data.weather.wind} m/s` : "—";
+    document.getElementById("w-hum").innerText   = data.weather.humidity ? `${data.weather.humidity}%` : "—";
+    const wet = data.weather.rainfall;
+    document.getElementById("w-cond").innerHTML = wet
+      ? `<span style="color:#0094ff">🌧️ WET</span>`
+      : `<span style="color:var(--green)">☀️ DRY</span>`;
+  }
+
+  // Track status / flag
+  if (data.track_status) {
+    updateStrip(data.track_status);
+  }
+
+  // Render drivers
+  if (data.drivers && data.drivers.length > 0) {
+    document.getElementById("no-session").style.display = "none";
+    document.getElementById("timing-table").style.display = "table";
+    renderTable(data.drivers, data.session?.type || currentView);
+  } else {
+    showNoSession();
+  }
+}
+
+// ── TRACK STATUS STRIP ────────────────────────────────────
+function updateStrip(status) {
+  const strip = document.getElementById("status-strip");
+  const map = {
+    "green":       { cls: "strip-green",  text: "🏁 ALL CLEAR — GREEN FLAG" },
+    "yellow":      { cls: "strip-yellow", text: "⚠️ YELLOW FLAG" },
+    "double_yellow":{ cls: "strip-yellow",text: "⚠️⚠️ DOUBLE YELLOW FLAG" },
+    "sc":          { cls: "strip-yellow", text: "🚓 SAFETY CAR DEPLOYED" },
+    "vsc":         { cls: "strip-yellow", text: "🟡 VIRTUAL SAFETY CAR" },
+    "vsc_ending":  { cls: "strip-yellow", text: "🟡 VSC ENDING" },
+    "red":         { cls: "strip-red",    text: "⛔ RED FLAG — SESSION STOPPED" },
+    "chequered":   { cls: "strip-green",  text: "🏁 CHEQUERED FLAG" },
+    "clear":       { cls: "strip-green",  text: "🏁 TRACK CLEAR" },
+  };
+  const s = map[status.toLowerCase()] || { cls: "strip-dark", text: "— " + status.toUpperCase() };
+  strip.className = s.cls;
+  strip.innerText = s.text;
+}
+
+// ── RENDER TIMING TABLE ───────────────────────────────────
+function renderTable(drivers, sessionType) {
+  const isRace = sessionType === "RACE" || sessionType === "SPRINT";
+  const headers = document.getElementById("t-headers");
+  const tbody   = document.getElementById("t-body");
+
+  // Headers
+  headers.innerHTML = `
+    <th></th>
+    <th>POS</th>
+    <th>DRIVER</th>
+    <th>TEAM</th>
+    <th>${isRace ? "GAP TO LEADER" : "GAP / INTERVAL"}</th>
+    <th>BEST LAP</th>
+    <th>LAST LAP</th>
+    <th>S1</th><th>S2</th><th>S3</th>
+    <th>TYRE</th>
+    ${isRace ? "<th>PITS</th>" : "<th>ZONE</th>"}
+    <th>STATUS</th>
+  `;
+
+  // Sort by position
+  const sorted = [...drivers].sort((a, b) => (a.position || 99) - (b.position || 99));
+
+  // Find fastest lap holder
+  const fastest = sorted
+    .filter(d => d.best_lap_seconds > 0)
+    .sort((a, b) => a.best_lap_seconds - b.best_lap_seconds)[0];
+
+  tbody.innerHTML = sorted.map((d, i) => {
+    const isFastest  = fastest && d.driver_number === fastest.driver_number;
+    const isLeader   = i === 0;
+    const teamColor  = d.team_color || "#666";
+    const tyre       = TYRE_STYLE[d.tyre] || { color: "#888", bg: "#111" };
+    const tyreChar   = (d.tyre || "—")[0];
+
+    // Position change
+    const prev = prevPositions[d.driver_number] || d.position;
+    const diff = prev - d.position;
+    const arrow = diff > 0
+      ? `<span class="pos-change up">▲${diff}</span>`
+      : diff < 0
+      ? `<span class="pos-change down">▼${Math.abs(diff)}</span>`
+      : `<span class="pos-change same">—</span>`;
+
+    prevPositions[d.driver_number] = d.position;
+
+    // Row highlight
+    let rowStyle = "";
+    if (isFastest) rowStyle = "background:rgba(183,0,255,0.06);";
+    else if (isLeader) rowStyle = "background:rgba(0,255,136,0.03);";
+
+    // Position colour
+    const posColor = isLeader ? "var(--green)" : i < 3 ? "#fff" : "var(--dim)";
+
+    // Gap display
+    const gapDisplay = isLeader
+      ? `<span class="c-green mono">LEADER</span>`
+      : d.gap
+      ? `<span class="c-dim mono">${d.gap}</span>`
+      : `<span class="c-dim">—</span>`;
+
+    // Best lap
+    const bestColor = isFastest ? "c-purple" : "c-white";
+    const flBadge   = isFastest ? `<span class="badge badge-fl">FL</span>` : "";
+
+    // Last lap
+    const lastColor = d.last_lap_pb ? "c-green" : "c-dim";
+
+    // Sector cells
+    const sectorCell = (val, idx) => {
+      const active = d.current_sector === idx;
+      const best   = d.sector_best?.[idx - 1];
+      const cls    = active ? "active" : val ? (best ? "best" : "done") : "";
+      const dots   = `
+        <div class="sector-cell">
+          <div class="s-dot ${cls}"></div>
+          <span class="mono" style="font-size:0.72rem;color:${active ? 'var(--yellow)' : best ? 'var(--purple)' : val ? 'var(--green)' : 'var(--dim)'}">
+            ${active ? (val || "···") : (val || "—")}
+          </span>
+        </div>`;
+      return dots;
+    };
+
+    // Qualifying zone
+    const zone = !isRace
+      ? (i < 10  ? `<span style="color:var(--green);font-size:0.7rem;font-weight:900;">Q3 ✓</span>`
+        : i < 15 ? `<span style="color:var(--yellow);font-size:0.7rem;font-weight:900;">Q2 ✗</span>`
+        :           `<span style="color:var(--red);font-size:0.7rem;font-weight:900;">Q1 ✗</span>`)
+      : (d.pits ?? "—");
+
+    // Status
+    const statusBadge = d.in_pit
+      ? `<span class="badge badge-pit">PIT</span>`
+      : d.out_lap
+      ? `<span class="badge badge-out">OUT LAP</span>`
+      : d.dnf
+      ? `<span style="color:var(--red);font-weight:900;font-size:0.7rem;">DNF</span>`
+      : `<span style="color:var(--green);font-weight:900;font-size:0.7rem;">● LIVE</span>`;
+
+    const drsTag = d.drs_open ? `<span class="badge badge-drs">DRS</span>` : "";
+
+    return `
+    <tr style="${rowStyle}" id="row-${d.driver_number}">
+      <td>${arrow}</td>
+      <td style="font-size:1.1rem;font-weight:900;color:${posColor};font-family:'Orbitron',sans-serif;">${d.position}</td>
+      <td>
+        <div class="driver-cell">
+          <div class="team-stripe" style="background:${teamColor}"></div>
+          <div>
+            <div class="drv-code" style="color:${isFastest ? 'var(--purple)' : '#fff'}">
+              ${d.code || "#" + d.driver_number}${flBadge}${drsTag}
+            </div>
+            <div class="drv-name">${d.name || ""}</div>
+          </div>
+        </div>
+      </td>
+      <td style="color:${teamColor};font-size:0.72rem;font-weight:900;">${d.team || "—"}</td>
+      <td>${gapDisplay}</td>
+      <td class="mono ${bestColor}">${d.best_lap || "—"}</td>
+      <td class="mono ${lastColor}">${d.last_lap || "—"}</td>
+      <td>${sectorCell(d.s1, 1)}</td>
+      <td>${sectorCell(d.s2, 2)}</td>
+      <td>${sectorCell(d.s3, 3)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <div class="tyre-circle" style="color:${tyre.color};background:${tyre.bg};">${tyreChar}</div>
+          <span style="font-size:0.6rem;color:var(--dim)">${d.tyre_age ? d.tyre_age + "L" : ""}</span>
+        </div>
+      </td>
+      <td style="text-align:center;font-weight:900;">${zone}</td>
+      <td>${statusBadge}</td>
+    </tr>`;
+  }).join("");
+}
+
+// ── SHOW NO SESSION ───────────────────────────────────────
+function showNoSession() {
+  document.getElementById("no-session").style.display = "flex";
+  document.getElementById("timing-table").style.display = "none";
+}
+
+// ── TAB SWITCHING ─────────────────────────────────────────
+function setView(v) {
+  currentView = v;
+  document.getElementById("tab-race").classList.toggle("active", v === "RACE");
+  document.getElementById("tab-quali").classList.toggle("active", v === "QUALIFYING");
+  document.getElementById("tab-practice").classList.toggle("active", v === "PRACTICE");
+  if (state?.drivers) renderTable(state.drivers, v);
+}
+</script>
+</body>
+</html>
