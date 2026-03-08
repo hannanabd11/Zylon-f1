@@ -128,11 +128,6 @@ function updateZenithTimer() {
                           font-weight:900;font-size:0.85rem;text-decoration:none;letter-spacing:1px;">
                     🔴 WATCH LIVE TIMING ➔
                 </a>
-                <a href="${race.hubUrl}" target="_blank" rel="noopener noreferrer"
-                   class="live-btn-link"
-                   style="pointer-events:auto;position:relative;z-index:999;display:inline-block;">
-                    ENTER COMMAND CENTER ➔
-                </a>
             </div>`;
 
         // Trigger results refresh when session goes live
@@ -232,7 +227,7 @@ if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 window.addEventListener('load', () => window.scrollTo(0,0));
 
 function handleTabLoading(id) {
-    if (id === 'home')       { fetchLiveF1News(); updateLatestResults(); }
+    if (id === 'home')           { fetchLiveF1News(); updateLatestResults(); }
     else if (id === 'results')   updateLatestResults();
     else if (id === 'schedule')  initSchedule();
     else if (id === 'standings') initStandings();
@@ -301,7 +296,7 @@ function renderDrivers() {
 // AUTO-UPDATE DRIVER WINS + POLES
 // ============================================================
 async function autoUpdateDriverStats() {
-    renderDrivers(); // Show local data immediately
+    renderDrivers();
 
     try {
         let standingsData = null;
@@ -315,7 +310,6 @@ async function autoUpdateDriverStats() {
 
         if (!standingsData) return;
 
-        // Count 2026 poles round by round
         const polesMap = {};
         for (let round = 1; round <= 24; round++) {
             try {
@@ -334,10 +328,8 @@ async function autoUpdateDriverStats() {
                 driver.name.toLowerCase().includes(ls.Driver.familyName.toLowerCase())
             );
             if (match) {
-                // Only add 2026 season wins/poles on top of career stats (not cumulative on re-render)
                 const seasonWins = parseInt(match.wins) || 0;
-                // Store original career stats once to avoid double-adding on re-render
-                if (driver._baseWins === undefined) driver._baseWins = driver.wins;
+                if (driver._baseWins  === undefined) driver._baseWins  = driver.wins;
                 if (driver._basePoles === undefined) driver._basePoles = driver.poles;
                 driver.wins  = driver._baseWins  + seasonWins;
                 const dId = match.Driver.driverId.toLowerCase();
@@ -365,7 +357,6 @@ async function initStandings() {
 
     let dList = [], tList = [];
 
-    // Try 2026 current standings first (after round 1+), fall back to 2025 only if NO 2026 data at all
     for (const year of ['2026','2025']) {
         try {
             const [dRes, tRes] = await Promise.all([
@@ -376,7 +367,6 @@ async function initStandings() {
             const tJson = await tRes.json();
             const dl = dJson.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings || [];
             const tl = tJson.MRData?.StandingsTable?.StandingsLists?.[0]?.ConstructorStandings || [];
-            // Only accept 2025 data if 2026 truly has nothing
             if (dl.length > 0) {
                 dList = dl; tList = tl;
                 const yr = dJson.MRData?.StandingsTable?.StandingsLists?.[0]?.season;
@@ -387,9 +377,6 @@ async function initStandings() {
         } catch(e) { continue; }
     }
 
-    // Build season label from the data itself (not from DOM attribute)
-    const standingsMeta  = dList.length > 0 ? { season: dList[0]?.season, round: dList[0]?.round } : null;
-    // Actually get it from the StandingsLists level — stored in dList's parent
     const seasonLabel2 = dList._season ? `<div style="padding:8px 20px;color:#444;font-size:0.65rem;letter-spacing:2px;font-weight:900;">${dList._season}</div>` : '';
 
     dContainer.innerHTML = seasonLabel2 + (dList.length ? dList.map((item, idx) => {
@@ -440,13 +427,11 @@ function getTeamColor(team) {
 }
 
 // ============================================================
-// FETCH ALL RESULTS (paginated — gets all 20+ drivers)
+// FETCH ALL RESULTS (paginated)
 // ============================================================
 async function fetchAllResults(url) {
-    // Determine if this is a qualifying or race URL
     const isQuali = url.includes('qualifying');
 
-    // Always fetch two pages to cover all 22 drivers
     const [res1, res2] = await Promise.all([
         fetch(`${url}.json?limit=20&offset=0`),
         fetch(`${url}.json?limit=10&offset=20`)
@@ -456,41 +441,28 @@ async function fetchAllResults(url) {
     const race1 = data1.MRData?.RaceTable?.Races?.[0];
     if (!race1) return null;
 
-    let page1 = isQuali
-        ? (race1.QualifyingResults || [])
-        : (race1.Results || []);
+    let page1 = isQuali ? (race1.QualifyingResults || []) : (race1.Results || []);
 
-    // Try to get page 2
     let page2 = [];
     try {
         const data2 = await res2.json();
         const race2 = data2.MRData?.RaceTable?.Races?.[0];
         if (race2) {
-            page2 = isQuali
-                ? (race2.QualifyingResults || [])
-                : (race2.Results || []);
+            page2 = isQuali ? (race2.QualifyingResults || []) : (race2.Results || []);
         }
     } catch(e) {}
 
-    // Merge, deduplicate by position
     const allResults = [...page1];
     const existingPositions = new Set(page1.map(r => r.position));
     for (const r of page2) {
-        if (!existingPositions.has(r.position)) {
-            allResults.push(r);
-        }
+        if (!existingPositions.has(r.position)) allResults.push(r);
     }
 
-    // Sort by position
     allResults.sort((a, b) => parseInt(a.position) - parseInt(b.position));
-
     console.log(`✅ ${isQuali ? 'Qualifying' : 'Race'} results: ${allResults.length} drivers loaded`);
 
-    if (isQuali) {
-        return { ...race1, QualifyingResults: allResults };
-    } else {
-        return { ...race1, Results: allResults };
-    }
+    if (isQuali) return { ...race1, QualifyingResults: allResults };
+    else return { ...race1, Results: allResults };
 }
 
 // ============================================================
@@ -514,19 +486,16 @@ async function updateLatestResults() {
 
             const raceDate = race ? new Date(`${race.date}T${race.time || '12:00:00Z'}`) : null;
 
-            // Race is finished and has results → ALWAYS show race result
             if (race?.Results?.length > 0 && raceDate && raceDate < now) {
                 renderResultsUI(race, "RACE");
                 return;
             }
 
-            // Race not finished yet → show qualifying
             if (qualy?.QualifyingResults?.length > 0) {
                 renderResultsUI(qualy, "QUALIFYING");
                 return;
             }
 
-            // Fallback
             if (race?.Results?.length > 0) { renderResultsUI(race, "RACE"); return; }
 
         } catch(e) { continue; }
@@ -625,7 +594,6 @@ function renderResultsUI(race, sessionType = "RACE") {
     container.innerHTML = html + `</div>`;
 }
 
-// Archive search
 async function fetchSpecificRace() {
     const year  = document.getElementById('lookup-year').value;
     const round = document.getElementById('lookup-round').value;
@@ -640,7 +608,6 @@ async function fetchSpecificRace() {
     }
 }
 
-// Populate round selector dynamically based on year
 async function populateRoundSelector() {
     const yearInput = document.getElementById('lookup-year');
     const roundSel  = document.getElementById('lookup-round');
@@ -654,9 +621,7 @@ async function populateRoundSelector() {
         const data = await res.json();
         const races = data.MRData?.RaceTable?.Races || [];
         const now   = new Date();
-
-        // Show all past rounds for selected year
-        const done = races.filter(r => new Date(`${r.date}T${r.time || '12:00:00Z'}`) < now);
+        const done  = races.filter(r => new Date(`${r.date}T${r.time || '12:00:00Z'}`) < now);
 
         if (done.length === 0) {
             roundSel.innerHTML = `<option value="">No completed rounds for ${year}</option>`;
@@ -667,7 +632,6 @@ async function populateRoundSelector() {
             `<option value="${r.round}">R${r.round.padStart(2,'0')} — ${r.raceName}</option>`
         ).join('');
 
-        // Default to latest completed round
         roundSel.value = done[done.length - 1].round;
 
     } catch(e) {
@@ -677,14 +641,13 @@ async function populateRoundSelector() {
 }
 
 // ============================================================
-// SCHEDULE — PKT date + time on each session, live badge
+// SCHEDULE
 // ============================================================
 async function initSchedule() {
     const container = document.getElementById('schedule-list');
     if (!container) return;
     container.innerHTML = `<div class="loading-container"><div class="f1-spinner"></div><p>FETCHING 2026 CALENDAR...</p></div>`;
 
-    // Convert UTC datetime string to PKT (UTC+5)
     function toPKT(dateStr, timeStr) {
         return new Date(new Date(`${dateStr}T${timeStr || '00:00:00Z'}`).getTime() + 5 * 3600000);
     }
@@ -709,9 +672,9 @@ async function initSchedule() {
         const now = new Date();
 
         const rows = await Promise.all(races.map(async (race) => {
-            const raceUTC    = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
-            const qualiUTC   = race.Qualifying ? new Date(`${race.Qualifying.date}T${race.Qualifying.time || '00:00:00Z'}`) : null;
-            const isFinished = raceUTC < now;
+            const raceUTC     = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
+            const qualiUTC    = race.Qualifying ? new Date(`${race.Qualifying.date}T${race.Qualifying.time || '00:00:00Z'}`) : null;
+            const isFinished  = raceUTC < now;
             const isQualiLive = qualiUTC && now >= qualiUTC && now < new Date(qualiUTC.getTime() + 2*3600000);
             const isRaceLive  = now >= raceUTC && now < new Date(raceUTC.getTime() + 3*3600000);
             const isSprint    = !!race.Sprint;
@@ -732,13 +695,8 @@ async function initSchedule() {
                 } catch(e) {}
             }
 
-            // Render a single session row with PKT date + time
             const sessionRow = (session, label, winner = null, isLive = false) => {
-                if (!session?.date) return `
-                    <div class="session-item">
-                        <span>${label}</span>
-                        <strong style="color:#333">TBC</strong>
-                    </div>`;
+                if (!session?.date) return `<div class="session-item"><span>${label}</span><strong style="color:#333">TBC</strong></div>`;
 
                 const pkt     = fmtPKT(session.date, session.time);
                 const sessUTC = new Date(`${session.date}T${session.time || '00:00:00Z'}`);
@@ -762,11 +720,7 @@ async function initSchedule() {
                         </a>
                     </div>`;
 
-                if (isPast) return `
-                    <div class="session-item">
-                        <span>${label}</span>
-                        <strong style="color:#444">DONE</strong>
-                    </div>`;
+                if (isPast) return `<div class="session-item"><span>${label}</span><strong style="color:#444">DONE</strong></div>`;
 
                 return `
                     <div class="session-item">
@@ -804,12 +758,8 @@ async function initSchedule() {
                     <div class="schedule-details">
                         <div class="details-grid">
                             ${sessionRow(race.FirstPractice, 'FP1')}
-                            ${isSprint
-                                ? sessionRow(race.SprintQualifying, 'SPRINT QUALI')
-                                : sessionRow(race.SecondPractice, 'FP2')}
-                            ${isSprint
-                                ? sessionRow(race.Sprint, 'SPRINT RACE', sprintWin)
-                                : sessionRow(race.ThirdPractice, 'FP3')}
+                            ${isSprint ? sessionRow(race.SprintQualifying, 'SPRINT QUALI') : sessionRow(race.SecondPractice, 'FP2')}
+                            ${isSprint ? sessionRow(race.Sprint, 'SPRINT RACE', sprintWin)  : sessionRow(race.ThirdPractice, 'FP3')}
                             ${sessionRow(race.Qualifying, 'QUALIFYING', poleSitter, isQualiLive)}
                             ${sessionRow({date:race.date,time:race.time}, 'GRAND PRIX', raceWin, isRaceLive)}
                         </div>
@@ -864,7 +814,6 @@ function openGallery(teamId, photoCount = 5) {
 }
 
 function tryNextExt(img, teamId, num) {
-    // Cars are .avif only — on error just show placeholder
     img.onerror = null;
     img.src = 'https://placehold.co/800x450/111/333?text=Image+Not+Found';
 }
@@ -922,8 +871,6 @@ async function updateF1Weather() {
         const race = f1Calendar2026.find(r => new Date(r.date) >= now) || f1Calendar2026[0];
         if (wm) wm.innerText = race.circuit.replace(/GP|Circuit|Grand Prix/gi,'').trim().toUpperCase();
 
-        // Request real track temp (soil_temperature_0cm), real rain probability,
-        // real precipitation, and surface pressure for better accuracy
         const url = `https://api.open-meteo.com/v1/forecast?latitude=${race.lat}&longitude=${race.lon}`
             + `&current=temperature_2m,apparent_temperature,precipitation,precipitation_probability,`
             + `weather_code,wind_speed_10m,wind_gusts_10m,surface_pressure,`
@@ -937,27 +884,19 @@ async function updateF1Weather() {
         setTimeout(() => {
             const set = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
 
-            const airTemp   = Math.round(live.temperature_2m);
-            const feelsLike = Math.round(live.apparent_temperature);
-
-            // Real track temp: soil surface + solar radiation effect
-            // On a sunny day track can be 20-30°C above air; cloudy much less
-            const radiation  = live.shortwave_radiation || 0;          // W/m²
-            const solarBoost = Math.round(radiation / 40);              // ~0–25°C boost
+            const airTemp    = Math.round(live.temperature_2m);
+            const radiation  = live.shortwave_radiation || 0;
+            const solarBoost = Math.round(radiation / 40);
             const trackTemp  = Math.round((live.soil_temperature_0cm || airTemp) + solarBoost);
-
-            // Real rain probability from API
-            const rainProb = live.precipitation_probability ?? Math.round(
+            const rainProb   = live.precipitation_probability ?? Math.round(
                 live.precipitation > 0 ? Math.min(live.precipitation * 100, 99) : 0
             );
-
             const isWet  = live.precipitation > 0.1;
             const isRain = live.weather_code >= 51;
 
-            // Weather status from WMO code
             let status = "CLEAR";
             const wc = live.weather_code;
-            if (wc <= 1)       status = "CLEAR";
+            if      (wc <= 1)  status = "CLEAR";
             else if (wc <= 3)  status = "PARTLY CLOUDY";
             else if (wc <= 48) status = "OVERCAST";
             else if (wc <= 67) status = "RAIN";
@@ -965,23 +904,16 @@ async function updateF1Weather() {
             else if (wc <= 82) status = "SHOWERS";
             else               status = "STORM";
 
-            set('air-temp',      `${airTemp}°C`);
-            set('track-temp',    `${trackTemp}°C`);
-            set('rain-risk',     `${rainProb}%`);
-            set('wind-speed',    `${Math.round(live.wind_speed_10m)} km/h`);
+            set('air-temp',       `${airTemp}°C`);
+            set('track-temp',     `${trackTemp}°C`);
+            set('rain-risk',      `${rainProb}%`);
+            set('wind-speed',     `${Math.round(live.wind_speed_10m)} km/h`);
             set('weather-status', status);
 
             if (gripEl) {
-                if (isWet || isRain) {
-                    gripEl.innerText   = "SLIPPERY";
-                    gripEl.className   = "weather-value slippery";
-                } else if (rainProb > 60) {
-                    gripEl.innerText   = "DAMP RISK";
-                    gripEl.className   = "weather-value slippery";
-                } else {
-                    gripEl.innerText   = "OPTIMAL";
-                    gripEl.className   = "weather-value optimal";
-                }
+                if (isWet || isRain)    { gripEl.innerText = "SLIPPERY"; gripEl.className = "weather-value slippery"; }
+                else if (rainProb > 60) { gripEl.innerText = "DAMP RISK"; gripEl.className = "weather-value slippery"; }
+                else                    { gripEl.innerText = "OPTIMAL";   gripEl.className = "weather-value optimal"; }
             }
 
             if (icon) icon.classList.remove('fa-spin');
