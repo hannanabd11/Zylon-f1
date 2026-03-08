@@ -260,7 +260,7 @@ function renderDrivers() {
             <div class="driver-number-overlay">${d.no}</div>
             <a href="https://www.google.com/search?tbm=isch&q=${firstName}+${lastName}+F1+2026" target="_blank" style="text-decoration:none;color:inherit;display:block;">
                 <div class="driver-image-area">
-                    <img src="images/Drivers/${d.id}.png" class="driver-portrait" onerror="this.src='https://dummyimage.com/400x600/111/fff&text=DRIVER'">
+                    <img src="images/Drivers/${d.id}.png" class="driver-portrait" onerror="this.onerror=null;this.src='images/Drivers/placeholder.png'">
                     <div class="image-gradient"></div>
                 </div>
             </a>
@@ -802,7 +802,7 @@ function initCarsTab() {
     grid.innerHTML = f1Cars2026.map(car => {
         let imgs = '';
         for (let i = 1; i <= 5; i++) {
-            imgs += `<img src="images/Cars/${car.id}-${i}.avif" id="img-${car.id}-${i}" data-ext="avif" onerror="tryNextExt(this,'${car.id}',${i})" alt="Angle ${i}">`;
+            imgs += `<img src="images/Cars/${car.id}-${i}.avif" id="img-${car.id}-${i}" onerror="tryNextExt(this,'${car.id}',${i})" alt="Angle ${i}" style="object-fit:contain;">`;
         }
         return `
         <div class="car-card" onclick="openGallery('${car.id}',5)">
@@ -831,10 +831,9 @@ function openGallery(teamId, photoCount = 5) {
 }
 
 function tryNextExt(img, teamId, num) {
-    const fmts = ['avif','webp','png','jpg'];
-    const next = fmts[fmts.indexOf(img.getAttribute('data-ext')) + 1];
-    if (next) { img.setAttribute('data-ext',next); img.src=`images/Cars/${teamId}-${num}.${next}`; }
-    else { img.src='https://placehold.co/400x225?text=2026+Car+Missing'; img.onerror=null; }
+    // Cars are .avif only — on error just show placeholder
+    img.onerror = null;
+    img.src = 'https://placehold.co/800x450/111/333?text=Image+Not+Found';
 }
 
 function closeGallery() {
