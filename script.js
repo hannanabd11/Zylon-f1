@@ -260,7 +260,7 @@ function renderDrivers() {
             <div class="driver-number-overlay">${d.no}</div>
             <a href="https://www.google.com/search?tbm=isch&q=${firstName}+${lastName}+F1+2026" target="_blank" style="text-decoration:none;color:inherit;display:block;">
                 <div class="driver-image-area">
-                    <img src="./Drivers/${d.id}.png" class="driver-portrait" onerror="this.onerror=null;this.src='images/Drivers/placeholder.png'">
+                    <img src="./Drivers/${d.id}.PNG" class="driver-portrait" onerror="this.onerror=null;this.src='images/Drivers/placeholder.png'">
                     <div class="image-gradient"></div>
                 </div>
             </a>
@@ -960,4 +960,5 @@ async function updateF1Weather() {
         if (icon) icon.classList.remove('fa-spin');
     }
 }
+
 
