@@ -256,9 +256,12 @@ function renderDrivers() {
         const card = document.createElement('div');
         card.className = "driver-card-new";
         card.style.setProperty('--team-color', accentColor);
+        const driverF1Url = `https://www.formula1.com/en/drivers/${d.id}`;
+        const teamF1Url   = `https://www.formula1.com/en/teams/${d.team.toLowerCase().replace(/_/g,'-').replace(/\s+/g,'-')}`;
+
         card.innerHTML = `
             <div class="driver-number-overlay">${d.no}</div>
-            <a href="https://www.google.com/search?tbm=isch&q=${firstName}+${lastName}+F1+2026" target="_blank" style="text-decoration:none;color:inherit;display:block;">
+            <a href="${driverF1Url}" target="_blank" style="text-decoration:none;color:inherit;display:block;">
                 <div class="driver-image-area">
                     <img src="./Drivers/${d.id}.PNG" class="driver-portrait" onerror="this.onerror=null;this.src='./Drivers/placeholder.png'">
                     <div class="image-gradient"></div>
@@ -267,8 +270,18 @@ function renderDrivers() {
             <div class="driver-info-area">
                 <div class="driver-header-row">
                     <div class="driver-name-stack">
-                        <div class="driver-team-tag">${d.team.replace('_',' ')}</div>
-                        <h3>${firstName} <b>${lastName}</b></h3>
+                        <a href="${teamF1Url}" target="_blank" style="text-decoration:none;">
+                            <div class="driver-team-tag" style="cursor:pointer;"
+                                 onmouseover="this.style.color='var(--team-color)';this.style.textDecoration='underline'"
+                                 onmouseout="this.style.color='';this.style.textDecoration=''">
+                                ${d.team.replace(/_/g,' ')}
+                            </div>
+                        </a>
+                        <a href="${driverF1Url}" target="_blank" style="text-decoration:none;color:inherit;">
+                            <h3 onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'" style="cursor:pointer;transition:opacity 0.2s;">
+                                ${firstName} <b>${lastName}</b>
+                            </h3>
+                        </a>
                     </div>
                     <div class="driver-flag-side">
                         <img src="https://flagcdn.com/w80/${d.flag}.png" class="mini-flag" alt="Flag">
@@ -958,5 +971,3 @@ async function updateF1Weather() {
         if (icon) icon.classList.remove('fa-spin');
     }
 }
-
-
