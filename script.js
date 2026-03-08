@@ -393,7 +393,7 @@ async function initStandings() {
     const seasonLabel2 = dList._season ? `<div style="padding:8px 20px;color:#444;font-size:0.65rem;letter-spacing:2px;font-weight:900;">${dList._season}</div>` : '';
 
     dContainer.innerHTML = seasonLabel2 + (dList.length ? dList.map((item, idx) => {
-        const pos       = item.positionText || item.position || (idx + 1);
+        const pos       = parseInt(item.position || item.positionText) || (idx + 1);
         const teamColor = getTeamColor(item.Constructors?.[0]?.name || '');
         const driverInfo = f1_2026_grid.find(d => d.name.toLowerCase().includes(item.Driver.familyName.toLowerCase()));
         const flag = driverInfo?.flag || 'un';
@@ -413,7 +413,7 @@ async function initStandings() {
     }).join('') : `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET — SHOWING AFTER ROUND 1</div>`);
 
     tContainer.innerHTML = tList.length ? tList.map((item, idx) => {
-        const pos       = item.positionText || item.position || (idx + 1);
+        const pos       = parseInt(item.position || item.positionText) || (idx + 1);
         const teamColor = getTeamColor(item.Constructor?.name || '');
         return `
             <div class="standings-entry" style="--team-glow:${teamColor}">
