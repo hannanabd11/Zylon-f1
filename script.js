@@ -408,6 +408,60 @@ function getTeamColor(team) {
 }
 
 // ============================================================
+// FETCH ALL RESULTS (paginated — gets all 20+ drivers)
+// ============================================================
+async function fetchAllResults(url) {
+    // Determine if this is a qualifying or race URL
+    const isQuali = url.includes('qualifying');
+
+    // Always fetch two pages to cover all 22 drivers
+    const [res1, res2] = await Promise.all([
+        fetch(`${url}.json?limit=20&offset=0`),
+        fetch(`${url}.json?limit=10&offset=20`)
+    ]);
+
+    const data1 = await res1.json();
+    const race1 = data1.MRData?.RaceTable?.Races?.[0];
+    if (!race1) return null;
+
+    let page1 = isQuali
+        ? (race1.QualifyingResults || [])
+        : (race1.Results || []);
+
+    // Try to get page 2
+    let page2 = [];
+    try {
+        const data2 = await res2.json();
+        const race2 = data2.MRData?.RaceTable?.Races?.[0];
+        if (race2) {
+            page2 = isQuali
+                ? (race2.QualifyingResults || [])
+                : (race2.Results || []);
+        }
+    } catch(e) {}
+
+    // Merge, deduplicate by position
+    const allResults = [...page1];
+    const existingPositions = new Set(page1.map(r => r.position));
+    for (const r of page2) {
+        if (!existingPositions.has(r.position)) {
+            allResults.push(r);
+        }
+    }
+
+    // Sort by position
+    allResults.sort((a, b) => parseInt(a.position) - parseInt(b.position));
+
+    console.log(`✅ ${isQuali ? 'Qualifying' : 'Race'} results: ${allResults.length} drivers loaded`);
+
+    if (isQuali) {
+        return { ...race1, QualifyingResults: allResults };
+    } else {
+        return { ...race1, Results: allResults };
+    }
+}
+
+// ============================================================
 // RESULTS ENGINE
 // ============================================================
 async function updateLatestResults() {
@@ -419,14 +473,10 @@ async function updateLatestResults() {
 
     for (const year of ['2026','2025']) {
         try {
-            const [rRes, qRes] = await Promise.all([
-                fetch(`https://api.jolpi.ca/ergast/f1/${year}/last/results.json?limit=30`),
-                fetch(`https://api.jolpi.ca/ergast/f1/${year}/last/qualifying.json`)
+            const [race, qualy] = await Promise.all([
+                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/results`),
+                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/qualifying`)
             ]);
-            const rData = await rRes.json();
-            const qData = await qRes.json();
-            const race  = rData.MRData?.RaceTable?.Races?.[0];
-            const qualy = qData.MRData?.RaceTable?.Races?.[0];
 
             if (!race && !qualy) continue;
 
@@ -547,9 +597,7 @@ async function fetchSpecificRace() {
     const container = document.getElementById('results-content');
     container.innerHTML = `<div style="padding:50px;text-align:center;color:#666;font-weight:bold;">ACCESSING ARCHIVES...</div>`;
     try {
-        const res  = await fetch(`https://api.jolpi.ca/ergast/f1/${year}/${round}/results.json?limit=30`);
-        const data = await res.json();
-        const r    = data.MRData.RaceTable.Races[0];
+        const r = await fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/${round}/results`);
         if (r) renderResultsUI(r, "RACE");
         else container.innerHTML = `<div style="padding:50px;text-align:center;"><h3 style="color:#e10600;">NO DATA FOUND</h3></div>`;
     } catch(e) {
@@ -559,35 +607,37 @@ async function fetchSpecificRace() {
 
 // Populate round selector dynamically based on year
 async function populateRoundSelector() {
-    const year      = document.getElementById('lookup-year').value;
+    const yearInput = document.getElementById('lookup-year');
     const roundSel  = document.getElementById('lookup-round');
-    if (!roundSel) return;
+    if (!roundSel || !yearInput) return;
 
-    roundSel.innerHTML = `<option value="">Loading...</option>`;
+    const year = yearInput.value || new Date().getFullYear();
+    roundSel.innerHTML = `<option value="">⏳ Loading rounds...</option>`;
 
     try {
-        const res   = await fetch(`https://api.jolpi.ca/ergast/f1/${year}.json`);
-        const data  = await res.json();
+        const res  = await fetch(`https://api.jolpi.ca/ergast/f1/${year}.json?limit=30`);
+        const data = await res.json();
         const races = data.MRData?.RaceTable?.Races || [];
         const now   = new Date();
 
-        // Only show rounds that have already happened
-        const done = races.filter(r => new Date(r.date) < now);
+        // Show all past rounds for selected year
+        const done = races.filter(r => new Date(`${r.date}T${r.time || '12:00:00Z'}`) < now);
 
         if (done.length === 0) {
-            roundSel.innerHTML = `<option value="">No rounds yet</option>`;
+            roundSel.innerHTML = `<option value="">No completed rounds for ${year}</option>`;
             return;
         }
 
         roundSel.innerHTML = done.map(r =>
-            `<option value="${r.round}">R${r.round} — ${r.raceName}</option>`
+            `<option value="${r.round}">R${r.round.padStart(2,'0')} — ${r.raceName}</option>`
         ).join('');
 
-        // Default to latest round
+        // Default to latest completed round
         roundSel.value = done[done.length - 1].round;
 
     } catch(e) {
-        roundSel.innerHTML = `<option value="1">Round 1</option>`;
+        roundSel.innerHTML = `<option value="">Error loading rounds</option>`;
+        console.error('Round selector error:', e);
     }
 }
 
