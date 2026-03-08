@@ -293,7 +293,7 @@ async function autoUpdateDriverStats() {
     try {
         let standingsData = null;
 
-        for (const year of ['2026','2025']) {
+        for (const year of ['2026']) {
             const res  = await fetch(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`);
             const json = await res.json();
             const list = json.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings;
@@ -348,7 +348,7 @@ async function initStandings() {
 
     let dList = [], tList = [];
 
-    for (const year of ['2026','2025']) {
+    for (const year of ['2026']) {
         try {
             const [dRes, tRes] = await Promise.all([
                 fetch(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`),
@@ -819,12 +819,10 @@ function initCarsTab() {
 function openGallery(teamId, photoCount = 5) {
     const overlay = document.getElementById('gallery-overlay');
     const content = document.getElementById('gallery-content');
-    if (!overlay||!content) return;
+    if (!overlay || !content) return;
     let html = '';
     for (let i = 1; i <= photoCount; i++) {
-        const img = document.getElementById(`img-${teamId}-${i}`);
-        const ext = img?.getAttribute('data-ext') || 'jpg';
-        html += `<img src="images/Cars/${teamId}-${i}.${ext}" onerror="this.src='https://placehold.co/800x450?text=Image+Missing'">`;
+        html += `<img src="./Cars/${teamId}-${i}.avif" onerror="this.onerror=null;this.src='https://placehold.co/800x450/111/333?text=No+Image'" style="object-fit:contain;">`;
     }
     content.innerHTML = html;
     overlay.style.display = 'flex';
@@ -960,5 +958,3 @@ async function updateF1Weather() {
         if (icon) icon.classList.remove('fa-spin');
     }
 }
-
-
