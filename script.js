@@ -379,55 +379,53 @@ async function initStandings() {
             // Only accept 2025 data if 2026 truly has nothing
             if (dl.length > 0) {
                 dList = dl; tList = tl;
-                // Show year label
                 const yr = dJson.MRData?.StandingsTable?.StandingsLists?.[0]?.season;
                 const rd = dJson.MRData?.StandingsTable?.StandingsLists?.[0]?.round;
-                if (yr) {
-                    ['drivers-list','teams-list'].forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) el.setAttribute('data-season', `${yr} • AFTER ROUND ${rd}`);
-                    });
-                }
+                if (yr) dList._season = `${yr} • AFTER ROUND ${rd}`;
                 break;
             }
         } catch(e) { continue; }
     }
 
-    const seasonTag = dContainer.getAttribute('data-season');
-    const seasonHeader = seasonTag ? `<div style="padding:10px 20px 6px;color:#444;font-size:0.65rem;letter-spacing:2px;font-weight:900;text-transform:uppercase;">${seasonTag}</div>` : '';
+    // Build season label from the data itself (not from DOM attribute)
+    const standingsMeta  = dList.length > 0 ? { season: dList[0]?.season, round: dList[0]?.round } : null;
+    // Actually get it from the StandingsLists level — stored in dList's parent
+    const seasonLabel2 = dList._season ? `<div style="padding:8px 20px;color:#444;font-size:0.65rem;letter-spacing:2px;font-weight:900;">${dList._season}</div>` : '';
 
-    dContainer.innerHTML = seasonHeader + (dList.map((item) => {
-        const teamColor = getTeamColor(item.Constructors[0].name);
+    dContainer.innerHTML = seasonLabel2 + (dList.length ? dList.map((item, idx) => {
+        const pos       = item.positionText || item.position || (idx + 1);
+        const teamColor = getTeamColor(item.Constructors?.[0]?.name || '');
         const driverInfo = f1_2026_grid.find(d => d.name.toLowerCase().includes(item.Driver.familyName.toLowerCase()));
         const flag = driverInfo?.flag || 'un';
         return `
             <div class="standings-entry" style="--team-glow:${teamColor}">
-                <div class="pos-num">${item.position}</div>
+                <div class="pos-num">${pos}</div>
                 <div class="team-strip" style="background:${teamColor}"></div>
                 <div class="entry-name">
-                    <span class="team-label">${item.Constructors[0].name}</span>
+                    <span class="team-label">${item.Constructors?.[0]?.name || '—'}</span>
                     <div class="driver-name-row" style="display:flex;align-items:center;">
                         <img src="https://flagcdn.com/w40/${flag}.png" class="tiny-flag">
                         <span class="driver-text">${item.Driver.givenName} <strong>${item.Driver.familyName}</strong></span>
                     </div>
                 </div>
-                <div class="entry-pts">${item.points}</div>
+                <div class="entry-pts">${item.points ?? 0}</div>
             </div>`;
-    }).join('') || `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET — SHOWING AFTER ROUND 1</div>`);
+    }).join('') : `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET — SHOWING AFTER ROUND 1</div>`);
 
-    tContainer.innerHTML = tList.map(item => {
-        const teamColor = getTeamColor(item.Constructor.name);
+    tContainer.innerHTML = tList.length ? tList.map((item, idx) => {
+        const pos       = item.positionText || item.position || (idx + 1);
+        const teamColor = getTeamColor(item.Constructor?.name || '');
         return `
             <div class="standings-entry" style="--team-glow:${teamColor}">
-                <div class="pos-num">${item.position}</div>
+                <div class="pos-num">${pos}</div>
                 <div class="team-strip" style="background:${teamColor}"></div>
                 <div class="entry-name">
                     <span class="team-label">CONSTRUCTOR</span>
-                    <div class="driver-text" style="color:${teamColor};font-weight:900;">${item.Constructor.name.toUpperCase()}</div>
+                    <div class="driver-text" style="color:${teamColor};font-weight:900;">${item.Constructor?.name?.toUpperCase() || '—'}</div>
                 </div>
-                <div class="entry-pts">${item.points}</div>
+                <div class="entry-pts">${item.points ?? 0}</div>
             </div>`;
-    }).join('') || `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET</div>`;
+    }).join('') : `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET</div>`;
 }
 
 function getTeamColor(team) {
@@ -593,7 +591,7 @@ function renderResultsUI(race, sessionType = "RACE") {
 
     resultsData.forEach((r, i) => {
         const isFirst      = i === 0;
-        const isFastestLap = r.FastestLap?.rank === "1" || r.FastestLap?.rank === 1;
+        const isFastestLap = r.FastestLap != null && String(r.FastestLap.rank) === "1";
         const tc           = tcMap[r.Constructor?.constructorId] || "#888";
         const hl           = isFirst ? (isQualy ? "#b700ff" : "#00ff00") : isFastestLap ? "#b700ff" : tc;
 
