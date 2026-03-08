@@ -393,12 +393,14 @@ async function initStandings() {
         } catch(e) { continue; }
     }
 
-    dContainer.innerHTML = dList.map((item, i) => {
+    const seasonTag = dContainer.getAttribute('data-season');
+    const seasonHeader = seasonTag ? `<div style="padding:10px 20px 6px;color:#444;font-size:0.65rem;letter-spacing:2px;font-weight:900;text-transform:uppercase;">${seasonTag}</div>` : '';
+
+    dContainer.innerHTML = seasonHeader + (dList.map((item) => {
         const teamColor = getTeamColor(item.Constructors[0].name);
         const driverInfo = f1_2026_grid.find(d => d.name.toLowerCase().includes(item.Driver.familyName.toLowerCase()));
         const flag = driverInfo?.flag || 'un';
-        const seasonLabel = i === 0 ? `<div style="padding:10px 20px 0;color:#333;font-size:0.65rem;letter-spacing:2px;font-weight:900;">${dContainer.getAttribute('data-season') || ''}</div>` : '';
-        return seasonLabel + `
+        return `
             <div class="standings-entry" style="--team-glow:${teamColor}">
                 <div class="pos-num">${item.position}</div>
                 <div class="team-strip" style="background:${teamColor}"></div>
@@ -411,7 +413,7 @@ async function initStandings() {
                 </div>
                 <div class="entry-pts">${item.points}</div>
             </div>`;
-    }).join('') || `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET — SHOWING AFTER ROUND 1</div>`;
+    }).join('') || `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET — SHOWING AFTER ROUND 1</div>`);
 
     tContainer.innerHTML = tList.map(item => {
         const teamColor = getTeamColor(item.Constructor.name);
@@ -591,7 +593,7 @@ function renderResultsUI(race, sessionType = "RACE") {
 
     resultsData.forEach((r, i) => {
         const isFirst      = i === 0;
-        const isFastestLap = r.FastestLap?.rank === "1";
+        const isFastestLap = r.FastestLap?.rank === "1" || r.FastestLap?.rank === 1;
         const tc           = tcMap[r.Constructor?.constructorId] || "#888";
         const hl           = isFirst ? (isQualy ? "#b700ff" : "#00ff00") : isFastestLap ? "#b700ff" : tc;
 
