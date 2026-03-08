@@ -45,13 +45,36 @@
         </div>
 
         <div class="header-utils">
-            <button class="btn-shop">
+            <button class="btn-shop" onclick="window.open('https://store.formula1.com','_blank')">
                 <span>SHOP</span>
                 <i class="fas fa-shopping-bag"></i>
             </button>
-            <div class="user-login">
+
+            <!-- LOGGED OUT state -->
+            <div class="user-login" id="login-btn" onclick="signInWithGoogle()" style="cursor:pointer;">
                 <i class="far fa-user-circle"></i>
                 <span>LOGIN</span>
+            </div>
+
+            <!-- LOGGED IN state (hidden by default) -->
+            <div class="user-profile" id="user-profile" style="display:none;position:relative;">
+                <div onclick="toggleUserMenu()" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                    <img id="user-avatar" src="" alt="Avatar"
+                         style="width:32px;height:32px;border-radius:50%;border:2px solid #e10600;object-fit:cover;">
+                    <span id="user-name" style="color:#fff;font-weight:700;font-size:0.8rem;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"></span>
+                    <i class="fas fa-chevron-down" style="color:#666;font-size:0.6rem;"></i>
+                </div>
+                <!-- Dropdown -->
+                <div id="user-menu" style="display:none;position:absolute;top:45px;right:0;background:#111;border:1px solid #222;border-radius:6px;min-width:180px;z-index:9999;padding:8px 0;">
+                    <div style="padding:12px 16px;border-bottom:1px solid #1a1a1a;">
+                        <div id="menu-name" style="color:#fff;font-weight:900;font-size:0.85rem;"></div>
+                        <div id="menu-email" style="color:#555;font-size:0.7rem;margin-top:2px;"></div>
+                    </div>
+                    <div onclick="signOutUser()" style="padding:10px 16px;color:#e10600;font-size:0.8rem;font-weight:700;cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:8px;"
+                         onmouseover="this.style.background='#1a0000'" onmouseout="this.style.background='transparent'">
+                        <i class="fas fa-sign-out-alt"></i> SIGN OUT
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -82,12 +105,90 @@
         <div id="results-display-area" class="results-grid"></div>
         <div id="results-content" style="color:#666;text-align:center;padding:20px;">Fetching latest FIA data...</div>
 
-        <!-- ARCHIVE SEARCH — dynamic round dropdown -->
+        <!-- ARCHIVE SEARCH — dynamic year + round dropdowns -->
         <div class="race-search-bar" style="background:rgba(255,255,255,0.03);padding:20px;border-radius:8px;margin:40px 0 20px 0;display:flex;gap:10px;align-items:center;border:1px solid rgba(255,255,255,0.05);flex-wrap:wrap;">
             <div style="color:#666;font-size:0.8rem;font-weight:bold;text-transform:uppercase;margin-right:10px;white-space:nowrap;">ARCHIVE SEARCH:</div>
-            <input type="number" id="lookup-year" placeholder="Year" value="2026"
-                   onchange="populateRoundSelector()"
-                   style="background:#111;border:1px solid #333;color:white;padding:12px;border-radius:4px;width:110px;font-weight:bold;font-family:inherit;">
+            <select id="lookup-year"
+                    onchange="populateRoundSelector()"
+                    style="background:#111;border:1px solid #333;color:white;padding:12px;border-radius:4px;width:110px;font-weight:bold;font-family:inherit;cursor:pointer;">
+                    <option value="2026" selected>2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                    <option value="2014">2014</option>
+                    <option value="2013">2013</option>
+                    <option value="2012">2012</option>
+                    <option value="2011">2011</option>
+                    <option value="2010">2010</option>
+                    <option value="2009">2009</option>
+                    <option value="2008">2008</option>
+                    <option value="2007">2007</option>
+                    <option value="2006">2006</option>
+                    <option value="2005">2005</option>
+                    <option value="2004">2004</option>
+                    <option value="2003">2003</option>
+                    <option value="2002">2002</option>
+                    <option value="2001">2001</option>
+                    <option value="2000">2000</option>
+                    <option value="1999">1999</option>
+                    <option value="1998">1998</option>
+                    <option value="1997">1997</option>
+                    <option value="1996">1996</option>
+                    <option value="1995">1995</option>
+                    <option value="1994">1994</option>
+                    <option value="1993">1993</option>
+                    <option value="1992">1992</option>
+                    <option value="1991">1991</option>
+                    <option value="1990">1990</option>
+                    <option value="1989">1989</option>
+                    <option value="1988">1988</option>
+                    <option value="1987">1987</option>
+                    <option value="1986">1986</option>
+                    <option value="1985">1985</option>
+                    <option value="1984">1984</option>
+                    <option value="1983">1983</option>
+                    <option value="1982">1982</option>
+                    <option value="1981">1981</option>
+                    <option value="1980">1980</option>
+                    <option value="1979">1979</option>
+                    <option value="1978">1978</option>
+                    <option value="1977">1977</option>
+                    <option value="1976">1976</option>
+                    <option value="1975">1975</option>
+                    <option value="1974">1974</option>
+                    <option value="1973">1973</option>
+                    <option value="1972">1972</option>
+                    <option value="1971">1971</option>
+                    <option value="1970">1970</option>
+                    <option value="1969">1969</option>
+                    <option value="1968">1968</option>
+                    <option value="1967">1967</option>
+                    <option value="1966">1966</option>
+                    <option value="1965">1965</option>
+                    <option value="1964">1964</option>
+                    <option value="1963">1963</option>
+                    <option value="1962">1962</option>
+                    <option value="1961">1961</option>
+                    <option value="1960">1960</option>
+                    <option value="1959">1959</option>
+                    <option value="1958">1958</option>
+                    <option value="1957">1957</option>
+                    <option value="1956">1956</option>
+                    <option value="1955">1955</option>
+                    <option value="1954">1954</option>
+                    <option value="1953">1953</option>
+                    <option value="1952">1952</option>
+                    <option value="1951">1951</option>
+                    <option value="1950">1950</option>
+            </select>
             <select id="lookup-round"
                    style="background:#111;border:1px solid #333;color:white;padding:12px;border-radius:4px;flex:1;min-width:180px;font-weight:bold;font-family:inherit;cursor:pointer;">
                 <option value="">SELECT ROUND</option>
@@ -274,7 +375,7 @@
 
         <div class="social-links-container">
             <div class="social-links">
-                <a href="mailto:hannanokay03@gmail.com" title="Gmail"><i class="fas fa-envelope"></i></a>
+                <a href="/cdn-cgi/l/email-protection#7f171e11111e1110141e064f4c3f18121e1613511c1012" title="Gmail"><i class="fas fa-envelope"></i></a>
                 <a href="https://linkedin.com/in/abdul-hannan-5146a2335" target="_blank" title="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
                 <a href="https://github.com/hannanabd11" target="_blank" title="GitHub"><i class="fab fa-github"></i></a>
                 <a href="YOUR_INSTAGRAM_URL" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
@@ -290,15 +391,78 @@
     </div>
 </footer>
 
+    <!-- Firebase Google Auth -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+            from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAc6P9R-0Bz7tXALSxkx51apvnTYT9NcTQ",
+            authDomain: "zylon-f1.firebaseapp.com",
+            projectId: "zylon-f1",
+            storageBucket: "zylon-f1.firebasestorage.app",
+            messagingSenderId: "687646842309",
+            appId: "1:687646842309:web:e588ede071e7e80fe3ffac",
+            measurementId: "G-2PHS9954FV"
+        };
+
+        const app      = initializeApp(firebaseConfig);
+        const auth     = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        window.signInWithGoogle = async () => {
+            try {
+                await signInWithPopup(auth, provider);
+            } catch(e) {
+                console.error("Login failed:", e.message);
+                alert("Login failed: " + e.message);
+            }
+        };
+
+        window.signOutUser = async () => {
+            await signOut(auth);
+            document.getElementById('user-menu').style.display = 'none';
+        };
+
+        window.toggleUserMenu = () => {
+            const m = document.getElementById('user-menu');
+            m.style.display = m.style.display === 'none' ? 'block' : 'none';
+        };
+
+        document.addEventListener('click', (e) => {
+            const profile = document.getElementById('user-profile');
+            if (profile && !profile.contains(e.target)) {
+                const m = document.getElementById('user-menu');
+                if (m) m.style.display = 'none';
+            }
+        });
+
+        onAuthStateChanged(auth, (user) => {
+            const loginBtn  = document.getElementById('login-btn');
+            const userProf  = document.getElementById('user-profile');
+            const avatar    = document.getElementById('user-avatar');
+            const userName  = document.getElementById('user-name');
+            const menuName  = document.getElementById('menu-name');
+            const menuEmail = document.getElementById('menu-email');
+            if (user) {
+                loginBtn.style.display  = 'none';
+                userProf.style.display  = 'flex';
+                userProf.style.alignItems = 'center';
+                avatar.src              = user.photoURL || '';
+                userName.textContent    = user.displayName?.split(' ')[0] || 'DRIVER';
+                menuName.textContent    = user.displayName || '';
+                menuEmail.textContent   = user.email || '';
+            } else {
+                loginBtn.style.display  = 'flex';
+                userProf.style.display  = 'none';
+            }
+        });
+    </script>
+
     <script src="data.js"></script>
     <script src="script.js"></script>
     
     <div id="gallery-overlay" class="gallery-overlay">
         <span class="close-gallery" onclick="closeGallery()">&times;</span>
-        <div class="gallery-slider" id="gallery-content"></div>
-        <div class="gallery-instruction">Swipe or use arrows to view all angles</div>
-    </div>
-
-</body>
-</html>
-
+        <div class="galle
