@@ -301,7 +301,7 @@ async function autoUpdateDriverStats() {
     try {
         let standingsData = null;
 
-        for (const year of ['2026','2025']) {
+        for (const year of ['2026']) {
             const res  = await fetch(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`);
             const json = await res.json();
             const list = json.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings;
@@ -925,3 +925,4 @@ async function updateF1Weather() {
         if (icon) icon.classList.remove('fa-spin');
     }
 }
+
