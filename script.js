@@ -4,6 +4,22 @@
 // auto-updating results, live green blinker, driver stats
 // ============================================================
 
+// ============================================================
+// FETCH WITH TIMEOUT — prevents page from hanging forever
+// ============================================================
+async function fetchWithTimeout(url, ms = 5000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), ms);
+    try {
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timer);
+        return res;
+    } catch(e) {
+        clearTimeout(timer);
+        throw e;
+    }
+}
+
 // --- STARTUP ENGINE ---
 document.addEventListener('DOMContentLoaded', () => {
     fetchLiveF1News();
@@ -302,7 +318,7 @@ async function autoUpdateDriverStats() {
         let standingsData = null;
 
         for (const year of ['2026']) {
-            const res  = await fetch(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`);
+            const res  = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`);
             const json = await res.json();
             const list = json.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings;
             if (list?.length > 0) { standingsData = list; break; }
@@ -313,7 +329,7 @@ async function autoUpdateDriverStats() {
         const polesMap = {};
         for (let round = 1; round <= 24; round++) {
             try {
-                const r = await fetch(`https://api.jolpi.ca/ergast/f1/2026/${round}/qualifying.json`);
+                const r = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/2026/${round}/qualifying.json`);
                 const j = await r.json();
                 const qr = j.MRData?.RaceTable?.Races?.[0]?.QualifyingResults;
                 if (!qr?.length) break;
@@ -360,8 +376,8 @@ async function initStandings() {
     for (const year of ['2026','2025']) {
         try {
             const [dRes, tRes] = await Promise.all([
-                fetch(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`),
-                fetch(`https://api.jolpi.ca/ergast/f1/${year}/constructorStandings.json`)
+                fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`),
+                fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${year}/constructorStandings.json`)
             ]);
             const dJson = await dRes.json();
             const tJson = await tRes.json();
@@ -433,8 +449,8 @@ async function fetchAllResults(url) {
     const isQuali = url.includes('qualifying');
 
     const [res1, res2] = await Promise.all([
-        fetch(`${url}.json?limit=20&offset=0`),
-        fetch(`${url}.json?limit=10&offset=20`)
+        fetchWithTimeout(`${url}.json?limit=20&offset=0`),
+        fetchWithTimeout(`${url}.json?limit=10&offset=20`)
     ]);
 
     const data1 = await res1.json();
@@ -617,7 +633,7 @@ async function populateRoundSelector() {
     roundSel.innerHTML = `<option value="">⏳ Loading rounds...</option>`;
 
     try {
-        const res  = await fetch(`https://api.jolpi.ca/ergast/f1/${year}.json?limit=30`);
+        const res  = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${year}.json?limit=30`);
         const data = await res.json();
         const races = data.MRData?.RaceTable?.Races || [];
         const now   = new Date();
@@ -663,7 +679,7 @@ async function initSchedule() {
     try {
         let races = [];
         for (const year of ['2026','2025']) {
-            const res  = await fetch(`https://api.jolpi.ca/ergast/f1/${year}.json`);
+            const res  = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${year}.json`);
             const data = await res.json();
             races = data.MRData?.RaceTable?.Races || [];
             if (races.length > 0) break;
@@ -683,13 +699,13 @@ async function initSchedule() {
             if (isFinished) {
                 try {
                     const [rr, qr] = await Promise.all([
-                        fetch(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/results.json?limit=30`).then(r=>r.json()),
-                        fetch(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/qualifying.json`).then(r=>r.json())
+                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/results.json?limit=30`).then(r=>r.json()),
+                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/qualifying.json`).then(r=>r.json())
                     ]);
                     raceWin    = rr.MRData?.RaceTable?.Races?.[0]?.Results?.[0]?.Driver.code;
                     poleSitter = qr.MRData?.RaceTable?.Races?.[0]?.QualifyingResults?.[0]?.Driver.code;
                     if (isSprint) {
-                        const sr = await fetch(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/sprint.json`).then(r=>r.json());
+                        const sr = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/sprint.json`).then(r=>r.json());
                         sprintWin = sr.MRData?.RaceTable?.Races?.[0]?.SprintResults?.[0]?.Driver.code;
                     }
                 } catch(e) {}
@@ -830,7 +846,7 @@ async function fetchLiveF1News() {
     if (!el) return;
     el.innerHTML = `<div style="color:#444;padding:20px;">FETCHING SATELLITE FEED...</div>`;
     try {
-        const res  = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://www.autosport.com/rss/f1/news/')}`);
+        const res  = await fetchWithTimeout(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://www.autosport.com/rss/f1/news/')}`, 8000);
         const data = await res.json();
         if (!data.items?.length) throw new Error();
         el.innerHTML = data.items.slice(0,8).map(item => {
@@ -877,7 +893,7 @@ async function updateF1Weather() {
             + `soil_temperature_0cm,shortwave_radiation`
             + `&timezone=auto`;
 
-        const res  = await fetch(url);
+        const res  = await fetchWithTimeout(url, 8000);
         const data = await res.json();
         const live = data.current;
 
@@ -925,4 +941,3 @@ async function updateF1Weather() {
         if (icon) icon.classList.remove('fa-spin');
     }
 }
-
