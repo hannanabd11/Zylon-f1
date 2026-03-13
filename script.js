@@ -389,14 +389,16 @@ async function initStandings() {
         return `
             <div class="standings-entry" style="--team-glow:${teamColor};transition:background 0.2s,transform 0.15s;"
                  onmouseover="this.style.background='${teamColor}15';this.style.transform='translateX(4px)';this.querySelector('.driver-text').style.color='${teamColor}';this.querySelector('.entry-pts-inner').style.color='${teamColor}'"
-                 onmouseout="this.style.background='';this.style.transform='';this.querySelector('.driver-text').style.color='';this.querySelector('.entry-pts-inner').style.color=''">
+                 onmouseout="this.style.background='';this.style.transform='';this.querySelector('.driver-text').style.color='#fff';this.querySelector('.entry-pts-inner').style.color=''">
                 <div class="pos-num">${pos}</div>
                 <div class="team-strip" style="background:${teamColor}"></div>
                 <div class="entry-name">
                     <span class="team-label">${item.Constructors?.[0]?.name || '—'}</span>
                     <div class="driver-name-row" style="display:flex;align-items:center;">
                         <img src="https://flagcdn.com/w40/${flag}.png" class="tiny-flag">
-                        <span class="driver-text" style="transition:color 0.2s;">${item.Driver.givenName} <strong>${item.Driver.familyName}</strong></span>
+                        <a href="https://www.formula1.com/en/drivers/${item.Driver.driverId}" target="_blank"
+                           class="driver-text" style="transition:color 0.2s;text-decoration:none;color:inherit;"
+                           onclick="event.stopPropagation()">${item.Driver.givenName} <strong>${item.Driver.familyName}</strong></a>
                     </div>
                 </div>
                 <div class="entry-pts"><span class="entry-pts-inner" style="transition:color 0.2s;">${item.points ?? 0}</span></div>
@@ -416,20 +418,44 @@ async function initStandings() {
         const teamFlag  = teamFlagMap[item.Constructor?.name] || 'un';
         return `
             <div class="standings-entry" style="--team-glow:${teamColor};transition:background 0.2s,transform 0.15s;"
-                 onmouseover="this.style.background='${teamColor}15';this.style.transform='translateX(4px)';this.querySelector('.team-name-glow').style.color='#fff';this.querySelector('.cons-pts').style.color='${teamColor}'"
-                 onmouseout="this.style.background='';this.style.transform='';this.querySelector('.team-name-glow').style.color='${teamColor}';this.querySelector('.cons-pts').style.color=''">
+                 onmouseover="this.style.background='${teamColor}15';this.style.transform='translateX(4px)';this.querySelector('.team-name-glow').style.color='${teamColor}';this.querySelector('.cons-pts').style.color='${teamColor}'"
+                 onmouseout="this.style.background='';this.style.transform='';this.querySelector('.team-name-glow').style.color='#fff';this.querySelector('.cons-pts').style.color=''">
                 <div class="pos-num">${pos}</div>
                 <div class="team-strip" style="background:${teamColor}"></div>
                 <div class="entry-name">
                     <span class="team-label">CONSTRUCTOR</span>
                     <div class="driver-name-row" style="display:flex;align-items:center;gap:6px;">
                         <img src="https://flagcdn.com/w40/${teamFlag}.png" class="tiny-flag" alt="${item.Constructor?.name}">
-                        <div class="team-name-glow driver-text" style="color:${teamColor};font-weight:900;transition:color 0.2s;">${item.Constructor?.name?.toUpperCase() || '—'}</div>
+                        <a href="${getTeamUrl(item.Constructor?.name)}" target="_blank"
+                           class="team-name-glow driver-text"
+                           style="color:#fff;font-weight:900;transition:color 0.2s;text-decoration:none;"
+                           onclick="event.stopPropagation()">${item.Constructor?.name?.toUpperCase() || '—'}</a>
                     </div>
                 </div>
                 <div class="entry-pts"><span class="cons-pts" style="transition:color 0.2s;">${item.points ?? 0}</span></div>
             </div>`;
     }).join('') : `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET</div>`;
+}
+
+function getTeamUrl(team) {
+    const urls = {
+        "McLaren":       "https://www.mclaren.com/racing/formula-1/",
+        "Red Bull":      "https://www.redbullracing.com/",
+        "Ferrari":       "https://www.ferrari.com/en-EN/formula1",
+        "Mercedes":      "https://www.mercedesamgf1.com/",
+        "Aston Martin":  "https://www.astonmartinf1.com/",
+        "Williams":      "https://www.williamsf1.com/",
+        "Alpine F1 Team":"https://www.alpinecars.com/",
+        "Haas F1 Team":  "https://www.haasf1team.com/",
+        "Audi":          "https://www.audi.com/en/sport/formula-1.html",
+        "Sauber":        "https://www.sauber-group.com/motorsport/formula-1/",
+        "Kick Sauber":   "https://www.sauber-group.com/motorsport/formula-1/",
+        "VCARB":         "https://www.visacashapprb.com/",
+        "RB F1 Team":    "https://www.visacashapprb.com/",
+        "Racing Bulls":  "https://www.visacashapprb.com/",
+        "Cadillac":      "https://www.cadillac.com/f1"
+    };
+    return urls[team] || `https://www.formula1.com/en/teams/${(team||'').toLowerCase().replace(/\s+/g,'-')}`;
 }
 
 function getTeamColor(team) {
@@ -903,8 +929,8 @@ async function initSchedule() {
 
                 if (isPast) return `
                     <div class="session-item">
-                        <span style="color:#333;font-size:0.75rem;letter-spacing:1px;">${label}</span>
-                        <strong style="color:#2a2a2a;font-size:0.8rem;">DONE</strong>
+                        <span style="color:#555;font-size:0.75rem;letter-spacing:1px;">${label}</span>
+                        <strong style="color:#555;font-size:0.78rem;letter-spacing:1px;">✓ DONE</strong>
                     </div>`;
 
                 // Upcoming — show exact PKT time + date
