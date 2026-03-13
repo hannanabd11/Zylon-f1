@@ -763,139 +763,138 @@ async function populateRoundSelector() {
 }
 
 // ============================================================
-// SCHEDULE — uses zenithRaceSchedule from data.js for all
-// session times (FP1/FP2/FP3/SprintQuali/Sprint/Quali/Race)
-// Ergast is only used for race name, circuit name, and results.
+// SCHEDULE — ALL session times from zenithRaceSchedule (data.js)
+// Ergast only used for circuit name + past winner codes.
+// Sprint weekends: FP1, SprintQuali, Sprint, Qualifying, Race
+// Normal weekends: FP1, FP2, FP3, Qualifying, Race
 // ============================================================
 async function initSchedule() {
     const container = document.getElementById('schedule-list');
     if (!container) return;
     container.innerHTML = `<div class="loading-container"><div class="f1-spinner"></div><p>FETCHING 2026 CALENDAR...</p></div>`;
 
-    // Parse our pre-calculated PKT ISO strings directly
-    // e.g. "2026-03-06T07:30:00+05:00" → displays correctly in user's browser
+    // Read PKT time directly from ISO string (e.g. "2026-03-06T07:30:00+05:00")
+    // The +05:00 offset means the T-part IS already the PKT time — just extract it
     function fmtISO(iso) {
         if (!iso) return null;
-        // Force-read as PKT by stripping offset and treating as local +05:00
-        const d = new Date(iso);
-        // Convert to PKT display (UTC+5)
-        const pktMs = d.getTime() + (5 * 3600000) - (d.getTimezoneOffset() * 60000);
-        // Actually: since ISO has +05:00, new Date() gives correct UTC internally.
-        // Just display using UTC methods shifted by 5h:
-        const utc = d.getTime();
-        const pkt = new Date(utc);
-        const hh  = String(pkt.getUTCHours()   + 0).padStart(2,'0'); // already UTC from +05:00
-        // Simpler: just read the local time from the +05:00 ISO directly
-        const parts = iso.match(/T(\d{2}):(\d{2})/);
-        const timeStr = parts ? `${parts[1]}:${parts[2]} PKT` : '';
-        const dateParts = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
-        let dateStr = '';
-        if (dateParts) {
-            const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-            dateStr = `${parseInt(dateParts[3])} ${months[parseInt(dateParts[2])-1]}`;
-        }
-        return { time: timeStr, date: dateStr, utc: d };
+        const tMatch = iso.match(/T(\d{2}):(\d{2})/);
+        const dMatch = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (!tMatch || !dMatch) return null;
+        const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+        return {
+            time: `${tMatch[1]}:${tMatch[2]} PKT`,
+            date: `${parseInt(dMatch[3])} ${months[parseInt(dMatch[2])-1]}`,
+            utc:  new Date(iso)   // correct UTC value for past/live checks
+        };
     }
 
-    // Session label config
-    const SESSION_CONFIG = [
-        { key: 'FP1',         label: 'FREE PRACTICE 1',   color: '#4af' },
-        { key: 'FP2',         label: 'FREE PRACTICE 2',   color: '#4af' },
-        { key: 'FP3',         label: 'FREE PRACTICE 3',   color: '#4af' },
-        { key: 'SprintQuali', label: 'SPRINT QUALIFYING',  color: '#ff9900' },
-        { key: 'Sprint',      label: 'SPRINT RACE',        color: '#ff6600' },
-        { key: 'Qualifying',  label: 'QUALIFYING',         color: '#b700ff' },
-        { key: 'Race',        label: 'GRAND PRIX',         color: '#e10600' },
-    ];
+    // Colors per session type
+    const SESSION_COLORS = {
+        FP1: '#44aaff', FP2: '#44aaff', FP3: '#44aaff',
+        SprintQuali: '#ff9900', Sprint: '#ff6600',
+        Qualifying: '#b700ff', Race: '#e10600'
+    };
+    // Duration in ms per session type (for live detection)
+    const SESSION_DUR = {
+        FP1: 5400000, FP2: 5400000, FP3: 5400000,   // 1.5h each
+        SprintQuali: 3600000,                          // 1h
+        Sprint: 3600000,                               // 1h
+        Qualifying: 7200000,                           // 2h
+        Race: 10800000                                 // 3h
+    };
 
     try {
-        // Fetch Ergast only for race names, circuit names, and winner data
+        // Ergast: only for circuit names + completed race winner data
         let ergastRaces = [];
-        for (const year of ['2026','2025']) {
-            const res  = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${year}.json`);
-            const data = await res.json();
-            ergastRaces = data.MRData?.RaceTable?.Races || [];
-            if (ergastRaces.length > 0) break;
-        }
+        try {
+            for (const year of ['2026','2025']) {
+                const res  = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${year}.json`);
+                const data = await res.json();
+                const list = data.MRData?.RaceTable?.Races || [];
+                if (list.length > 0) { ergastRaces = list; break; }
+            }
+        } catch(e) {}
 
-        // Build lookup: round number → ergast race object
+        // Ergast lookup by round number
         const ergastByRound = {};
         ergastRaces.forEach(r => { ergastByRound[parseInt(r.round)] = r; });
 
         const now = new Date();
 
-        const rows = await Promise.all(zenithRaceSchedule.map(async (local) => {
-            const ergast    = ergastByRound[local.round] || {};
-            const isSprint  = !!local.sprint;
-            const gpName    = ergast.raceName || local.gp;
-            const circuit   = ergast.Circuit?.circuitName || '';
-            const season    = ergast.season || '2026';
+        // Find the next upcoming race index (auto-expand it)
+        const nextIdx = zenithRaceSchedule.findIndex(r => new Date(r.Race.iso) > now);
 
-            const raceUTC  = local.Race?.iso  ? new Date(local.Race.iso)  : null;
-            const qualiUTC = local.Qualifying?.iso ? new Date(local.Qualifying.iso) : null;
+        const rows = await Promise.all(zenithRaceSchedule.map(async (local, idx) => {
+            const ergast   = ergastByRound[local.round] || {};
+            const isSprint = !!local.sprint;                         // from data.js boolean
+            const gpName   = ergast.raceName  || local.gp;
+            const circuit  = ergast.Circuit?.circuitName || '';
+            const season   = ergast.season    || '2026';
+            const round    = ergast.round     || String(local.round);
 
-            const isFinished  = raceUTC  && raceUTC  < now;
-            const isRaceLive  = raceUTC  && now >= raceUTC  && now < new Date(raceUTC.getTime()  + 3*3600000);
-            const isQualiLive = qualiUTC && now >= qualiUTC && now < new Date(qualiUTC.getTime() + 2*3600000);
-            const isAnyLive   = isRaceLive || isQualiLive;
+            const raceUTC  = new Date(local.Race.iso);
+            const qualiUTC = new Date(local.Qualifying.iso);
+            const fp1UTC   = local.FP1?.iso ? new Date(local.FP1.iso) : null;
 
-            // Check if any session is currently live (for FP sessions too)
-            let isSessionLive = isRaceLive || isQualiLive;
-            if (!isSessionLive) {
-                for (const sc of SESSION_CONFIG) {
-                    const iso = local[sc.key]?.iso;
+            const isFinished  = raceUTC  < now;
+            const isRaceLive  = now >= raceUTC  && now < new Date(raceUTC.getTime()  + SESSION_DUR.Race);
+            const isQualiLive = now >= qualiUTC && now < new Date(qualiUTC.getTime() + SESSION_DUR.Qualifying);
+
+            // Check if ANY session this weekend is currently live
+            let anyLive = isRaceLive || isQualiLive;
+            const allKeys = isSprint
+                ? ['FP1','SprintQuali','Sprint','Qualifying','Race']
+                : ['FP1','FP2','FP3','Qualifying','Race'];
+            if (!anyLive) {
+                for (const k of allKeys) {
+                    const iso = local[k]?.iso;
                     if (!iso) continue;
                     const t = new Date(iso);
-                    const duration = sc.key === 'Race' ? 3*3600000 : sc.key.startsWith('FP') ? 1.5*3600000 : 2*3600000;
-                    if (now >= t && now < new Date(t.getTime() + duration)) { isSessionLive = true; break; }
+                    if (now >= t && now < new Date(t.getTime() + (SESSION_DUR[k] || 3600000))) {
+                        anyLive = true; break;
+                    }
                 }
             }
 
-            // Fetch winner/pole data for finished races
+            // Fetch winner/pole for completed races only
             let raceWin = null, poleSitter = null, sprintWin = null;
             if (isFinished && ergast.season && ergast.round) {
                 try {
                     const [rr, qr] = await Promise.all([
-                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${season}/${ergast.round}/results.json?limit=3`).then(r=>r.json()).catch(()=>null),
-                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${season}/${ergast.round}/qualifying.json`).then(r=>r.json()).catch(()=>null)
+                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${season}/${round}/results.json?limit=3`).then(r=>r.json()).catch(()=>null),
+                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${season}/${round}/qualifying.json`).then(r=>r.json()).catch(()=>null)
                     ]);
                     raceWin    = rr?.MRData?.RaceTable?.Races?.[0]?.Results?.[0]?.Driver?.code || null;
                     poleSitter = qr?.MRData?.RaceTable?.Races?.[0]?.QualifyingResults?.[0]?.Driver?.code || null;
                     if (isSprint) {
-                        const sr = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${season}/${ergast.round}/sprint.json`).then(r=>r.json()).catch(()=>null);
+                        const sr = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${season}/${round}/sprint.json`).then(r=>r.json()).catch(()=>null);
                         sprintWin = sr?.MRData?.RaceTable?.Races?.[0]?.SprintResults?.[0]?.Driver?.code || null;
                     }
                 } catch(e) {}
             }
 
-            // Build session rows from zenithRaceSchedule keys
+            // ── sessionRow: renders one session line ──────────────────
             const sessionRow = (key, label, winner = null) => {
                 const iso = local[key]?.iso;
                 if (!iso) return '';
-
-                const fmt  = fmtISO(iso);
-                const sessUTC = fmt.utc;
-                const isPast  = sessUTC < now;
-
-                // Check if this specific session is live
-                const duration = key === 'Race' ? 3*3600000 : key.startsWith('FP') ? 1.5*3600000 : 2*3600000;
-                const isLive   = now >= sessUTC && now < new Date(sessUTC.getTime() + duration);
-
-                const sc = SESSION_CONFIG.find(s => s.key === key);
-                const dotColor = sc?.color || '#888';
+                const fmt     = fmtISO(iso);
+                if (!fmt) return '';
+                const isPast  = fmt.utc < now;
+                const isLive  = now >= fmt.utc && now < new Date(fmt.utc.getTime() + (SESSION_DUR[key] || 3600000));
+                const color   = SESSION_COLORS[key] || '#888';
 
                 if (isLive) return `
                     <div class="session-item" style="background:rgba(0,255,65,0.06);border-left:2px solid #00ff41;padding-left:8px;">
-                        <span style="color:#fff;font-weight:900;">${label}</span>
+                        <span style="color:#fff;font-weight:900;letter-spacing:1px;">${label}</span>
                         <div style="display:flex;align-items:center;gap:6px;">
                             <span class="live-blink-dot" style="width:7px;height:7px;margin:0;"></span>
-                            <strong style="color:#00ff41">LIVE NOW</strong>
+                            <strong style="color:#00ff41;font-size:0.85rem;">LIVE NOW</strong>
                         </div>
                     </div>`;
 
                 if (isPast && winner) return `
                     <div class="session-item">
-                        <span>${label}</span>
+                        <span style="color:#555;font-size:0.75rem;letter-spacing:1px;">${label}</span>
                         <a href="https://www.formula1.com/en/results.html/${season}/races.html" target="_blank" class="session-link">
                             <strong class="result-text">🏁 ${winner}</strong>
                             <span class="view-icon">VIEW ↗</span>
@@ -904,28 +903,31 @@ async function initSchedule() {
 
                 if (isPast) return `
                     <div class="session-item">
-                        <span>${label}</span>
-                        <strong style="color:#333">DONE</strong>
+                        <span style="color:#333;font-size:0.75rem;letter-spacing:1px;">${label}</span>
+                        <strong style="color:#2a2a2a;font-size:0.8rem;">DONE</strong>
                     </div>`;
 
-                // Upcoming — show time + date
+                // Upcoming — show exact PKT time + date
                 return `
                     <div class="session-item">
-                        <span style="color:${dotColor};">● ${label}</span>
-                        <div style="text-align:right;line-height:1.4;">
+                        <span style="color:${color};font-size:0.75rem;letter-spacing:1px;font-weight:900;">▸ ${label}</span>
+                        <div style="text-align:right;line-height:1.3;">
                             <strong style="color:#fff;font-size:0.9rem;">${fmt.time}</strong>
-                            <div style="font-size:0.65rem;color:#555;letter-spacing:1px;">${fmt.date}</div>
+                            <div style="font-size:0.65rem;color:#666;letter-spacing:1px;margin-top:1px;">${fmt.date}</div>
                         </div>
                     </div>`;
             };
 
-            // Race date display (from data.js, not Ergast)
-            const raceFmt  = fmtISO(local.Race?.iso);
-            const raceDay  = raceFmt?.date?.split(' ')[0] || '';
-            const raceMon  = raceFmt?.date?.split(' ')[1] || '';
+            // Race day display from data.js (guaranteed correct)
+            const raceFmt = fmtISO(local.Race.iso);
+            const raceDay = raceFmt.date.split(' ')[0];
+            const raceMon = raceFmt.date.split(' ')[1];
+
+            // Auto-expand the next upcoming race
+            const autoExpand = (idx === nextIdx) ? 'expanded' : '';
 
             return `
-                <div class="schedule-row-container ${isFinished ? 'completed' : ''} ${isAnyLive ? 'live-weekend' : ''}">
+                <div class="schedule-row-container ${isFinished ? 'completed' : ''} ${anyLive ? 'live-weekend' : ''} ${autoExpand}">
                     <div class="schedule-main-row" onclick="toggleSchedule(this)">
                         <div class="col-rd">${local.round}</div>
                         <div class="col-date">
@@ -935,13 +937,14 @@ async function initSchedule() {
                         <div class="col-gp">
                             ${gpName.toUpperCase()}
                             ${isSprint ? '<span class="sprint-badge">SPRINT</span>' : ''}
-                            ${isAnyLive ? '<span class="live-blink-dot" style="margin-left:8px;width:8px;height:8px;"></span>' : ''}
+                            ${anyLive  ? '<span class="live-blink-dot" style="margin-left:8px;width:8px;height:8px;"></span>' : ''}
                         </div>
                         <div class="col-circuit">${circuit}</div>
                         <div class="col-status">
-                            ${isRaceLive  ? `<span style="color:#00ff41;font-weight:900;">● RACE LIVE</span>` :
+                            ${isRaceLive  ? `<span style="color:#00ff41;font-weight:900;">● RACE LIVE</span>`  :
                               isQualiLive ? `<span style="color:#00ff41;font-weight:900;">● QUALI LIVE</span>` :
-                              isFinished  ? `<span class="winner-label">🏆 ${raceWin||'FIN'}</span>` :
+                              anyLive     ? `<span style="color:#00ff41;font-weight:900;">● LIVE</span>`       :
+                              isFinished  ? `<span class="winner-label">🏆 ${raceWin||'FIN'}</span>`           :
                               '<span>UPCOMING ❯</span>'}
                         </div>
                     </div>
@@ -949,15 +952,15 @@ async function initSchedule() {
                         <div class="details-grid">
                             ${isSprint
                                 ? sessionRow('FP1',         'FREE PRACTICE 1')
-                                + sessionRow('SprintQuali', 'SPRINT QUALIFYING', poleSitter)
-                                + sessionRow('Sprint',      'SPRINT RACE',       sprintWin)
-                                + sessionRow('Qualifying',  'QUALIFYING',        poleSitter)
-                                + sessionRow('Race',        'GRAND PRIX',        raceWin)
+                                + sessionRow('SprintQuali', 'SPRINT QUALIFYING')
+                                + sessionRow('Sprint',      'SPRINT RACE',  sprintWin)
+                                + sessionRow('Qualifying',  'QUALIFYING',   poleSitter)
+                                + sessionRow('Race',        'GRAND PRIX',   raceWin)
                                 : sessionRow('FP1',         'FREE PRACTICE 1')
                                 + sessionRow('FP2',         'FREE PRACTICE 2')
                                 + sessionRow('FP3',         'FREE PRACTICE 3')
-                                + sessionRow('Qualifying',  'QUALIFYING',        poleSitter)
-                                + sessionRow('Race',        'GRAND PRIX',        raceWin)
+                                + sessionRow('Qualifying',  'QUALIFYING',   poleSitter)
+                                + sessionRow('Race',        'GRAND PRIX',   raceWin)
                             }
                         </div>
                     </div>
@@ -965,6 +968,10 @@ async function initSchedule() {
         }));
 
         container.innerHTML = rows.join('');
+
+        // Scroll next race into view
+        const nextEl = container.querySelector('.schedule-row-container.expanded');
+        if (nextEl) nextEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     } catch(e) {
         container.innerHTML = `<p style="color:#e10600;text-align:center;padding:40px;">Error loading schedule.</p>`;
