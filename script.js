@@ -763,76 +763,130 @@ async function populateRoundSelector() {
 }
 
 // ============================================================
-// SCHEDULE
+// SCHEDULE — uses zenithRaceSchedule from data.js for all
+// session times (FP1/FP2/FP3/SprintQuali/Sprint/Quali/Race)
+// Ergast is only used for race name, circuit name, and results.
 // ============================================================
 async function initSchedule() {
     const container = document.getElementById('schedule-list');
     if (!container) return;
     container.innerHTML = `<div class="loading-container"><div class="f1-spinner"></div><p>FETCHING 2026 CALENDAR...</p></div>`;
 
-    function toPKT(dateStr, timeStr) {
-        return new Date(new Date(`${dateStr}T${timeStr || '00:00:00Z'}`).getTime() + 5 * 3600000);
+    // Parse our pre-calculated PKT ISO strings directly
+    // e.g. "2026-03-06T07:30:00+05:00" → displays correctly in user's browser
+    function fmtISO(iso) {
+        if (!iso) return null;
+        // Force-read as PKT by stripping offset and treating as local +05:00
+        const d = new Date(iso);
+        // Convert to PKT display (UTC+5)
+        const pktMs = d.getTime() + (5 * 3600000) - (d.getTimezoneOffset() * 60000);
+        // Actually: since ISO has +05:00, new Date() gives correct UTC internally.
+        // Just display using UTC methods shifted by 5h:
+        const utc = d.getTime();
+        const pkt = new Date(utc);
+        const hh  = String(pkt.getUTCHours()   + 0).padStart(2,'0'); // already UTC from +05:00
+        // Simpler: just read the local time from the +05:00 ISO directly
+        const parts = iso.match(/T(\d{2}):(\d{2})/);
+        const timeStr = parts ? `${parts[1]}:${parts[2]} PKT` : '';
+        const dateParts = iso.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        let dateStr = '';
+        if (dateParts) {
+            const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+            dateStr = `${parseInt(dateParts[3])} ${months[parseInt(dateParts[2])-1]}`;
+        }
+        return { time: timeStr, date: dateStr, utc: d };
     }
 
-    function fmtPKT(dateStr, timeStr) {
-        const d = toPKT(dateStr, timeStr);
-        return {
-            date: `${String(d.getDate()).padStart(2,'0')} ${d.toLocaleString('default',{month:'short'}).toUpperCase()}`,
-            time: `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} PKT`
-        };
-    }
+    // Session label config
+    const SESSION_CONFIG = [
+        { key: 'FP1',         label: 'FREE PRACTICE 1',   color: '#4af' },
+        { key: 'FP2',         label: 'FREE PRACTICE 2',   color: '#4af' },
+        { key: 'FP3',         label: 'FREE PRACTICE 3',   color: '#4af' },
+        { key: 'SprintQuali', label: 'SPRINT QUALIFYING',  color: '#ff9900' },
+        { key: 'Sprint',      label: 'SPRINT RACE',        color: '#ff6600' },
+        { key: 'Qualifying',  label: 'QUALIFYING',         color: '#b700ff' },
+        { key: 'Race',        label: 'GRAND PRIX',         color: '#e10600' },
+    ];
 
     try {
-        let races = [];
+        // Fetch Ergast only for race names, circuit names, and winner data
+        let ergastRaces = [];
         for (const year of ['2026','2025']) {
             const res  = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${year}.json`);
             const data = await res.json();
-            races = data.MRData?.RaceTable?.Races || [];
-            if (races.length > 0) break;
+            ergastRaces = data.MRData?.RaceTable?.Races || [];
+            if (ergastRaces.length > 0) break;
         }
+
+        // Build lookup: round number → ergast race object
+        const ergastByRound = {};
+        ergastRaces.forEach(r => { ergastByRound[parseInt(r.round)] = r; });
 
         const now = new Date();
 
-        const rows = await Promise.all(races.map(async (race) => {
-            const raceUTC     = new Date(`${race.date}T${race.time || '00:00:00Z'}`);
-            const qualiUTC    = race.Qualifying ? new Date(`${race.Qualifying.date}T${race.Qualifying.time || '00:00:00Z'}`) : null;
-            const isFinished  = raceUTC < now;
-            const isQualiLive = qualiUTC && now >= qualiUTC && now < new Date(qualiUTC.getTime() + 2*3600000);
-            const isRaceLive  = now >= raceUTC && now < new Date(raceUTC.getTime() + 3*3600000);
-            const isSprint    = !!race.Sprint;
+        const rows = await Promise.all(zenithRaceSchedule.map(async (local) => {
+            const ergast    = ergastByRound[local.round] || {};
+            const isSprint  = !!local.sprint;
+            const gpName    = ergast.raceName || local.gp;
+            const circuit   = ergast.Circuit?.circuitName || '';
+            const season    = ergast.season || '2026';
 
-            let raceWin = null, poleSitter = null, sprintWin = null, sprintPoleSitter = null;
-            if (isFinished) {
+            const raceUTC  = local.Race?.iso  ? new Date(local.Race.iso)  : null;
+            const qualiUTC = local.Qualifying?.iso ? new Date(local.Qualifying.iso) : null;
+
+            const isFinished  = raceUTC  && raceUTC  < now;
+            const isRaceLive  = raceUTC  && now >= raceUTC  && now < new Date(raceUTC.getTime()  + 3*3600000);
+            const isQualiLive = qualiUTC && now >= qualiUTC && now < new Date(qualiUTC.getTime() + 2*3600000);
+            const isAnyLive   = isRaceLive || isQualiLive;
+
+            // Check if any session is currently live (for FP sessions too)
+            let isSessionLive = isRaceLive || isQualiLive;
+            if (!isSessionLive) {
+                for (const sc of SESSION_CONFIG) {
+                    const iso = local[sc.key]?.iso;
+                    if (!iso) continue;
+                    const t = new Date(iso);
+                    const duration = sc.key === 'Race' ? 3*3600000 : sc.key.startsWith('FP') ? 1.5*3600000 : 2*3600000;
+                    if (now >= t && now < new Date(t.getTime() + duration)) { isSessionLive = true; break; }
+                }
+            }
+
+            // Fetch winner/pole data for finished races
+            let raceWin = null, poleSitter = null, sprintWin = null;
+            if (isFinished && ergast.season && ergast.round) {
                 try {
-                    // Always fetch race + qualifying results
-                    const baseResults = await Promise.all([
-                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/results.json?limit=3`).then(r=>r.json()).catch(()=>null),
-                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/qualifying.json`).then(r=>r.json()).catch(()=>null)
+                    const [rr, qr] = await Promise.all([
+                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${season}/${ergast.round}/results.json?limit=3`).then(r=>r.json()).catch(()=>null),
+                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${season}/${ergast.round}/qualifying.json`).then(r=>r.json()).catch(()=>null)
                     ]);
-                    const [rr, qr] = baseResults;
                     raceWin    = rr?.MRData?.RaceTable?.Races?.[0]?.Results?.[0]?.Driver?.code || null;
                     poleSitter = qr?.MRData?.RaceTable?.Races?.[0]?.QualifyingResults?.[0]?.Driver?.code || null;
-
                     if (isSprint) {
-                        // Sprint race winner from /sprint endpoint
-                        const sr = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/sprint.json`).then(r=>r.json()).catch(()=>null);
+                        const sr = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${season}/${ergast.round}/sprint.json`).then(r=>r.json()).catch(()=>null);
                         sprintWin = sr?.MRData?.RaceTable?.Races?.[0]?.SprintResults?.[0]?.Driver?.code || null;
-                        // Ergast has no separate sprint quali endpoint — use sprint P1 as sprint pole
-                        sprintPoleSitter = sprintWin;
                     }
                 } catch(e) {}
             }
 
-            const sessionRow = (session, label, winner = null, isLive = false) => {
-                if (!session?.date) return `<div class="session-item"><span>${label}</span><strong style="color:#333">TBC</strong></div>`;
+            // Build session rows from zenithRaceSchedule keys
+            const sessionRow = (key, label, winner = null) => {
+                const iso = local[key]?.iso;
+                if (!iso) return '';
 
-                const pkt     = fmtPKT(session.date, session.time);
-                const sessUTC = new Date(`${session.date}T${session.time || '00:00:00Z'}`);
+                const fmt  = fmtISO(iso);
+                const sessUTC = fmt.utc;
                 const isPast  = sessUTC < now;
+
+                // Check if this specific session is live
+                const duration = key === 'Race' ? 3*3600000 : key.startsWith('FP') ? 1.5*3600000 : 2*3600000;
+                const isLive   = now >= sessUTC && now < new Date(sessUTC.getTime() + duration);
+
+                const sc = SESSION_CONFIG.find(s => s.key === key);
+                const dotColor = sc?.color || '#888';
 
                 if (isLive) return `
                     <div class="session-item" style="background:rgba(0,255,65,0.06);border-left:2px solid #00ff41;padding-left:8px;">
-                        <span>${label}</span>
+                        <span style="color:#fff;font-weight:900;">${label}</span>
                         <div style="display:flex;align-items:center;gap:6px;">
                             <span class="live-blink-dot" style="width:7px;height:7px;margin:0;"></span>
                             <strong style="color:#00ff41">LIVE NOW</strong>
@@ -842,40 +896,48 @@ async function initSchedule() {
                 if (isPast && winner) return `
                     <div class="session-item">
                         <span>${label}</span>
-                        <a href="https://www.formula1.com/en/results.html/${race.season}/races.html" target="_blank" class="session-link">
+                        <a href="https://www.formula1.com/en/results.html/${season}/races.html" target="_blank" class="session-link">
                             <strong class="result-text">🏁 ${winner}</strong>
                             <span class="view-icon">VIEW ↗</span>
                         </a>
                     </div>`;
 
-                if (isPast) return `<div class="session-item"><span>${label}</span><strong style="color:#444">DONE</strong></div>`;
-
-                return `
+                if (isPast) return `
                     <div class="session-item">
                         <span>${label}</span>
+                        <strong style="color:#333">DONE</strong>
+                    </div>`;
+
+                // Upcoming — show time + date
+                return `
+                    <div class="session-item">
+                        <span style="color:${dotColor};">● ${label}</span>
                         <div style="text-align:right;line-height:1.4;">
-                            <strong style="color:#fff;font-size:0.9rem;">${pkt.time}</strong>
-                            <div style="font-size:0.65rem;color:#555;letter-spacing:1px;">${pkt.date}</div>
+                            <strong style="color:#fff;font-size:0.9rem;">${fmt.time}</strong>
+                            <div style="font-size:0.65rem;color:#555;letter-spacing:1px;">${fmt.date}</div>
                         </div>
                     </div>`;
             };
 
-            const racePKT = fmtPKT(race.date, race.time);
+            // Race date display (from data.js, not Ergast)
+            const raceFmt  = fmtISO(local.Race?.iso);
+            const raceDay  = raceFmt?.date?.split(' ')[0] || '';
+            const raceMon  = raceFmt?.date?.split(' ')[1] || '';
 
             return `
-                <div class="schedule-row-container ${isFinished ? 'completed' : ''} ${isRaceLive||isQualiLive ? 'live-weekend' : ''}">
+                <div class="schedule-row-container ${isFinished ? 'completed' : ''} ${isAnyLive ? 'live-weekend' : ''}">
                     <div class="schedule-main-row" onclick="toggleSchedule(this)">
-                        <div class="col-rd">${race.round}</div>
+                        <div class="col-rd">${local.round}</div>
                         <div class="col-date">
-                            <span class="day">${racePKT.date.split(' ')[0]}</span>
-                            <span class="month">${racePKT.date.split(' ')[1]}</span>
+                            <span class="day">${raceDay}</span>
+                            <span class="month">${raceMon}</span>
                         </div>
                         <div class="col-gp">
-                            ${race.raceName.toUpperCase()}
+                            ${gpName.toUpperCase()}
                             ${isSprint ? '<span class="sprint-badge">SPRINT</span>' : ''}
-                            ${isRaceLive||isQualiLive ? '<span class="live-blink-dot" style="margin-left:8px;width:8px;height:8px;"></span>' : ''}
+                            ${isAnyLive ? '<span class="live-blink-dot" style="margin-left:8px;width:8px;height:8px;"></span>' : ''}
                         </div>
-                        <div class="col-circuit">${race.Circuit.circuitName}</div>
+                        <div class="col-circuit">${circuit}</div>
                         <div class="col-status">
                             ${isRaceLive  ? `<span style="color:#00ff41;font-weight:900;">● RACE LIVE</span>` :
                               isQualiLive ? `<span style="color:#00ff41;font-weight:900;">● QUALI LIVE</span>` :
@@ -885,11 +947,18 @@ async function initSchedule() {
                     </div>
                     <div class="schedule-details">
                         <div class="details-grid">
-                            ${sessionRow(race.FirstPractice, 'FP1')}
-                            ${isSprint ? sessionRow(race.SprintQualifying, 'SPRINT QUALI', sprintPoleSitter) : sessionRow(race.SecondPractice, 'FP2')}
-                            ${isSprint ? sessionRow(race.Sprint, 'SPRINT RACE', sprintWin) : sessionRow(race.ThirdPractice, 'FP3')}
-                            ${sessionRow(race.Qualifying, 'QUALIFYING', poleSitter, isQualiLive)}
-                            ${sessionRow({date:race.date,time:race.time}, 'GRAND PRIX', raceWin, isRaceLive)}
+                            ${isSprint
+                                ? sessionRow('FP1',         'FREE PRACTICE 1')
+                                + sessionRow('SprintQuali', 'SPRINT QUALIFYING', poleSitter)
+                                + sessionRow('Sprint',      'SPRINT RACE',       sprintWin)
+                                + sessionRow('Qualifying',  'QUALIFYING',        poleSitter)
+                                + sessionRow('Race',        'GRAND PRIX',        raceWin)
+                                : sessionRow('FP1',         'FREE PRACTICE 1')
+                                + sessionRow('FP2',         'FREE PRACTICE 2')
+                                + sessionRow('FP3',         'FREE PRACTICE 3')
+                                + sessionRow('Qualifying',  'QUALIFYING',        poleSitter)
+                                + sessionRow('Race',        'GRAND PRIX',        raceWin)
+                            }
                         </div>
                     </div>
                 </div>`;
@@ -899,6 +968,7 @@ async function initSchedule() {
 
     } catch(e) {
         container.innerHTML = `<p style="color:#e10600;text-align:center;padding:40px;">Error loading schedule.</p>`;
+        console.error('Schedule error:', e);
     }
 }
 
@@ -1051,5 +1121,3 @@ async function updateF1Weather() {
         if (icon) icon.classList.remove('fa-spin');
     }
 }
-
-
