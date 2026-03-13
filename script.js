@@ -56,6 +56,27 @@ document.addEventListener('DOMContentLoaded', () => {
             100% { opacity:1; transform:scale(1);   box-shadow:0 0 0 0 #00ff4100; }
         }
         .live-weekend { border-left: 3px solid #00ff41 !important; }
+
+        /* Driver number — bottom-right corner of image, not on face */
+        .driver-number-corner {
+            position: absolute;
+            bottom: 12px;
+            right: 14px;
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: var(--team-color, #e10600);
+            opacity: 0.18;
+            line-height: 1;
+            letter-spacing: -3px;
+            pointer-events: none;
+            font-style: italic;
+            z-index: 2;
+            text-shadow: 0 0 30px var(--team-color, #e10600);
+            transition: opacity 0.3s;
+        }
+        .driver-card-new:hover .driver-number-corner {
+            opacity: 0.32;
+        }
     `;
     document.head.appendChild(style);
 })();
@@ -264,11 +285,11 @@ function renderDrivers() {
         const teamF1Url   = `https://www.formula1.com/en/teams/${d.team.toLowerCase().replace(/_/g,'-').replace(/\s+/g,'-')}`;
 
         card.innerHTML = `
-            <div class="driver-number-overlay">${d.no}</div>
             <a href="${driverF1Url}" target="_blank" style="text-decoration:none;color:inherit;display:block;">
                 <div class="driver-image-area">
                     <img src="./Drivers/${d.id}.PNG" class="driver-portrait" onerror="this.onerror=null;this.src='./Drivers/placeholder.png'">
                     <div class="image-gradient"></div>
+                    <div class="driver-number-corner">${d.no}</div>
                 </div>
             </a>
             <div class="driver-info-area">
@@ -293,6 +314,7 @@ function renderDrivers() {
                 </div>
                 <div class="driver-stats-container">
                     <div class="stat-box"><span class="stat-n" id="wins-${d.id}">${d.wins}</span><span class="stat-l">Wins</span></div>
+                    <div class="stat-box"><span class="stat-n" id="podiums-${d.id}">${d.podiums ?? 0}</span><span class="stat-l">Podiums</span></div>
                     <div class="stat-box"><span class="stat-n" id="poles-${d.id}">${d.poles}</span><span class="stat-l">Poles</span></div>
                     <div class="stat-box"><span class="stat-n">${d.champ}</span><span class="stat-l">Titles</span></div>
                 </div>
@@ -326,6 +348,24 @@ async function autoUpdateDriverStats() {
                 polesMap[dId] = (polesMap[dId] || 0) + 1;
             } catch(e) { break; }
         }
+        // Build podiums map: count P1+P2+P3 finishes per driver this season
+        const podiumsMap = {};
+        for (let round = 1; round <= 24; round++) {
+            try {
+                const r = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/2026/${round}/results.json?limit=3`);
+                const j = await r.json();
+                const results = j.MRData?.RaceTable?.Races?.[0]?.Results;
+                if (!results?.length) break;
+                results.forEach(res => {
+                    const pos = parseInt(res.position);
+                    if (pos <= 3) {
+                        const dId = res.Driver.driverId.toLowerCase();
+                        podiumsMap[dId] = (podiumsMap[dId] || 0) + 1;
+                    }
+                });
+            } catch(e) { break; }
+        }
+
         f1_2026_grid.forEach(driver => {
             const match = standingsData.find(ls =>
                 ls.Driver.driverId.toLowerCase().includes(driver.id.toLowerCase()) ||
@@ -333,11 +373,13 @@ async function autoUpdateDriverStats() {
             );
             if (match) {
                 const seasonWins = parseInt(match.wins) || 0;
-                if (driver._baseWins  === undefined) driver._baseWins  = driver.wins;
-                if (driver._basePoles === undefined) driver._basePoles = driver.poles;
+                if (driver._baseWins    === undefined) driver._baseWins    = driver.wins;
+                if (driver._basePoles   === undefined) driver._basePoles   = driver.poles;
+                if (driver._basePodiums === undefined) driver._basePodiums = driver.podiums ?? 0;
                 driver.wins  = driver._baseWins  + seasonWins;
                 const dId = match.Driver.driverId.toLowerCase();
-                driver.poles = driver._basePoles + (polesMap[dId] || 0);
+                driver.poles   = driver._basePoles   + (polesMap[dId]   || 0);
+                driver.podiums = driver._basePodiums + (podiumsMap[dId] || 0);
             }
         });
         renderDrivers();
