@@ -31,9 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateF1Weather();
     populateRoundSelector();
 
-    // Auto-refresh results every 2 minutes
     setInterval(updateLatestResults, 120000);
-    // Auto-refresh standings every 5 minutes
     setInterval(initStandings, 300000);
 });
 
@@ -79,7 +77,7 @@ function getFlagForGP(gpName) {
 }
 
 // ============================================================
-// ZENITH TIMER — flag + country + live blinker
+// ZENITH TIMER
 // ============================================================
 function updateZenithTimer() {
     const now       = new Date().getTime();
@@ -106,7 +104,6 @@ function updateZenithTimer() {
     const qualiTime = new Date(race.Qualifying.iso).getTime();
     const raceTime  = new Date(race.Race.iso).getTime();
 
-    // Update flag
     if (flagImg) flagImg.src = `https://flagcdn.com/w40/${getFlagForGP(race.gp)}.png`;
 
     let targetTime, sessionName, isLive = false;
@@ -131,7 +128,6 @@ function updateZenithTimer() {
     if (isLive) {
         container.classList.add('state-live');
         label.innerHTML = `<span class="live-blink-dot"></span>${gpShort} ${sessionName} LIVE`;
-
         display.style.pointerEvents = "auto";
         display.style.overflow = "visible";
         display.style.zIndex = "999";
@@ -145,10 +141,7 @@ function updateZenithTimer() {
                     🔴 WATCH LIVE TIMING ➔
                 </a>
             </div>`;
-
-        // Trigger results refresh when session goes live
         updateLatestResults();
-
     } else {
         const diff = targetTime - now;
         if (diff < 3600000) container.classList.add('state-warning');
@@ -313,19 +306,15 @@ function renderDrivers() {
 // ============================================================
 async function autoUpdateDriverStats() {
     renderDrivers();
-
     try {
         let standingsData = null;
-
         for (const year of ['2026']) {
             const res  = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${year}/driverStandings.json`);
             const json = await res.json();
             const list = json.MRData?.StandingsTable?.StandingsLists?.[0]?.DriverStandings;
             if (list?.length > 0) { standingsData = list; break; }
         }
-
         if (!standingsData) return;
-
         const polesMap = {};
         for (let round = 1; round <= 24; round++) {
             try {
@@ -337,7 +326,6 @@ async function autoUpdateDriverStats() {
                 polesMap[dId] = (polesMap[dId] || 0) + 1;
             } catch(e) { break; }
         }
-
         f1_2026_grid.forEach(driver => {
             const match = standingsData.find(ls =>
                 ls.Driver.driverId.toLowerCase().includes(driver.id.toLowerCase()) ||
@@ -352,10 +340,8 @@ async function autoUpdateDriverStats() {
                 driver.poles = driver._basePoles + (polesMap[dId] || 0);
             }
         });
-
         renderDrivers();
         console.log("✅ Driver stats updated");
-
     } catch(e) {
         console.log("Driver stats: using local data");
     }
@@ -446,7 +432,8 @@ function getTeamColor(team) {
 // FETCH ALL RESULTS (paginated)
 // ============================================================
 async function fetchAllResults(url) {
-    const isQuali = url.includes('qualifying');
+    const isQuali  = url.includes('qualifying');
+    const isSprint = url.includes('sprint');
 
     const [res1, res2] = await Promise.all([
         fetchWithTimeout(`${url}.json?limit=20&offset=0`),
@@ -457,14 +444,22 @@ async function fetchAllResults(url) {
     const race1 = data1.MRData?.RaceTable?.Races?.[0];
     if (!race1) return null;
 
-    let page1 = isQuali ? (race1.QualifyingResults || []) : (race1.Results || []);
+    let page1 = isQuali
+        ? (race1.QualifyingResults || [])
+        : isSprint
+            ? (race1.SprintResults || [])
+            : (race1.Results || []);
 
     let page2 = [];
     try {
         const data2 = await res2.json();
         const race2 = data2.MRData?.RaceTable?.Races?.[0];
         if (race2) {
-            page2 = isQuali ? (race2.QualifyingResults || []) : (race2.Results || []);
+            page2 = isQuali
+                ? (race2.QualifyingResults || [])
+                : isSprint
+                    ? (race2.SprintResults || [])
+                    : (race2.Results || []);
         }
     } catch(e) {}
 
@@ -475,10 +470,10 @@ async function fetchAllResults(url) {
     }
 
     allResults.sort((a, b) => parseInt(a.position) - parseInt(b.position));
-    console.log(`✅ ${isQuali ? 'Qualifying' : 'Race'} results: ${allResults.length} drivers loaded`);
 
-    if (isQuali) return { ...race1, QualifyingResults: allResults };
-    else return { ...race1, Results: allResults };
+    if (isQuali)  return { ...race1, QualifyingResults: allResults };
+    if (isSprint) return { ...race1, SprintResults: allResults };
+    return { ...race1, Results: allResults };
 }
 
 // ============================================================
@@ -493,9 +488,11 @@ async function updateLatestResults() {
 
     for (const year of ['2026','2025']) {
         try {
-            const [race, qualy] = await Promise.all([
+            const [race, qualy, sprint, sprintQuali] = await Promise.all([
                 fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/results`),
-                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/qualifying`)
+                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/qualifying`),
+                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/sprint`).catch(()=>null),
+                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/qualifying`).catch(()=>null)
             ]);
 
             if (!race && !qualy) continue;
@@ -506,12 +503,14 @@ async function updateLatestResults() {
                 renderResultsUI(race, "RACE");
                 return;
             }
-
+            if (sprint?.SprintResults?.length > 0) {
+                renderResultsUI(sprint, "SPRINT");
+                return;
+            }
             if (qualy?.QualifyingResults?.length > 0) {
                 renderResultsUI(qualy, "QUALIFYING");
                 return;
             }
-
             if (race?.Results?.length > 0) { renderResultsUI(race, "RACE"); return; }
 
         } catch(e) { continue; }
@@ -520,19 +519,14 @@ async function updateLatestResults() {
     container.innerHTML = `
         <div style="text-align:center; padding:60px 20px;">
             <div style="font-size:2.5rem; margin-bottom:15px;">⏳</div>
-            <h2 style="color:#fff; font-weight:900; text-transform:uppercase; margin-bottom:10px; letter-spacing:2px;">
-                RESULTS INCOMING
-            </h2>
-            <p style="color:#555; font-family:'JetBrains Mono'; font-size:0.8rem; margin-bottom:30px; letter-spacing:1px; line-height:1.8;">
-                RACE DATA IS BEING PROCESSED<br>
-                <span style="color:#333;">CHECK BACK IN A FEW HOURS</span>
+            <h2 style="color:#fff; font-weight:900; text-transform:uppercase; margin-bottom:10px; letter-spacing:2px;">RESULTS INCOMING</h2>
+            <p style="color:#555; font-size:0.8rem; margin-bottom:30px; letter-spacing:1px; line-height:1.8;">
+                RACE DATA IS BEING PROCESSED<br><span style="color:#333;">CHECK BACK IN A FEW HOURS</span>
             </p>
             <button onclick="updateLatestResults()"
                style="background:#111; color:#555; padding:12px 30px; border-radius:4px;
                       font-weight:900; letter-spacing:2px; cursor:pointer; font-size:0.75rem;
-                      text-transform:uppercase; border:1px solid #222;">
-                ↻ RETRY
-            </button>
+                      text-transform:uppercase; border:1px solid #222;">↻ RETRY</button>
         </div>`;
 }
 
@@ -547,58 +541,71 @@ function renderResultsUI(race, sessionType = "RACE") {
         "rb":"#6692FF","racing_bulls":"#6692FF","cadillac":"#FFD700","audi":"#535151"
     };
 
-    const isQualy     = sessionType === "QUALIFYING";
-    const accentColor = isQualy ? "#b700ff" : "#e10600";
-    const resultsData = isQualy ? race.QualifyingResults : race.Results;
+    const isQualy  = sessionType === "QUALIFYING";
+    const isSprint = sessionType === "SPRINT";
+    const isSprintQuali = sessionType === "SPRINT_QUALI";
+
+    const accentColor = isQualy ? "#b700ff" : isSprint ? "#ff6600" : isSprintQuali ? "#ff9900" : "#e10600";
+
+    const resultsData = isQualy || isSprintQuali
+        ? race.QualifyingResults
+        : isSprint
+            ? race.SprintResults
+            : race.Results;
+
     if (!resultsData?.length) return;
+
+    const sessionLabel = isQualy ? "QUALIFYING RESULT" : isSprint ? "SPRINT RACE" : isSprintQuali ? "SPRINT QUALIFYING" : "LATEST RACE";
+    const classLabel   = isQualy ? "QUALIFYING CLASSIFICATION" : isSprint ? "SPRINT CLASSIFICATION" : isSprintQuali ? "SPRINT QUALI CLASSIFICATION" : "OFFICIAL CLASSIFICATION";
 
     let html = `
         <div class="results-wrapper">
             <div style="padding:40px 0 20px 0;">
                 <div style="margin-bottom:20px;">
                     <span style="background:${accentColor};color:#fff;padding:4px 12px;font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;">
-                        ${isQualy ? "QUALIFYING RESULT" : "LATEST RACE"}
+                        ${sessionLabel}
                     </span>
                 </div>
                 <h1 style="color:#fff;font-size:3rem;font-weight:900;margin:0;text-transform:uppercase;line-height:1;">
                     ${race.raceName.toUpperCase()} <span style="color:#444;">${race.season}</span>
                 </h1>
                 <p style="color:#aaa;font-size:0.9rem;margin-top:15px;text-transform:uppercase;letter-spacing:2px;">
-                    ROUND ${race.round} • ${isQualy ? 'QUALIFYING CLASSIFICATION' : 'OFFICIAL CLASSIFICATION'}
+                    ROUND ${race.round} • ${classLabel}
                 </p>
                 <div style="width:100%;height:2px;background:${accentColor};margin-top:30px;"></div>
             </div>
             <div style="display:grid;grid-template-columns:50px 1.5fr 1fr 150px 80px;padding:10px 25px;color:#444;font-size:0.75rem;font-weight:900;text-transform:uppercase;">
                 <div>Pos</div><div>Driver</div><div>Team</div>
-                <div style="text-align:right;">${isQualy ? "Best Lap" : "Time / Gap"}</div>
-                <div style="text-align:right;">${isQualy ? "Zone" : "Pts"}</div>
+                <div style="text-align:right;">${(isQualy||isSprintQuali) ? "Best Lap" : "Time / Gap"}</div>
+                <div style="text-align:right;">${(isQualy||isSprintQuali) ? "Zone" : "Pts"}</div>
             </div>`;
 
     resultsData.forEach((r, i) => {
         const isFirst      = i === 0;
         const isFastestLap = r.FastestLap != null && String(r.FastestLap.rank) === "1";
         const tc           = tcMap[r.Constructor?.constructorId] || "#888";
-        const hl           = isFirst ? (isQualy ? "#b700ff" : "#00ff00") : isFastestLap ? "#b700ff" : tc;
+        const hl           = isFirst ? (isQualy||isSprintQuali ? "#b700ff" : "#00ff00") : isFastestLap ? "#b700ff" : tc;
 
-        const flTime = !isQualy && isFastestLap && r.FastestLap?.Time?.time
+        const flTime = !(isQualy||isSprintQuali) && isFastestLap && r.FastestLap?.Time?.time
             ? ` <span style="font-size:0.65rem;color:#b700ff;display:block;">${r.FastestLap.Time.time}</span>` : '';
-        const timeDisplay = isQualy
+
+        const timeDisplay = (isQualy||isSprintQuali)
             ? (r.Q3 || r.Q2 || r.Q1 || "No Time")
             : (isFirst ? (r.Time?.time || "—") : (r.Time ? `+${r.Time.time}` : r.status));
 
-        const zone = isQualy
+        const zone = (isQualy||isSprintQuali)
             ? (i < 10  ? `<span style="color:#00ff88;font-weight:900;font-size:0.7rem;">Q3 ✓</span>`
               : i < 15 ? `<span style="color:#f9d71c;font-weight:900;font-size:0.7rem;">Q2 ✗</span>`
               :           `<span style="color:#e10600;font-weight:900;font-size:0.7rem;">Q1 ✗</span>`)
             : r.points;
 
         html += `
-            <div class="${isFastestLap||(isFirst&&isQualy)?'result-row highlight-purple':'result-row'}"
+            <div class="${isFastestLap||(isFirst&&(isQualy||isSprintQuali))?'result-row highlight-purple':'result-row'}"
                  style="border-left:4px solid ${hl};${isFirst?'background:rgba(255,255,255,0.02);':''}">
                 <div style="font-weight:900;color:${isFirst?hl:'#555'};font-size:1.2rem;">${r.position}</div>
                 <div style="color:#fff;font-weight:900;font-size:1.1rem;display:flex;align-items:center;gap:8px;">
                     <span>${r.Driver.givenName[0]}. <span style="color:${isFirst?hl:'#fff'}">${r.Driver.familyName.toUpperCase()}</span></span>
-                    ${(isFastestLap||(isFirst&&isQualy))?`<span style="background:#b700ff;color:#fff;padding:2px 6px;font-size:0.6rem;border-radius:2px;">${isQualy?'POLE':'FL'}</span>`:''}
+                    ${(isFastestLap||(isFirst&&(isQualy||isSprintQuali)))?`<span style="background:#b700ff;color:#fff;padding:2px 6px;font-size:0.6rem;border-radius:2px;">${(isQualy||isSprintQuali)?'POLE':'FL'}</span>`:''}
                 </div>
                 <div style="color:#666;font-size:0.8rem;font-weight:bold;text-transform:uppercase;cursor:default;transition:color 0.2s;"
                      onmouseover="this.style.color='${tc}'" onmouseout="this.style.color='#666'">${r.Constructor?.name||'—'}</div>
@@ -610,15 +617,32 @@ function renderResultsUI(race, sessionType = "RACE") {
     container.innerHTML = html + `</div>`;
 }
 
+// ============================================================
+// ARCHIVE SEARCH — now supports Race / Qualifying / Sprint / Sprint Quali
+// ============================================================
 async function fetchSpecificRace() {
-    const year  = document.getElementById('lookup-year').value;
-    const round = document.getElementById('lookup-round').value;
+    const year    = document.getElementById('lookup-year').value;
+    const round   = document.getElementById('lookup-round').value;
+    const session = document.getElementById('lookup-session')?.value || 'results';
     const container = document.getElementById('results-content');
+    if (!round) { container.innerHTML = `<div style="padding:50px;text-align:center;color:#666;">SELECT A ROUND FIRST</div>`; return; }
+
     container.innerHTML = `<div style="padding:50px;text-align:center;color:#666;font-weight:bold;">ACCESSING ARCHIVES...</div>`;
+
     try {
-        const r = await fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/${round}/results`);
-        if (r) renderResultsUI(r, "RACE");
-        else container.innerHTML = `<div style="padding:50px;text-align:center;"><h3 style="color:#e10600;">NO DATA FOUND</h3></div>`;
+        if (session === 'sprint') {
+            const r = await fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/${round}/sprint`);
+            if (r?.SprintResults?.length) { renderResultsUI(r, "SPRINT"); return; }
+            container.innerHTML = `<div style="padding:50px;text-align:center;"><h3 style="color:#e10600;">NO SPRINT DATA — THIS MAY NOT BE A SPRINT WEEKEND</h3></div>`;
+        } else if (session === 'qualifying') {
+            const r = await fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/${round}/qualifying`);
+            if (r?.QualifyingResults?.length) { renderResultsUI(r, "QUALIFYING"); return; }
+            container.innerHTML = `<div style="padding:50px;text-align:center;"><h3 style="color:#e10600;">NO QUALIFYING DATA FOUND</h3></div>`;
+        } else {
+            const r = await fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/${round}/results`);
+            if (r?.Results?.length) { renderResultsUI(r, "RACE"); return; }
+            container.innerHTML = `<div style="padding:50px;text-align:center;"><h3 style="color:#e10600;">NO DATA FOUND</h3></div>`;
+        }
     } catch(e) {
         container.innerHTML = `<div style="color:red;text-align:center;padding:20px;">SYSTEM ERROR</div>`;
     }
@@ -645,7 +669,7 @@ async function populateRoundSelector() {
         }
 
         roundSel.innerHTML = done.map(r =>
-            `<option value="${r.round}">R${r.round.padStart(2,'0')} — ${r.raceName}</option>`
+            `<option value="${r.round}">R${r.round.padStart(2,'0')} — ${r.raceName}${r.Sprint ? ' 🏃' : ''}</option>`
         ).join('');
 
         roundSel.value = done[done.length - 1].round;
@@ -695,7 +719,7 @@ async function initSchedule() {
             const isRaceLive  = now >= raceUTC && now < new Date(raceUTC.getTime() + 3*3600000);
             const isSprint    = !!race.Sprint;
 
-            let raceWin = null, poleSitter = null, sprintWin = null;
+            let raceWin = null, poleSitter = null, sprintWin = null, sprintPoleSitter = null;
             if (isFinished) {
                 try {
                     const [rr, qr] = await Promise.all([
@@ -704,9 +728,14 @@ async function initSchedule() {
                     ]);
                     raceWin    = rr.MRData?.RaceTable?.Races?.[0]?.Results?.[0]?.Driver.code;
                     poleSitter = qr.MRData?.RaceTable?.Races?.[0]?.QualifyingResults?.[0]?.Driver.code;
+
                     if (isSprint) {
-                        const sr = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/sprint.json`).then(r=>r.json());
-                        sprintWin = sr.MRData?.RaceTable?.Races?.[0]?.SprintResults?.[0]?.Driver.code;
+                        const [sr, sqr] = await Promise.all([
+                            fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/sprint.json`).then(r=>r.json()),
+                            fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/qualifying.json`).then(r=>r.json())
+                        ]);
+                        sprintWin        = sr.MRData?.RaceTable?.Races?.[0]?.SprintResults?.[0]?.Driver.code;
+                        sprintPoleSitter = sqr.MRData?.RaceTable?.Races?.[0]?.QualifyingResults?.[0]?.Driver.code;
                     }
                 } catch(e) {}
             }
@@ -774,8 +803,8 @@ async function initSchedule() {
                     <div class="schedule-details">
                         <div class="details-grid">
                             ${sessionRow(race.FirstPractice, 'FP1')}
-                            ${isSprint ? sessionRow(race.SprintQualifying, 'SPRINT QUALI') : sessionRow(race.SecondPractice, 'FP2')}
-                            ${isSprint ? sessionRow(race.Sprint, 'SPRINT RACE', sprintWin)  : sessionRow(race.ThirdPractice, 'FP3')}
+                            ${isSprint ? sessionRow(race.SprintQualifying, 'SPRINT QUALI', sprintPoleSitter) : sessionRow(race.SecondPractice, 'FP2')}
+                            ${isSprint ? sessionRow(race.Sprint, 'SPRINT RACE', sprintWin) : sessionRow(race.ThirdPractice, 'FP3')}
                             ${sessionRow(race.Qualifying, 'QUALIFYING', poleSitter, isQualiLive)}
                             ${sessionRow({date:race.date,time:race.time}, 'GRAND PRIX', raceWin, isRaceLive)}
                         </div>
@@ -823,7 +852,7 @@ function openGallery(teamId, photoCount = 5) {
     if (!overlay || !content) return;
     let html = '';
     for (let i = 1; i <= photoCount; i++) {
-        html += `<img src="./Cars/${teamId}-${i}.avif" onerror="this.onerror=null;this.src='https://placehold.co/800x450/111/333?text=No+Image'">`;
+        html += `<img src="./Cars/${teamId}-${i}.avif" onerror="this.style.display='none'">`;
     }
     content.innerHTML = html;
     overlay.style.display = 'flex';
@@ -831,7 +860,7 @@ function openGallery(teamId, photoCount = 5) {
 
 function tryNextExt(img, teamId, num) {
     img.onerror = null;
-    img.src = 'https://placehold.co/800x450/111/333?text=Image+Not+Found';
+    img.style.display = 'none';
 }
 
 function closeGallery() {
@@ -899,7 +928,6 @@ async function updateF1Weather() {
 
         setTimeout(() => {
             const set = (id, v) => { const el = document.getElementById(id); if (el) el.innerText = v; };
-
             const airTemp    = Math.round(live.temperature_2m);
             const radiation  = live.shortwave_radiation || 0;
             const solarBoost = Math.round(radiation / 40);
@@ -931,7 +959,6 @@ async function updateF1Weather() {
                 else if (rainProb > 60) { gripEl.innerText = "DAMP RISK"; gripEl.className = "weather-value slippery"; }
                 else                    { gripEl.innerText = "OPTIMAL";   gripEl.className = "weather-value optimal"; }
             }
-
             if (icon) icon.classList.remove('fa-spin');
         }, 500);
 
