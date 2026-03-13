@@ -57,34 +57,42 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         .live-weekend { border-left: 3px solid #00ff41 !important; }
 
-        /* Driver number — sits BEHIND the driver image, z-index:0, clipped to bottom strip */
-        .driver-number-corner {
-            position: absolute;
-            bottom: -10px;
-            right: -8px;
-            font-size: 9rem;
-            font-weight: 900;
-            color: var(--team-color, #e10600);
-            opacity: 0.12;
-            line-height: 1;
-            letter-spacing: -6px;
-            pointer-events: none;
-            font-style: italic;
-            z-index: 0;
-            transition: opacity 0.4s;
-            user-select: none;
-        }
-        /* The driver portrait sits on z-index:1 — always in front of the number */
-        .driver-portrait {
-            position: relative;
-            z-index: 1;
-        }
+        /* Driver number — decorative watermark, bottom-right, above portrait */
         .driver-image-area {
             position: relative;
             overflow: hidden;
         }
+        .driver-portrait {
+            position: relative;
+            z-index: 1;
+            display: block;
+            width: 100%;
+        }
+        .driver-number-corner {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            font-size: 7.5rem;
+            font-weight: 900;
+            font-style: italic;
+            line-height: 1;
+            letter-spacing: -4px;
+            pointer-events: none;
+            user-select: none;
+            z-index: 4;
+            padding: 0 8px 0 0;
+            /* Gradient text in team color, very transparent */
+            background: linear-gradient(to top,
+                var(--team-color, #e10600) 0%,
+                transparent 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0.55;
+            transition: opacity 0.3s;
+        }
         .driver-card-new:hover .driver-number-corner {
-            opacity: 0.22;
+            opacity: 0.85;
         }
     `;
     document.head.appendChild(style);
@@ -1205,3 +1213,4 @@ async function updateF1Weather() {
         if (icon) icon.classList.remove('fa-spin');
     }
 }
+
