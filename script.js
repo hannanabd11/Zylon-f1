@@ -387,19 +387,19 @@ async function initStandings() {
         const driverInfo = f1_2026_grid.find(d => d.name.toLowerCase().includes(item.Driver.familyName.toLowerCase()));
         const flag = driverInfo?.flag || 'un';
         return `
-            <div class="standings-entry" style="--team-glow:${teamColor};transition:background 0.2s,border-color 0.2s;"
-                 onmouseover="this.style.background='${teamColor}18';this.style.borderLeft='3px solid ${teamColor}';this.querySelector('.driver-text').style.textShadow='0 0 8px ${teamColor},0 0 16px ${teamColor}88';this.querySelector('.driver-text').style.color='${teamColor}';this.querySelector('.team-label').style.textShadow='0 0 6px ${teamColor}99'"
-                 onmouseout="this.style.background='';this.style.borderLeft='';this.querySelector('.driver-text').style.textShadow='';this.querySelector('.driver-text').style.color='';this.querySelector('.team-label').style.textShadow=''">
+            <div class="standings-entry" style="--team-glow:${teamColor};transition:background 0.2s,transform 0.15s;"
+                 onmouseover="this.style.background='${teamColor}15';this.style.transform='translateX(4px)';this.querySelector('.driver-text').style.color='${teamColor}';this.querySelector('.entry-pts-inner').style.color='${teamColor}'"
+                 onmouseout="this.style.background='';this.style.transform='';this.querySelector('.driver-text').style.color='';this.querySelector('.entry-pts-inner').style.color=''">
                 <div class="pos-num">${pos}</div>
                 <div class="team-strip" style="background:${teamColor}"></div>
                 <div class="entry-name">
-                    <span class="team-label" style="transition:text-shadow 0.2s;">${item.Constructors?.[0]?.name || '—'}</span>
+                    <span class="team-label">${item.Constructors?.[0]?.name || '—'}</span>
                     <div class="driver-name-row" style="display:flex;align-items:center;">
                         <img src="https://flagcdn.com/w40/${flag}.png" class="tiny-flag">
-                        <span class="driver-text" style="transition:color 0.2s,text-shadow 0.2s;">${item.Driver.givenName} <strong>${item.Driver.familyName}</strong></span>
+                        <span class="driver-text" style="transition:color 0.2s;">${item.Driver.givenName} <strong>${item.Driver.familyName}</strong></span>
                     </div>
                 </div>
-                <div class="entry-pts">${item.points ?? 0}</div>
+                <div class="entry-pts"><span class="entry-pts-inner" style="transition:color 0.2s;">${item.points ?? 0}</span></div>
             </div>`;
     }).join('') : `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET — SHOWING AFTER ROUND 1</div>`);
 
@@ -415,19 +415,19 @@ async function initStandings() {
         const teamColor = getTeamColor(item.Constructor?.name || '');
         const teamFlag  = teamFlagMap[item.Constructor?.name] || 'un';
         return `
-            <div class="standings-entry" style="--team-glow:${teamColor};transition:background 0.2s,border-color 0.2s;"
-                 onmouseover="this.style.background='${teamColor}18';this.style.borderLeft='3px solid ${teamColor}';this.querySelector('.team-name-glow').style.textShadow='0 0 8px ${teamColor},0 0 20px ${teamColor}88';this.querySelector('.constructor-label').style.textShadow='0 0 6px ${teamColor}99'"
-                 onmouseout="this.style.background='';this.style.borderLeft='';this.querySelector('.team-name-glow').style.textShadow='';this.querySelector('.constructor-label').style.textShadow=''">
+            <div class="standings-entry" style="--team-glow:${teamColor};transition:background 0.2s,transform 0.15s;"
+                 onmouseover="this.style.background='${teamColor}15';this.style.transform='translateX(4px)';this.querySelector('.team-name-glow').style.color='#fff';this.querySelector('.cons-pts').style.color='${teamColor}'"
+                 onmouseout="this.style.background='';this.style.transform='';this.querySelector('.team-name-glow').style.color='${teamColor}';this.querySelector('.cons-pts').style.color=''">
                 <div class="pos-num">${pos}</div>
                 <div class="team-strip" style="background:${teamColor}"></div>
                 <div class="entry-name">
-                    <span class="constructor-label team-label" style="transition:text-shadow 0.2s;">CONSTRUCTOR</span>
+                    <span class="team-label">CONSTRUCTOR</span>
                     <div class="driver-name-row" style="display:flex;align-items:center;gap:6px;">
                         <img src="https://flagcdn.com/w40/${teamFlag}.png" class="tiny-flag" alt="${item.Constructor?.name}">
-                        <div class="team-name-glow driver-text" style="color:${teamColor};font-weight:900;transition:text-shadow 0.2s;">${item.Constructor?.name?.toUpperCase() || '—'}</div>
+                        <div class="team-name-glow driver-text" style="color:${teamColor};font-weight:900;transition:color 0.2s;">${item.Constructor?.name?.toUpperCase() || '—'}</div>
                     </div>
                 </div>
-                <div class="entry-pts">${item.points ?? 0}</div>
+                <div class="entry-pts"><span class="cons-pts" style="transition:color 0.2s;">${item.points ?? 0}</span></div>
             </div>`;
     }).join('') : `<div style="padding:20px;color:#444;text-align:center;">NO 2026 DATA YET</div>`;
 }
@@ -681,8 +681,8 @@ function renderResultsUIInto(target, race, sessionType) {
         html += `
             <div class="${isFastestLap||(isFirst&&(isQualy||isSprintQuali))?'result-row highlight-purple':'result-row'}"
                  style="border-left:4px solid ${hl};${isFirst?'background:rgba(255,255,255,0.02);':''}transition:background 0.2s;"
-                 onmouseover="this.style.background='${tc}18';this.style.borderLeftColor='${tc}';this.querySelector('.result-driver-name').style.textShadow='0 0 8px ${tc},0 0 16px ${tc}66';this.querySelector('.result-team-name').style.color='${tc}';this.querySelector('.result-team-name').style.textShadow='0 0 6px ${tc}88'"
-                 onmouseout="this.style.background='${isFirst?'rgba(255,255,255,0.02)':'transparent'}';this.style.borderLeftColor='${hl}';this.querySelector('.result-driver-name').style.textShadow='';this.querySelector('.result-team-name').style.color='#666';this.querySelector('.result-team-name').style.textShadow=''">
+                 onmouseover="this.style.background='${tc}18';this.style.borderLeftColor='${isFirst?hl:tc}';this.querySelector('.result-team-name').style.color='${tc}'"
+                 onmouseout="this.style.background='${isFirst?'rgba(255,255,255,0.02)':'transparent'}';this.style.borderLeftColor='${hl}';this.querySelector('.result-team-name').style.color='#666'">
                 <div style="font-weight:900;color:${isFirst?hl:'#555'};font-size:1.2rem;">${r.position}</div>
                 <div class="result-driver-name" style="color:#fff;font-weight:900;font-size:1.1rem;display:flex;align-items:center;gap:8px;transition:text-shadow 0.2s;">
                     <span>${r.Driver.givenName[0]}. <span style="color:${isFirst?hl:'#fff'}">${r.Driver.familyName.toUpperCase()}</span></span>
@@ -1051,3 +1051,5 @@ async function updateF1Weather() {
         if (icon) icon.classList.remove('fa-spin');
     }
 }
+
+
