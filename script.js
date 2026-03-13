@@ -57,25 +57,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         .live-weekend { border-left: 3px solid #00ff41 !important; }
 
-        /* Driver number — bottom-right corner of image, not on face */
+        /* Driver number — sits BEHIND the driver image, z-index:0, clipped to bottom strip */
         .driver-number-corner {
             position: absolute;
-            bottom: 12px;
-            right: 14px;
-            font-size: 4.5rem;
+            bottom: -10px;
+            right: -8px;
+            font-size: 9rem;
             font-weight: 900;
             color: var(--team-color, #e10600);
-            opacity: 0.18;
+            opacity: 0.12;
             line-height: 1;
-            letter-spacing: -3px;
+            letter-spacing: -6px;
             pointer-events: none;
             font-style: italic;
-            z-index: 2;
-            text-shadow: 0 0 30px var(--team-color, #e10600);
-            transition: opacity 0.3s;
+            z-index: 0;
+            transition: opacity 0.4s;
+            user-select: none;
+        }
+        /* The driver portrait sits on z-index:1 — always in front of the number */
+        .driver-portrait {
+            position: relative;
+            z-index: 1;
+        }
+        .driver-image-area {
+            position: relative;
+            overflow: hidden;
         }
         .driver-card-new:hover .driver-number-corner {
-            opacity: 0.32;
+            opacity: 0.22;
         }
     `;
     document.head.appendChild(style);
