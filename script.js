@@ -488,30 +488,36 @@ async function updateLatestResults() {
 
     for (const year of ['2026','2025']) {
         try {
-            const [race, qualy, sprint, sprintQuali] = await Promise.all([
-                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/results`),
-                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/qualifying`),
-                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/sprint`).catch(()=>null),
-                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/qualifying`).catch(()=>null)
+            const [race, qualy, sprint] = await Promise.all([
+                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/results`).catch(()=>null),
+                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/qualifying`).catch(()=>null),
+                fetchAllResults(`https://api.jolpi.ca/ergast/f1/${year}/last/sprint`).catch(()=>null)
             ]);
 
             if (!race && !qualy) continue;
 
-            const raceDate = race ? new Date(`${race.date}T${race.time || '12:00:00Z'}`) : null;
+            const raceDate  = race  ? new Date(`${race.date}T${race.time || '12:00:00Z'}`) : null;
+            const qualiDate = qualy ? new Date(`${qualy.date}T${qualy.time || '12:00:00Z'}`) : null;
 
-            if (race?.Results?.length > 0 && raceDate && raceDate < now) {
-                renderResultsUI(race, "RACE");
+            // Collect all completed sessions
+            const sessions = [];
+            if (race?.Results?.length > 0 && raceDate && raceDate < now)
+                sessions.push({ type: "RACE", data: race, time: raceDate });
+            if (sprint?.SprintResults?.length > 0 && sprint.date)
+                sessions.push({ type: "SPRINT", data: sprint, time: new Date(`${sprint.date}T${sprint.time || '12:00:00Z'}`) });
+            if (qualy?.QualifyingResults?.length > 0 && qualiDate && qualiDate < now)
+                sessions.push({ type: "QUALIFYING", data: qualy, time: qualiDate });
+
+            if (sessions.length > 0) {
+                sessions.sort((a, b) => b.time - a.time);
+                // Show session tabs so user can switch between all available sessions
+                renderSessionTabs(sessions);
                 return;
             }
-            if (sprint?.SprintResults?.length > 0) {
-                renderResultsUI(sprint, "SPRINT");
-                return;
-            }
-            if (qualy?.QualifyingResults?.length > 0) {
-                renderResultsUI(qualy, "QUALIFYING");
-                return;
-            }
-            if (race?.Results?.length > 0) { renderResultsUI(race, "RACE"); return; }
+
+            // Fallback: quali weekend only
+            if (qualy?.QualifyingResults?.length > 0) { renderSessionTabs([{type:"QUALIFYING", data:qualy, time:qualiDate}]); return; }
+            if (race?.Results?.length > 0) { renderSessionTabs([{type:"RACE", data:race, time:raceDate}]); return; }
 
         } catch(e) { continue; }
     }
@@ -530,8 +536,65 @@ async function updateLatestResults() {
         </div>`;
 }
 
-function renderResultsUI(race, sessionType = "RACE") {
+// ============================================================
+// SESSION TABS — shows Race / Sprint / Qualifying tabs
+// ============================================================
+function renderSessionTabs(sessions) {
     const container = document.getElementById('results-content');
+    if (!container || !sessions.length) return;
+
+    const tabColors = { RACE: "#e10600", SPRINT: "#ff6600", QUALIFYING: "#b700ff" };
+    const tabLabels = { RACE: "🏁 RACE", SPRINT: "🏃 SPRINT RACE", QUALIFYING: "⏱ QUALIFYING" };
+
+    // Build tab bar HTML
+    const tabBar = sessions.map((s, i) => `
+        <button onclick="switchResultTab(${i})" id="rtab-${i}"
+            style="background:${i===0 ? tabColors[s.type] : '#1a1a1a'};
+                   color:${i===0 ? '#fff' : '#555'};
+                   border:1px solid ${tabColors[s.type]}44;
+                   padding:8px 20px;border-radius:4px;font-weight:900;
+                   font-size:0.75rem;cursor:pointer;letter-spacing:1px;
+                   transition:all 0.2s;font-family:inherit;">
+            ${tabLabels[s.type] || s.type}
+        </button>`).join('');
+
+    container.innerHTML = `
+        <div style="display:flex;gap:8px;padding:20px 0 0 0;flex-wrap:wrap;" id="result-tab-bar">
+            ${tabBar}
+        </div>
+        <div id="result-tab-content"></div>`;
+
+    // Store sessions globally for tab switching
+    window._resultSessions = sessions;
+    window._resultTabColors = tabColors;
+    switchResultTab(0);
+}
+
+function switchResultTab(idx) {
+    const sessions = window._resultSessions;
+    const tabColors = window._resultTabColors;
+    if (!sessions) return;
+
+    // Update tab styles
+    sessions.forEach((s, i) => {
+        const btn = document.getElementById(`rtab-${i}`);
+        if (!btn) return;
+        btn.style.background = i === idx ? tabColors[s.type] : '#1a1a1a';
+        btn.style.color = i === idx ? '#fff' : '#555';
+    });
+
+    const tabContent = document.getElementById('result-tab-content');
+    if (!tabContent) return;
+    const s = sessions[idx];
+    renderResultsUIInto(tabContent, s.data, s.type);
+}
+
+function renderResultsUI(race, sessionType = "RACE") {
+    renderResultsUIInto(document.getElementById('results-content'), race, sessionType);
+}
+
+function renderResultsUIInto(target, race, sessionType) {
+    const container = target;
     if (!container) return;
 
     const tcMap = {
@@ -722,20 +785,21 @@ async function initSchedule() {
             let raceWin = null, poleSitter = null, sprintWin = null, sprintPoleSitter = null;
             if (isFinished) {
                 try {
-                    const [rr, qr] = await Promise.all([
-                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/results.json?limit=30`).then(r=>r.json()),
-                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/qualifying.json`).then(r=>r.json())
+                    // Always fetch race + qualifying results
+                    const baseResults = await Promise.all([
+                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/results.json?limit=3`).then(r=>r.json()).catch(()=>null),
+                        fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/qualifying.json`).then(r=>r.json()).catch(()=>null)
                     ]);
-                    raceWin    = rr.MRData?.RaceTable?.Races?.[0]?.Results?.[0]?.Driver.code;
-                    poleSitter = qr.MRData?.RaceTable?.Races?.[0]?.QualifyingResults?.[0]?.Driver.code;
+                    const [rr, qr] = baseResults;
+                    raceWin    = rr?.MRData?.RaceTable?.Races?.[0]?.Results?.[0]?.Driver?.code || null;
+                    poleSitter = qr?.MRData?.RaceTable?.Races?.[0]?.QualifyingResults?.[0]?.Driver?.code || null;
 
                     if (isSprint) {
-                        const [sr, sqr] = await Promise.all([
-                            fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/sprint.json`).then(r=>r.json()),
-                            fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/qualifying.json`).then(r=>r.json())
-                        ]);
-                        sprintWin        = sr.MRData?.RaceTable?.Races?.[0]?.SprintResults?.[0]?.Driver.code;
-                        sprintPoleSitter = sqr.MRData?.RaceTable?.Races?.[0]?.QualifyingResults?.[0]?.Driver.code;
+                        // Sprint race winner from /sprint endpoint
+                        const sr = await fetchWithTimeout(`https://api.jolpi.ca/ergast/f1/${race.season}/${race.round}/sprint.json`).then(r=>r.json()).catch(()=>null);
+                        sprintWin = sr?.MRData?.RaceTable?.Races?.[0]?.SprintResults?.[0]?.Driver?.code || null;
+                        // Ergast has no separate sprint quali endpoint — use sprint P1 as sprint pole
+                        sprintPoleSitter = sprintWin;
                     }
                 } catch(e) {}
             }
