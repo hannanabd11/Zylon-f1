@@ -58,41 +58,24 @@ document.addEventListener('DOMContentLoaded', () => {
         .live-weekend { border-left: 3px solid #00ff41 !important; }
 
         /* Driver number — decorative watermark, bottom-right, above portrait */
-        .driver-image-area {
-            position: relative;
-            overflow: hidden;
-        }
-        .driver-portrait {
-            position: relative;
-            z-index: 1;
-            display: block;
-            width: 100%;
-        }
+        .driver-card-new { position: relative; overflow: visible; }
         .driver-number-corner {
             position: absolute;
-            bottom: 0;
-            right: 0;
-            font-size: 7.5rem;
+            bottom: 90px;
+            right: 14px;
+            font-size: 7rem;
             font-weight: 900;
             font-style: italic;
             line-height: 1;
-            letter-spacing: -4px;
+            color: var(--team-color, #e10600);
+            opacity: 0.20;
             pointer-events: none;
             user-select: none;
-            z-index: 4;
-            padding: 0 8px 0 0;
-            /* Gradient text in team color, very transparent */
-            background: linear-gradient(to top,
-                var(--team-color, #e10600) 0%,
-                transparent 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            opacity: 0.55;
+            z-index: 10;
             transition: opacity 0.3s;
         }
         .driver-card-new:hover .driver-number-corner {
-            opacity: 0.85;
+            opacity: 0.42;
         }
     `;
     document.head.appendChild(style);
@@ -306,8 +289,8 @@ function renderDrivers() {
                 <div class="driver-image-area">
                     <img src="./Drivers/${d.id}.PNG" class="driver-portrait" onerror="this.onerror=null;this.src='./Drivers/placeholder.png'">
                     <div class="image-gradient"></div>
-                    <div class="driver-number-corner">${d.no}</div>
                 </div>
+                <div class="driver-number-corner">${d.no}</div>
             </a>
             <div class="driver-info-area">
                 <div class="driver-header-row">
@@ -1213,4 +1196,3 @@ async function updateF1Weather() {
         if (icon) icon.classList.remove('fa-spin');
     }
 }
-
