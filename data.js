@@ -48,8 +48,7 @@ const f1Calendar2026 = [
     { gp: "Australian Grand Prix",          circuit: "Albert Park Circuit",              date: "2026-03-08", time: "09:00:00", lat: -37.84, lon: 144.97, Qualifying: { date: "2026-03-07", time: "09:00:00" } },
     { gp: "Chinese Grand Prix",             circuit: "Shanghai International Circuit",   date: "2026-03-15", time: "12:00:00", lat:  31.33, lon: 121.22, Qualifying: { date: "2026-03-14", time: "12:00:00" } },
     { gp: "Japanese Grand Prix",            circuit: "Suzuka Circuit",                   date: "2026-03-29", time: "10:00:00", lat:  34.84, lon: 136.54, Qualifying: { date: "2026-03-28", time: "11:00:00" } },
-    { gp: "Bahrain Grand Prix",             circuit: "Bahrain International Circuit",    date: "2026-04-12", time: "20:00:00", lat:  26.03, lon:  50.51, Qualifying: { date: "2026-04-10", time: "20:00:00" } },
-    { gp: "Saudi Arabian Grand Prix",       circuit: "Jeddah Corniche Circuit",          date: "2026-04-19", time: "22:00:00", lat:  21.63, lon:  39.10, Qualifying: { date: "2026-04-17", time: "23:00:00" } },
+    
     { gp: "Miami Grand Prix",               circuit: "Miami International Autodrome",    date: "2026-05-04", time: "01:00:00", lat:  25.95, lon: -80.23, Qualifying: { date: "2026-05-02", time: "23:00:00" } },
     { gp: "Canadian Grand Prix",            circuit: "Circuit Gilles-Villeneuve",        date: "2026-05-24", time: "23:00:00", lat:  45.50, lon: -73.52, Qualifying: { date: "2026-05-23", time: "00:00:00" } },
     { gp: "Monaco Grand Prix",              circuit: "Circuit de Monaco",                date: "2026-06-07", time: "18:00:00", lat:  43.73, lon:   7.42, Qualifying: { date: "2026-06-06", time: "19:00:00" } },
