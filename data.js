@@ -227,40 +227,8 @@ const zenithRaceSchedule = [
         hubUrl: "race-hub-jpn.html"
     },
 
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // R4  BAHRAIN — BIC (AST = UTC+3) — Thu/Fri/Sun format
-    // FP1 Thu 15:30 AST = 17:30 PKT
-    // FP2 Thu 19:00 AST = 21:00 PKT
-    // FP3 Fri 14:00 AST = 16:00 PKT
-    // Quali Fri 18:00 AST = 20:00 PKT
-    // Race Sun 18:00 AST = 20:00 PKT
-    {
-        round: 4, gp: "Bahrain Grand Prix",
-        FP1:   { iso: "2026-04-09T17:30:00+05:00" },
-        FP2:   { iso: "2026-04-09T21:00:00+05:00" },
-        FP3:   { iso: "2026-04-10T16:00:00+05:00" },
-        Qualifying: { iso: "2026-04-10T20:00:00+05:00" },
-        Race:  { iso: "2026-04-12T20:00:00+05:00" },
-        hubUrl: "race-hub-bhr.html"
-    },
-
-    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // R5  SAUDI ARABIA — Jeddah (AST = UTC+3) — Thu/Fri/Sun format
-    // FP1 Thu 17:30 AST = 19:30 PKT
-    // FP2 Thu 21:00 AST = 23:00 PKT
-    // FP3 Fri 17:30 AST = 19:30 PKT
-    // Quali Fri 21:00 AST = 23:00 PKT
-    // Race Sun 20:00 AST = 22:00 PKT
-    {
-        round: 5, gp: "Saudi Arabian Grand Prix",
-        FP1:   { iso: "2026-04-16T19:30:00+05:00" },
-        FP2:   { iso: "2026-04-16T23:00:00+05:00" },
-        FP3:   { iso: "2026-04-17T19:30:00+05:00" },
-        Qualifying: { iso: "2026-04-17T23:00:00+05:00" },
-        Race:  { iso: "2026-04-19T22:00:00+05:00" },
-        hubUrl: "race-hub-sau.html"
-    },
-
+  
+   
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // R6  MIAMI ★SPRINT — Miami Autodrome (EDT = UTC-4)
     // FP1 Fri 12:30 EDT = 21:30 PKT
@@ -269,7 +237,7 @@ const zenithRaceSchedule = [
     // Quali Sat 14:00 EDT = 23:00 PKT
     // Race Sun 16:00 EDT = 01:00 PKT Mon
     {
-        round: 6, gp: "Miami Grand Prix", sprint: true,
+        round: 4, gp: "Miami Grand Prix", sprint: true,
         FP1:         { iso: "2026-05-01T21:30:00+05:00" },
         SprintQuali: { iso: "2026-05-02T01:30:00+05:00" },
         Sprint:      { iso: "2026-05-02T19:00:00+05:00" },
@@ -286,7 +254,7 @@ const zenithRaceSchedule = [
     // Quali Sat 15:00 EDT = 00:00 PKT Sun
     // Race Sun 14:00 EDT = 23:00 PKT
     {
-        round: 7, gp: "Canadian Grand Prix", sprint: true,
+        round: 5, gp: "Canadian Grand Prix", sprint: true,
         FP1:         { iso: "2026-05-22T22:30:00+05:00" },
         SprintQuali: { iso: "2026-05-23T02:30:00+05:00" },
         Sprint:      { iso: "2026-05-23T20:00:00+05:00" },
@@ -303,7 +271,7 @@ const zenithRaceSchedule = [
     // Quali Sat 16:00 CEST = 19:00 PKT
     // Race Sun 15:00 CEST = 18:00 PKT
     {
-        round: 8, gp: "Monaco Grand Prix",
+        round: 6, gp: "Monaco Grand Prix",
         FP1:   { iso: "2026-06-05T16:30:00+05:00" },
         FP2:   { iso: "2026-06-05T20:00:00+05:00" },
         FP3:   { iso: "2026-06-06T15:30:00+05:00" },
@@ -315,7 +283,7 @@ const zenithRaceSchedule = [
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // R9  BARCELONA-CATALUNYA (CEST = UTC+2)
     {
-        round: 9, gp: "Barcelona Grand Prix",
+        round: 7, gp: "Barcelona Grand Prix",
         FP1:   { iso: "2026-06-12T16:30:00+05:00" },
         FP2:   { iso: "2026-06-12T20:00:00+05:00" },
         FP3:   { iso: "2026-06-13T15:30:00+05:00" },
@@ -327,7 +295,7 @@ const zenithRaceSchedule = [
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // R10 AUSTRIA — Red Bull Ring (CEST = UTC+2)
     {
-        round: 10, gp: "Austrian Grand Prix",
+        round: 8, gp: "Austrian Grand Prix",
         FP1:   { iso: "2026-06-26T16:30:00+05:00" },
         FP2:   { iso: "2026-06-26T20:00:00+05:00" },
         FP3:   { iso: "2026-06-27T15:30:00+05:00" },
@@ -344,7 +312,7 @@ const zenithRaceSchedule = [
     // Quali Sat 16:00 BST = 20:00 PKT
     // Race Sun 15:00 BST = 19:00 PKT
     {
-        round: 11, gp: "British Grand Prix", sprint: true,
+        round: 9, gp: "British Grand Prix", sprint: true,
         FP1:         { iso: "2026-07-03T17:30:00+05:00" },
         SprintQuali: { iso: "2026-07-03T21:30:00+05:00" },
         Sprint:      { iso: "2026-07-04T16:00:00+05:00" },
@@ -356,7 +324,7 @@ const zenithRaceSchedule = [
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // R12 BELGIUM — Spa (CEST = UTC+2)
     {
-        round: 12, gp: "Belgian Grand Prix",
+        round: 10, gp: "Belgian Grand Prix",
         FP1:   { iso: "2026-07-17T16:30:00+05:00" },
         FP2:   { iso: "2026-07-17T20:00:00+05:00" },
         FP3:   { iso: "2026-07-18T15:30:00+05:00" },
@@ -368,7 +336,7 @@ const zenithRaceSchedule = [
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // R13 HUNGARY — Hungaroring (CEST = UTC+2)
     {
-        round: 13, gp: "Hungarian Grand Prix",
+        round: 11, gp: "Hungarian Grand Prix",
         FP1:   { iso: "2026-07-24T16:30:00+05:00" },
         FP2:   { iso: "2026-07-24T20:00:00+05:00" },
         FP3:   { iso: "2026-07-25T15:30:00+05:00" },
@@ -385,7 +353,7 @@ const zenithRaceSchedule = [
     // Quali Sat 16:00 CEST = 19:00 PKT (wait, standard is 16:00 CEST = 19:00 PKT but last session said 18:00 PKT)
     // Race Sun 15:00 CEST = 18:00 PKT
     {
-        round: 14, gp: "Dutch Grand Prix", sprint: true,
+        round: 12, gp: "Dutch Grand Prix", sprint: true,
         FP1:         { iso: "2026-08-21T16:30:00+05:00" },
         SprintQuali: { iso: "2026-08-21T20:30:00+05:00" },
         Sprint:      { iso: "2026-08-22T15:00:00+05:00" },
@@ -397,7 +365,7 @@ const zenithRaceSchedule = [
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // R15 ITALY — Monza (CEST = UTC+2)
     {
-        round: 15, gp: "Italian Grand Prix",
+        round: 13, gp: "Italian Grand Prix",
         FP1:   { iso: "2026-09-04T16:30:00+05:00" },
         FP2:   { iso: "2026-09-04T20:00:00+05:00" },
         FP3:   { iso: "2026-09-05T15:30:00+05:00" },
@@ -409,7 +377,7 @@ const zenithRaceSchedule = [
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // R16 SPAIN MADRID — Madring (CEST = UTC+2)
     {
-        round: 16, gp: "Spanish Grand Prix (Madrid)",
+        round: 14, gp: "Spanish Grand Prix (Madrid)",
         FP1:   { iso: "2026-09-11T16:30:00+05:00" },
         FP2:   { iso: "2026-09-11T20:00:00+05:00" },
         FP3:   { iso: "2026-09-12T15:30:00+05:00" },
@@ -426,7 +394,7 @@ const zenithRaceSchedule = [
     // Quali Fri 16:00 AZT = 17:00 PKT
     // Race SAT 15:00 AZT = 16:00 PKT
     {
-        round: 17, gp: "Azerbaijan Grand Prix",
+        round: 15, gp: "Azerbaijan Grand Prix",
         FP1:   { iso: "2026-09-24T13:30:00+05:00" },
         FP2:   { iso: "2026-09-24T17:00:00+05:00" },
         FP3:   { iso: "2026-09-25T13:30:00+05:00" },
@@ -443,7 +411,7 @@ const zenithRaceSchedule = [
     // Quali Sat 20:00 SGT = 17:00 PKT
     // Race Sun 20:00 SGT = 17:00 PKT
     {
-        round: 18, gp: "Singapore Grand Prix", sprint: true,
+        round: 16, gp: "Singapore Grand Prix", sprint: true,
         FP1:         { iso: "2026-10-09T15:30:00+05:00" },
         SprintQuali: { iso: "2026-10-09T19:30:00+05:00" },
         Sprint:      { iso: "2026-10-10T13:00:00+05:00" },
@@ -460,7 +428,7 @@ const zenithRaceSchedule = [
     // Quali Sat 15:00 CDT = 01:00 PKT Sun
     // Race Sun 14:00 CDT = 00:00 PKT Mon
     {
-        round: 19, gp: "United States Grand Prix",
+        round: 17, gp: "United States Grand Prix",
         FP1:   { iso: "2026-10-23T23:30:00+05:00" },
         FP2:   { iso: "2026-10-24T03:00:00+05:00" },
         FP3:   { iso: "2026-10-24T21:30:00+05:00" },
@@ -477,7 +445,7 @@ const zenithRaceSchedule = [
     // Quali Sat 15:00 CST = 02:00 PKT Sun
     // Race Sun 14:00 CST = 01:00 PKT Mon
     {
-        round: 20, gp: "Mexico City Grand Prix",
+        round: 18, gp: "Mexico City Grand Prix",
         FP1:   { iso: "2026-10-31T00:30:00+05:00" },
         FP2:   { iso: "2026-10-31T04:00:00+05:00" },
         FP3:   { iso: "2026-10-31T22:00:00+05:00" },
@@ -494,7 +462,7 @@ const zenithRaceSchedule = [
     // Quali Sat 15:00 BRT = 23:00 PKT
     // Race Sun 14:00 BRT = 22:00 PKT
     {
-        round: 21, gp: "São Paulo Grand Prix",
+        round: 19, gp: "São Paulo Grand Prix",
         FP1:   { iso: "2026-11-06T22:30:00+05:00" },
         FP2:   { iso: "2026-11-07T02:00:00+05:00" },
         FP3:   { iso: "2026-11-07T19:30:00+05:00" },
@@ -511,7 +479,7 @@ const zenithRaceSchedule = [
     // Quali Fri 22:00 PDT = 10:00 PKT Sat
     // Race SAT 22:00 PDT = 10:00 PKT Sun
     {
-        round: 22, gp: "Las Vegas Grand Prix",
+        round: 20, gp: "Las Vegas Grand Prix",
         FP1:   { iso: "2026-11-20T07:00:00+05:00" },
         FP2:   { iso: "2026-11-20T11:00:00+05:00" },
         FP3:   { iso: "2026-11-21T07:00:00+05:00" },
@@ -528,7 +496,7 @@ const zenithRaceSchedule = [
     // Quali Sat 18:00 AST = 20:00 PKT
     // Race Sun 19:00 AST = 21:00 PKT
     {
-        round: 23, gp: "Qatar Grand Prix",
+        round: 21, gp: "Qatar Grand Prix",
         FP1:   { iso: "2026-11-27T17:30:00+05:00" },
         FP2:   { iso: "2026-11-27T21:00:00+05:00" },
         FP3:   { iso: "2026-11-28T16:30:00+05:00" },
@@ -545,7 +513,7 @@ const zenithRaceSchedule = [
     // Quali Sat 17:00 GST = 18:00 PKT
     // Race Sun 17:00 GST = 18:00 PKT
     {
-        round: 24, gp: "Abu Dhabi Grand Prix",
+        round: 22, gp: "Abu Dhabi Grand Prix",
         FP1:   { iso: "2026-12-04T15:30:00+05:00" },
         FP2:   { iso: "2026-12-04T19:00:00+05:00" },
         FP3:   { iso: "2026-12-05T14:30:00+05:00" },
