@@ -307,7 +307,7 @@ function renderDrivers() {
         card.innerHTML = `
             <a href="${driverF1Url}" target="_blank" style="text-decoration:none;color:inherit;display:block;">
                 <div class="driver-image-area">
-                    <img src="images/Drivers/${d.id}.PNG" class="driver-portrait"
+                    <img src="./Drivers/${d.id}.PNG" class="driver-portrait"
                          onerror="this.onerror=null;this.src='images/Drivers/placeholder.png'">
                     <div class="image-gradient"></div>
                 </div>
@@ -998,7 +998,7 @@ function initCarsTab() {
     grid.innerHTML = f1Cars2026.map(car => {
         let imgs = '';
         for (let i = 1; i <= 5; i++) {
-            imgs += `<img src="images/Cars/${car.id}-${i}.avif" id="img-${car.id}-${i}" data-ext="avif" onerror="tryNextExt(this,'${car.id}',${i})" alt="Angle ${i}">`;
+            imgs += `<img src="./Cars/${car.id}-${i}.avif" id="img-${car.id}-${i}" data-ext="avif" onerror="tryNextExt(this,'${car.id}',${i})" alt="Angle ${i}">`;
         }
         return `
         <div class="car-card" onclick="openGallery('${car.id}',5)">
