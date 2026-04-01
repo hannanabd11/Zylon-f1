@@ -109,12 +109,7 @@ function updateZenithTimer() {
     const QUALI_DURATION_MS = 2 * 60 * 60 * 1000;
     const RACE_DURATION_MS  = 3 * 60 * 60 * 1000;
 
-    // CHANGE 1: Skip cancelled rounds — Bahrain (R2) and Saudi Arabia (R3) cancelled 2026
-    const CANCELLED_ROUNDS = [2, 3];
-    let race = zenithRaceSchedule.find(r =>
-        !CANCELLED_ROUNDS.includes(r.round) &&
-        now < new Date(r.Race.iso).getTime() + RACE_DURATION_MS
-    );
+    let race = zenithRaceSchedule.find(r => now < new Date(r.Race.iso).getTime() + RACE_DURATION_MS);
     if (!race) { label.innerText = "SEASON COMPLETE"; display.innerText = "SEE YOU IN 2027"; return; }
 
     const qualiTime = new Date(race.Qualifying.iso).getTime();
@@ -181,11 +176,7 @@ function checkAndOpenLiveTiming() {
     if (_liveTabOpened) return;
     const now              = new Date().getTime();
     const RACE_DURATION_MS = 3 * 60 * 60 * 1000;
-    const CANCELLED_ROUNDS = [2, 3];
-    const race = zenithRaceSchedule.find(r =>
-        !CANCELLED_ROUNDS.includes(r.round) &&
-        now < new Date(r.Race.iso).getTime() + RACE_DURATION_MS
-    );
+    const race = zenithRaceSchedule.find(r => now < new Date(r.Race.iso).getTime() + RACE_DURATION_MS);
     if (!race) return;
     const qualiTime = new Date(race.Qualifying.iso).getTime();
     const raceTime  = new Date(race.Race.iso).getTime();
@@ -847,7 +838,11 @@ async function initSchedule() {
         } catch(e) {}
 
         const ergastByRound = {};
-        ergastRaces.forEach(r => { ergastByRound[parseInt(r.round)] = r; });
+        // Only use ergast data if it's 2026 season to avoid 2025 round number conflicts
+        const ergastSeason = ergastRaces[0]?.season;
+        if (ergastSeason === '2026') {
+            ergastRaces.forEach(r => { ergastByRound[parseInt(r.round)] = r; });
+        }
 
         const now     = new Date();
         const nextIdx = zenithRaceSchedule.findIndex(r => new Date(r.Race.iso) > now);
