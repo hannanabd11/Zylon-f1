@@ -139,12 +139,12 @@ function updateZenithTimer() {
                           font-weight:900;font-size:0.85rem;text-decoration:none;letter-spacing:1px;">
                     🔴 WATCH LIVE TIMING ➔
                 </a>
-                <a href="live-timing.html" target="_blank" rel="noopener noreferrer"
+                <a href="https://www.formula1.com/en/racing/2026" target="_blank" rel="noopener noreferrer"
                    style="pointer-events:auto;position:relative;z-index:999;display:inline-block;
-                          background:#000;color:#00ff41;padding:8px 20px;border-radius:3px;
+                          background:#111;color:#fff;padding:8px 20px;border-radius:3px;
                           font-weight:900;font-size:0.85rem;text-decoration:none;letter-spacing:1px;
-                          border:1px solid #00ff41;">
-                    ⚡ ENTER COMMAND CENTER ➔
+                          border:1px solid #333;">
+                    🏁 RACE HUB ➔
                 </a>
             </div>`;
         updateLatestResults();
@@ -193,14 +193,14 @@ function checkAndOpenLiveTiming() {
                 <span style="width:10px;height:10px;border-radius:50%;background:#fff;
                     display:inline-block;animation:blink 0.8s infinite;"></span>
                 🔴 ${race.gp.toUpperCase()} — ${raceJustStarted ? 'RACE' : 'QUALIFYING'} IS LIVE
-                <a href="live-timing.html" target="_blank"
+                <a href="https://www.formula1.com/en/live-timing" target="_blank"
                    style="background:#fff;color:#e10600;padding:5px 16px;
                           text-decoration:none;font-size:0.75rem;font-weight:900;letter-spacing:2px;">
-                    OPEN LIVE TIMING →
+                    WATCH ON F1.COM →
                 </a>
             </div>`;
         document.body.prepend(banner);
-        setTimeout(() => window.open("live-timing.html", "_blank"), 3000);
+        setTimeout(() => window.open("https://www.formula1.com/en/live-timing", "_blank"), 3000);
     }
 }
 
@@ -307,7 +307,7 @@ function renderDrivers() {
         card.innerHTML = `
             <a href="${driverF1Url}" target="_blank" style="text-decoration:none;color:inherit;display:block;">
                 <div class="driver-image-area">
-                    <img src="./Drivers/${d.id}.PNG" class="driver-portrait"
+                    <img src="images/Drivers/${d.id}.PNG" class="driver-portrait"
                          onerror="this.onerror=null;this.src='images/Drivers/placeholder.png'">
                     <div class="image-gradient"></div>
                 </div>
@@ -998,7 +998,7 @@ function initCarsTab() {
     grid.innerHTML = f1Cars2026.map(car => {
         let imgs = '';
         for (let i = 1; i <= 5; i++) {
-            imgs += `<img src="./Cars/${car.id}-${i}.avif" id="img-${car.id}-${i}" data-ext="avif" onerror="tryNextExt(this,'${car.id}',${i})" alt="Angle ${i}">`;
+            imgs += `<img src="images/Cars/${car.id}-${i}.avif" id="img-${car.id}-${i}" data-ext="avif" onerror="tryNextExt(this,'${car.id}',${i})" alt="Angle ${i}">`;
         }
         return `
         <div class="car-card" onclick="openGallery('${car.id}',5)">
