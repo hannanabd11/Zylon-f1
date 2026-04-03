@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zylon By A.H F1| Latest News Live Data 2026</title>
-<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/x-icon" href="images/Drivers/favicon.ico">
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="live-style.css">    
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;700;900&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
 <body>
 <header class="main-header">
@@ -44,10 +45,47 @@
         </div>
 
         <div class="header-utils">
-            <button class="btn-shop" onclick="window.open('https://store.formula1.com','_blank')">
-                <span>SHOP</span>
-                <i class="fas fa-shopping-bag"></i>
-            </button>
+            <div class="btn-shop-wrap" style="position:relative;">
+                <button class="btn-shop" onclick="toggleShopMenu()" style="cursor:pointer;">
+                    <span>F1 TV</span>
+                    <i class="fas fa-tv"></i>
+                </button>
+                <div id="shop-menu" style="display:none;position:absolute;top:48px;right:0;
+                     background:#111;border:1px solid #222;border-radius:6px;min-width:200px;
+                     z-index:9999;padding:6px 0;white-space:nowrap;">
+                    <a href="https://f1tv.formula1.com" target="_blank"
+                       style="display:flex;align-items:center;gap:10px;padding:10px 16px;
+                              color:#fff;text-decoration:none;font-size:0.8rem;font-weight:700;letter-spacing:1px;"
+                       onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
+                        <i class="fas fa-play" style="color:#e10600;width:14px;"></i> F1 TV PRO
+                    </a>
+                    <a href="https://www.formula1.com/en/live-timing" target="_blank"
+                       style="display:flex;align-items:center;gap:10px;padding:10px 16px;
+                              color:#fff;text-decoration:none;font-size:0.8rem;font-weight:700;letter-spacing:1px;"
+                       onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
+                        <i class="fas fa-stopwatch" style="color:#00ff41;width:14px;"></i> LIVE TIMING
+                    </a>
+                    <a href="https://www.formula1.com/en/latest/all" target="_blank"
+                       style="display:flex;align-items:center;gap:10px;padding:10px 16px;
+                              color:#fff;text-decoration:none;font-size:0.8rem;font-weight:700;letter-spacing:1px;"
+                       onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
+                        <i class="fas fa-newspaper" style="color:#888;width:14px;"></i> F1 NEWS
+                    </a>
+                    <a href="https://www.formula1.com/en/video" target="_blank"
+                       style="display:flex;align-items:center;gap:10px;padding:10px 16px;
+                              color:#fff;text-decoration:none;font-size:0.8rem;font-weight:700;letter-spacing:1px;"
+                       onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
+                        <i class="fab fa-youtube" style="color:#e10600;width:14px;"></i> F1 VIDEOS
+                    </a>
+                    <hr style="border:none;border-top:1px solid #1a1a1a;margin:4px 0;">
+                    <a href="https://store.formula1.com" target="_blank"
+                       style="display:flex;align-items:center;gap:10px;padding:10px 16px;
+                              color:#888;text-decoration:none;font-size:0.8rem;font-weight:700;letter-spacing:1px;"
+                       onmouseover="this.style.background='#1a1a1a'" onmouseout="this.style.background='transparent'">
+                        <i class="fas fa-shopping-bag" style="color:#555;width:14px;"></i> F1 STORE
+                    </a>
+                </div>
+            </div>
 
             <!-- LOGGED OUT state -->
             <div class="user-login" id="login-btn" onclick="signInWithGoogle()" style="cursor:pointer;">
@@ -64,14 +102,55 @@
                     <i class="fas fa-chevron-down" style="color:#666;font-size:0.6rem;"></i>
                 </div>
                 <!-- Dropdown -->
-                <div id="user-menu" style="display:none;position:absolute;top:45px;right:0;background:#111;border:1px solid #222;border-radius:6px;min-width:180px;z-index:9999;padding:8px 0;">
-                    <div style="padding:12px 16px;border-bottom:1px solid #1a1a1a;">
-                        <div id="menu-name" style="color:#fff;font-weight:900;font-size:0.85rem;"></div>
-                        <div id="menu-email" style="color:#555;font-size:0.7rem;margin-top:2px;"></div>
+                <div id="user-menu" style="display:none;position:absolute;top:50px;right:0;background:#111;border:1px solid #222;border-radius:8px;min-width:220px;z-index:9999;padding:0;overflow:hidden;">
+                    <!-- Profile Header -->
+                    <div style="padding:16px;background:#0a0a0a;border-bottom:1px solid #1a1a1a;display:flex;align-items:center;gap:12px;">
+                        <img id="menu-avatar-lg" src="" style="width:44px;height:44px;border-radius:50%;border:2px solid #e10600;object-fit:cover;">
+                        <div>
+                            <div id="menu-name" style="color:#fff;font-weight:900;font-size:0.9rem;"></div>
+                            <div id="menu-email" style="color:#555;font-size:0.65rem;margin-top:2px;"></div>
+                            <div style="margin-top:4px;">
+                                <span style="background:#e10600;color:#fff;font-size:0.55rem;padding:2px 6px;border-radius:2px;font-weight:900;letter-spacing:1px;">ZYLON MEMBER</span>
+                            </div>
+                        </div>
                     </div>
-                    <div onclick="signOutUser()" style="padding:10px 16px;color:#e10600;font-size:0.8rem;font-weight:700;cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:8px;"
+                    <!-- Favourite Team -->
+                    <div style="padding:12px 16px;border-bottom:1px solid #1a1a1a;">
+                        <div style="color:#555;font-size:0.65rem;letter-spacing:1px;margin-bottom:6px;font-weight:700;">FAVOURITE TEAM</div>
+                        <select id="fav-team-select" onchange="saveFavTeam(this.value)"
+                            style="width:100%;background:#0a0a0a;border:1px solid #222;color:#fff;padding:6px 8px;border-radius:4px;font-size:0.75rem;font-weight:700;font-family:inherit;cursor:pointer;">
+                            <option value="">SELECT TEAM</option>
+                            <option value="ferrari">🔴 Ferrari</option>
+                            <option value="mclaren">🟠 McLaren</option>
+                            <option value="mercedes">🩵 Mercedes</option>
+                            <option value="red_bull">🔵 Red Bull</option>
+                            <option value="aston_martin">🟢 Aston Martin</option>
+                            <option value="alpine">🔷 Alpine</option>
+                            <option value="williams">🩵 Williams</option>
+                            <option value="audi">⚫ Audi</option>
+                            <option value="racing_bulls">🔵 Racing Bulls</option>
+                            <option value="haas">⚪ Haas</option>
+                            <option value="cadillac">🟡 Cadillac</option>
+                        </select>
+                    </div>
+                    <!-- Quick Links -->
+                    <div style="padding:6px 0;border-bottom:1px solid #1a1a1a;">
+                        <a href="https://www.formula1.com/en/drivers" target="_blank"
+                           style="display:flex;align-items:center;gap:10px;padding:8px 16px;color:#aaa;text-decoration:none;font-size:0.75rem;font-weight:700;letter-spacing:1px;"
+                           onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">
+                            <i class="fas fa-id-card" style="width:14px;color:#555;"></i> MY DRIVERS
+                        </a>
+                        <a href="https://www.formula1.com/en/racing/2026" target="_blank"
+                           style="display:flex;align-items:center;gap:10px;padding:8px 16px;color:#aaa;text-decoration:none;font-size:0.75rem;font-weight:700;letter-spacing:1px;"
+                           onmouseover="this.style.color='#fff'" onmouseout="this.style.color='#aaa'">
+                            <i class="fas fa-calendar" style="width:14px;color:#555;"></i> 2026 SEASON
+                        </a>
+                    </div>
+                    <!-- Sign Out -->
+                    <div onclick="signOutUser()"
+                         style="padding:10px 16px;color:#e10600;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:1px;display:flex;align-items:center;gap:10px;"
                          onmouseover="this.style.background='#1a0000'" onmouseout="this.style.background='transparent'">
-                        <i class="fas fa-sign-out-alt"></i> SIGN OUT
+                        <i class="fas fa-sign-out-alt" style="width:14px;"></i> SIGN OUT
                     </div>
                 </div>
             </div>
@@ -104,19 +183,96 @@
         <div id="results-display-area" class="results-grid"></div>
         <div id="results-content" style="color:#666;text-align:center;padding:20px;">Fetching latest FIA data...</div>
 
+        <!-- ARCHIVE SEARCH — dynamic year + round dropdowns -->
         <div class="race-search-bar" style="background:rgba(255,255,255,0.03);padding:20px;border-radius:8px;margin:40px 0 20px 0;display:flex;gap:10px;align-items:center;border:1px solid rgba(255,255,255,0.05);flex-wrap:wrap;">
             <div style="color:#666;font-size:0.8rem;font-weight:bold;text-transform:uppercase;margin-right:10px;white-space:nowrap;">ARCHIVE SEARCH:</div>
-            <select id="lookup-year" onchange="populateRoundSelector()" style="background:#111;border:1px solid #333;color:white;padding:12px;border-radius:4px;width:110px;font-weight:bold;font-family:inherit;cursor:pointer;">
-                <option value="2026" selected>2026</option><option value="2025">2025</option><option value="2024">2024</option><option value="2023">2023</option><option value="2022">2022</option><option value="2021">2021</option><option value="2020">2020</option><option value="2019">2019</option><option value="2018">2018</option><option value="2017">2017</option><option value="2016">2016</option><option value="2015">2015</option><option value="2014">2014</option><option value="2013">2013</option><option value="2012">2012</option><option value="2011">2011</option><option value="2010">2010</option><option value="2009">2009</option><option value="2008">2008</option><option value="2007">2007</option><option value="2006">2006</option><option value="2005">2005</option><option value="2004">2004</option><option value="2003">2003</option><option value="2002">2002</option><option value="2001">2001</option><option value="2000">2000</option><option value="1999">1999</option><option value="1998">1998</option><option value="1997">1997</option><option value="1996">1996</option><option value="1995">1995</option><option value="1994">1994</option><option value="1993">1993</option><option value="1992">1992</option><option value="1991">1991</option><option value="1990">1990</option><option value="1989">1989</option><option value="1988">1988</option><option value="1987">1987</option><option value="1986">1986</option><option value="1985">1985</option><option value="1984">1984</option><option value="1983">1983</option><option value="1982">1982</option><option value="1981">1981</option><option value="1980">1980</option><option value="1979">1979</option><option value="1978">1978</option><option value="1977">1977</option><option value="1976">1976</option><option value="1975">1975</option><option value="1974">1974</option><option value="1973">1973</option><option value="1972">1972</option><option value="1971">1971</option><option value="1970">1970</option><option value="1969">1969</option><option value="1968">1968</option><option value="1967">1967</option><option value="1966">1966</option><option value="1965">1965</option><option value="1964">1964</option><option value="1963">1963</option><option value="1962">1962</option><option value="1961">1961</option><option value="1960">1960</option><option value="1959">1959</option><option value="1958">1958</option><option value="1957">1957</option><option value="1956">1956</option><option value="1955">1955</option><option value="1954">1954</option><option value="1953">1953</option><option value="1952">1952</option><option value="1951">1951</option><option value="1950">1950</option>
+            <select id="lookup-year"
+                    onchange="populateRoundSelector()"
+                    style="background:#111;border:1px solid #333;color:white;padding:12px;border-radius:4px;width:110px;font-weight:bold;font-family:inherit;cursor:pointer;">
+                    <option value="2026" selected>2026</option>
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                    <option value="2020">2020</option>
+                    <option value="2019">2019</option>
+                    <option value="2018">2018</option>
+                    <option value="2017">2017</option>
+                    <option value="2016">2016</option>
+                    <option value="2015">2015</option>
+                    <option value="2014">2014</option>
+                    <option value="2013">2013</option>
+                    <option value="2012">2012</option>
+                    <option value="2011">2011</option>
+                    <option value="2010">2010</option>
+                    <option value="2009">2009</option>
+                    <option value="2008">2008</option>
+                    <option value="2007">2007</option>
+                    <option value="2006">2006</option>
+                    <option value="2005">2005</option>
+                    <option value="2004">2004</option>
+                    <option value="2003">2003</option>
+                    <option value="2002">2002</option>
+                    <option value="2001">2001</option>
+                    <option value="2000">2000</option>
+                    <option value="1999">1999</option>
+                    <option value="1998">1998</option>
+                    <option value="1997">1997</option>
+                    <option value="1996">1996</option>
+                    <option value="1995">1995</option>
+                    <option value="1994">1994</option>
+                    <option value="1993">1993</option>
+                    <option value="1992">1992</option>
+                    <option value="1991">1991</option>
+                    <option value="1990">1990</option>
+                    <option value="1989">1989</option>
+                    <option value="1988">1988</option>
+                    <option value="1987">1987</option>
+                    <option value="1986">1986</option>
+                    <option value="1985">1985</option>
+                    <option value="1984">1984</option>
+                    <option value="1983">1983</option>
+                    <option value="1982">1982</option>
+                    <option value="1981">1981</option>
+                    <option value="1980">1980</option>
+                    <option value="1979">1979</option>
+                    <option value="1978">1978</option>
+                    <option value="1977">1977</option>
+                    <option value="1976">1976</option>
+                    <option value="1975">1975</option>
+                    <option value="1974">1974</option>
+                    <option value="1973">1973</option>
+                    <option value="1972">1972</option>
+                    <option value="1971">1971</option>
+                    <option value="1970">1970</option>
+                    <option value="1969">1969</option>
+                    <option value="1968">1968</option>
+                    <option value="1967">1967</option>
+                    <option value="1966">1966</option>
+                    <option value="1965">1965</option>
+                    <option value="1964">1964</option>
+                    <option value="1963">1963</option>
+                    <option value="1962">1962</option>
+                    <option value="1961">1961</option>
+                    <option value="1960">1960</option>
+                    <option value="1959">1959</option>
+                    <option value="1958">1958</option>
+                    <option value="1957">1957</option>
+                    <option value="1956">1956</option>
+                    <option value="1955">1955</option>
+                    <option value="1954">1954</option>
+                    <option value="1953">1953</option>
+                    <option value="1952">1952</option>
+                    <option value="1951">1951</option>
+                    <option value="1950">1950</option>
             </select>
-            <select id="lookup-round" style="background:#111;border:1px solid #333;color:white;padding:12px;border-radius:4px;flex:1;min-width:180px;font-weight:bold;font-family:inherit;cursor:pointer;">
+            <select id="lookup-round"
+                   style="background:#111;border:1px solid #333;color:white;padding:12px;border-radius:4px;flex:1;min-width:180px;font-weight:bold;font-family:inherit;cursor:pointer;">
                 <option value="">SELECT ROUND</option>
             </select>
-            <select id="lookup-session" style="background:#111;border:1px solid #333;color:white;padding:12px;border-radius:4px;width:180px;font-weight:bold;font-family:inherit;cursor:pointer;">
-                <option value="results">🏁 RACE</option>
-                <option value="qualifying">⏱ QUALIFYING</option>
-            </select>
-            <button onclick="fetchSpecificRace()" style="background:#e10600;color:white;border:none;padding:12px 24px;border-radius:4px;font-weight:900;cursor:pointer;text-transform:uppercase;white-space:nowrap;letter-spacing:1px;">
+            <button onclick="fetchSpecificRace()"
+                    style="background:#e10600;color:white;border:none;padding:12px 24px;border-radius:4px;font-weight:900;cursor:pointer;text-transform:uppercase;white-space:nowrap;letter-spacing:1px;">
                 VIEW RESULTS
             </button>
         </div>
@@ -144,10 +300,12 @@
     <section id="home" class="tab-content active">
         <div id="weather-widget">
             <div id="dynamic-watermark" class="track-watermark">INITIALIZING...</div>
+
             <div class="live-status-bar">
                 <div class="dot"></div>
                 <span class="live-text">TELEMETRY LIVE</span>
             </div>
+
             <div class="weather-data-wrapper">
                 <div class="tel-wing">
                     <div class="weather-item">
@@ -159,6 +317,7 @@
                         <span id="rain-risk" class="weather-value">--%</span>
                     </div>
                 </div>
+
                 <div class="weather-center-hud">
                     <span class="weather-label center-label">AIR TEMP</span>
                     <span id="air-temp" class="temp-display">--°C</span>
@@ -167,6 +326,7 @@
                         <i id="refresh-icon" class="fas fa-sync-alt"></i>
                     </button>
                 </div>
+
                 <div class="tel-wing wing-right">
                     <div class="weather-item">
                         <span class="weather-label">TRACK TEMP</span>
@@ -178,6 +338,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="weather-footer">
                 <span class="weather-label">WIND SPEED:</span>
                 <span id="wind-speed" class="weather-value">-- km/h</span>
@@ -235,7 +396,7 @@
         <div class="cars-grid" id="cars-display-grid">
             <div class="car-card" onclick="openCarView('ferrari', 'SF-26')">
                 <div class="car-badge">SCUDERIA FERRARI</div>
-                <img src="images/cars/ferrari-main.png" alt="Ferrari 2026" onerror="this.style.display='none'">
+                <img src="images/cars/ferrari-main.png" alt="Ferrari 2026" onerror="this.src='https://via.placeholder.com/400x200?text=2026+Car+Coming+Soon'">
                 <div class="car-info">
                     <h3>SF-26</h3>
                     <span>CLICK TO ENLARGE</span>
@@ -261,6 +422,7 @@
 
 <footer class="f1-footer">
     <div class="footer-content">
+        
         <div class="partners-section">
             <h2 class="f1-large-title">GLOBAL Partners</h2>
             <div class="brands-column partners-glow">
@@ -303,6 +465,7 @@
         
         <p class="copyright-text">© 2026 Abdul's copyright reserved</p>
         <p class="copyright-text">Made By Abdul Hannan</p>
+
     </div>
 </footer>
 
@@ -326,62 +489,89 @@
         const auth     = getAuth(app);
         const provider = new GoogleAuthProvider();
 
+        // Google sign-in (shows account picker)
         window.signInWithGoogle = async () => {
             try {
+                provider.setCustomParameters({ prompt: 'select_account' });
                 await signInWithPopup(auth, provider);
             } catch(e) {
                 console.error("Login failed:", e.message);
-                alert("Login failed: " + e.message);
+                if (e.code !== 'auth/popup-closed-by-user') alert("Login failed: " + e.message);
             }
         };
 
         window.signOutUser = async () => {
             await signOut(auth);
             document.getElementById('user-menu').style.display = 'none';
+            sessionStorage.removeItem('zylon_fav_team');
+        };
+
+        window.saveFavTeam = (val) => {
+            sessionStorage.setItem('zylon_fav_team', val);
+        };
+
+        window.toggleShopMenu = () => {
+            const sm = document.getElementById('shop-menu');
+            const um = document.getElementById('user-menu');
+            if (um) um.style.display = 'none';
+            if (sm) sm.style.display = sm.style.display === 'none' ? 'block' : 'none';
         };
 
         window.toggleUserMenu = () => {
-            const m = document.getElementById('user-menu');
-            m.style.display = m.style.display === 'none' ? 'block' : 'none';
+            const m  = document.getElementById('user-menu');
+            const sm = document.getElementById('shop-menu');
+            if (sm) sm.style.display = 'none';
+            if (m)  m.style.display  = m.style.display === 'none' ? 'block' : 'none';
         };
 
+        // Close menus when clicking outside
         document.addEventListener('click', (e) => {
-            const profile = document.getElementById('user-profile');
+            const profile  = document.getElementById('user-profile');
+            const shopWrap = document.querySelector('.btn-shop-wrap');
             if (profile && !profile.contains(e.target)) {
                 const m = document.getElementById('user-menu');
                 if (m) m.style.display = 'none';
             }
+            if (shopWrap && !shopWrap.contains(e.target)) {
+                const sm = document.getElementById('shop-menu');
+                if (sm) sm.style.display = 'none';
+            }
         });
+
+        // AUTO LOGOUT when tab/browser closes
+        window.addEventListener('beforeunload', () => signOut(auth));
 
         onAuthStateChanged(auth, (user) => {
             const loginBtn  = document.getElementById('login-btn');
             const userProf  = document.getElementById('user-profile');
             const avatar    = document.getElementById('user-avatar');
+            const menuAvLg  = document.getElementById('menu-avatar-lg');
             const userName  = document.getElementById('user-name');
             const menuName  = document.getElementById('menu-name');
             const menuEmail = document.getElementById('menu-email');
             if (user) {
-                loginBtn.style.display  = 'none';
-                userProf.style.display  = 'flex';
+                loginBtn.style.display    = 'none';
+                userProf.style.display    = 'flex';
                 userProf.style.alignItems = 'center';
-                avatar.src              = user.photoURL || '';
-                userName.textContent    = user.displayName?.split(' ')[0] || 'DRIVER';
-                menuName.textContent    = user.displayName || '';
-                menuEmail.textContent   = user.email || '';
+                avatar.src                = user.photoURL || '';
+                if (menuAvLg) menuAvLg.src = user.photoURL || '';
+                userName.textContent      = user.displayName?.split(' ')[0] || 'DRIVER';
+                menuName.textContent      = user.displayName || '';
+                menuEmail.textContent     = user.email || '';
+                const saved = sessionStorage.getItem('zylon_fav_team');
+                const sel   = document.getElementById('fav-team-select');
+                if (saved && sel) sel.value = saved;
             } else {
-                loginBtn.style.display  = 'flex';
-                userProf.style.display  = 'none';
+                loginBtn.style.display = 'flex';
+                userProf.style.display = 'none';
+                setTimeout(() => signInWithGoogle(), 800);
             }
         });
     </script>
 
     <script src="data.js"></script>
     <script src="script.js"></script>
-
+    
     <div id="gallery-overlay" class="gallery-overlay">
         <span class="close-gallery" onclick="closeGallery()">&times;</span>
-<div id="gallery-content" class="gallery-slider" onclick="event.stopPropagation()"></div>
-    </div>
-
-</body>
-</html>
+        <div class="galle
