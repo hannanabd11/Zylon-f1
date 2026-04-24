@@ -240,8 +240,8 @@ const zenithRaceSchedule = [
         round: 4, gp: "Miami Grand Prix", sprint: true,
         FP1:         { iso: "2026-05-01T21:30:00+05:00" },
         SprintQuali: { iso: "2026-05-02T01:30:00+05:00" },
-        Sprint:      { iso: "2026-05-02T19:00:00+05:00" },
-        Qualifying:  { iso: "2026-05-02T23:00:00+05:00" },
+        Sprint:      { iso: "2026-05-02T21:00:00+05:00" },
+        Qualifying:  { iso: "2026-05-03T01:00:00+05:00" },
         Race:        { iso: "2026-05-04T01:00:00+05:00" },
         hubUrl: "race-hub-mia.html"
     },
@@ -255,11 +255,11 @@ const zenithRaceSchedule = [
     // Race Sun 14:00 EDT = 23:00 PKT
     {
         round: 5, gp: "Canadian Grand Prix", sprint: true,
-        FP1:         { iso: "2026-05-22T22:30:00+05:00" },
-        SprintQuali: { iso: "2026-05-23T02:30:00+05:00" },
-        Sprint:      { iso: "2026-05-23T20:00:00+05:00" },
-        Qualifying:  { iso: "2026-05-24T00:00:00+05:00" },
-        Race:        { iso: "2026-05-24T23:00:00+05:00" },
+        FP1:         { iso: "2026-05-22T21:30:00+05:00" },
+        SprintQuali: { iso: "2026-05-23T01:30:00+05:00" },
+        Sprint:      { iso: "2026-05-23T21:00:00+05:00" },
+        Qualifying:  { iso: "2026-05-24T01:00:00+05:00" },
+        Race:        { iso: "2026-05-25T01:00:00+05:00" },
         hubUrl: "race-hub-can.html"
     },
 
