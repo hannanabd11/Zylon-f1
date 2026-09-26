@@ -538,9 +538,6 @@
             }
         });
 
-        // AUTO LOGOUT when tab/browser closes
-        window.addEventListener('beforeunload', () => signOut(auth));
-
         onAuthStateChanged(auth, (user) => {
             const loginBtn  = document.getElementById('login-btn');
             const userProf  = document.getElementById('user-profile');
@@ -564,7 +561,6 @@
             } else {
                 loginBtn.style.display = 'flex';
                 userProf.style.display = 'none';
-                setTimeout(() => signInWithGoogle(), 800);
             }
         });
     </script>
