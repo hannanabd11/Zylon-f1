@@ -1,4 +1,3 @@
-
 /* Ensure the base page is black */
 body, html {
     margin: 0;
@@ -308,16 +307,6 @@ body, html {
 
 
 /* The Row Design */
-.standings-entry {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    margin-bottom: 12px;
-    background: rgba(255,255,255,0.01);
-    border-radius: 12px;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid transparent;
-}
 
 /* Neon Glow on Hover */
 .standings-entry:hover {
@@ -385,11 +374,6 @@ letter-spacing: -1px;
 }
 
 /* 1. Prevent the individual tab from expanding the page width */
-.tab-content {
-    overflow-x: hidden; /* This kills the horizontal 'bleed' */
-    max-width: 100vw;    /* Ensures it never exceeds the screen width */
-    position: relative; 
-}
 
 /* 2. Safety lock for the whole website */
 body {
@@ -399,7 +383,15 @@ body {
 
 /* 3. Refine the sliding row so it doesn't 'push' the container */
 .standings-entry {
-    box-sizing: border-box; /* Ensures padding doesn't add to width */
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 12px;
+    background: rgba(255,255,255,0.01);
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid transparent;
+    box-sizing: border-box;
     width: 100%;
 }
 /* Reset link colors so they don't turn blue */
@@ -420,70 +412,25 @@ body {
 }
 
 /* Schedule Row Design */
-.schedule-row-container {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-    margin-bottom: 12px;
-    transition: 0.3s ease-in-out;
-    overflow: hidden;
-}
 
 /* Green Row Logic */
-.schedule-row-container.completed {
-    border-left: 4px solid #00ff88;
-    background: linear-gradient(90deg, rgba(0, 255, 136, 0.05) 0%, transparent 100%);
-}
 
-.schedule-main-row {
-    display: flex;
-    align-items: center;
-    padding: 15px 20px;
-    cursor: pointer;
-}
 
 /* Expansion Effect */
-.schedule-row-container.expanded {
-    transform: scale(1.02);
-    background: rgba(255, 255, 255, 0.08);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
 
-.schedule-details {
-    max-height: 0;
-    opacity: 0;
-    transition: all 0.4s ease;
-    background: rgba(0, 0, 0, 0.2);
-}
 
-.schedule-row-container.expanded .schedule-details {
-    max-height: 200px;
-    opacity: 1;
-    padding: 20px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-}
 
 /* Grid for Practice Times */
-.details-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 15px;
-    text-align: center;
-}
 
-.session-item span { display: block; font-size: 0.6rem; color: #888; margin-bottom: 4px; }
-.session-item strong { font-size: 1rem; color: #fff; }
-.session-item.highlight strong { color: #e10600; text-shadow: 0 0 10px rgba(225, 6, 0, 0.4); }
 
 /* Mirror the exact Grid of your Header */
 .schedule-main-row {
     display: grid;
-    /* This matches your HTML inline style exactly */
-    grid-template-columns: 60px 100px 1.5fr 1.5fr 1.2fr; 
     align-items: center;
     padding: 15px 25px;
-    gap: 10px;
     cursor: pointer;
+    grid-template-columns: 60px 100px 1.5fr 1.5fr 1.2fr;
+    gap: 10px;
     background: rgba(255, 255, 255, 0.02);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -516,29 +463,22 @@ body {
 }
 
 /* Expansion Logic */
-.schedule-row-container.completed {
-    border-left: 4px solid #00ff88;
-}
 
 .schedule-details {
     max-height: 0;
-    overflow: hidden;
+    opacity: 0;
     transition: all 0.4s ease-out;
     background: #111;
+    overflow: hidden;
 }
 
 .schedule-row-container.expanded .schedule-details {
     max-height: 250px;
+    opacity: 1;
     padding: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.details-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 15px;
-    text-align: center;
-}
 
 /* Green Row Logic: Past Races */
 .schedule-row-container.completed {
@@ -554,34 +494,24 @@ body {
 }
 
 /* Maintain alignment for the expanded sessions */
-.details-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 10px;
-    text-align: center;
-    padding: 15px 0;
-}
 
-.session-item span { display: block; font-size: 0.65rem; color: #888; margin-bottom: 5px; }
-.session-item strong { font-size: 1rem; color: #fff; }
-.session-item.highlight strong { color: #e10600; } /* Qualifying in F1 Red */
-/* Winner Label in the Main Row */
-.winner-label {
-    color: #ffd700; /* Gold for the winner */
-    font-weight: 900;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-    letter-spacing: 1px;
+.session-item span {
+    display: block;
+    font-size: 0.65rem;
+    color: #888;
+    margin-bottom: 5px;
 }
+.session-item strong {
+    font-size: 1rem;
+    color: #fff;
+}
+.session-item.highlight strong {
+    color: #e10600;
+    text-shadow: 0 0 10px rgba(225, 6, 0, 0.4);
+}
+/* Winner Label in the Main Row */
 
 /* Expansion Details Styling */
-.session-item small {
-    display: block;
-    font-size: 0.6rem;
-    color: #00ff88; /* Green for results */
-    margin-top: 5px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
-}
 
 .session-item.highlight small {
     color: #e10600; /* Red for Qualifying results */
@@ -593,8 +523,9 @@ body {
 }
 
 .schedule-row-container.expanded {
-    background: rgba(255, 255, 255, 0.08);
     transform: scale(1.01);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 /* Sprint Badge in Main Row */
 .sprint-badge {
@@ -623,6 +554,7 @@ body {
     color: #ffd700;
     font-weight: 900;
     text-shadow: 0 0 8px rgba(255, 215, 0, 0.4);
+    letter-spacing: 1px;
 }
 
 .upcoming-label {
@@ -638,19 +570,11 @@ body {
     color: #00ff88;
     margin-top: 4px;
     font-weight: 800;
+    letter-spacing: 0.5px;
 }
 /* Styling for when a Winner name replaces the Time */
-.result-text {
-    color: #00ff88 !important; /* Neon green for finished sessions */
-    font-weight: 900;
-    letter-spacing: 1px;
-    text-shadow: 0 0 5px rgba(0, 255, 136, 0.2);
-}
 
 /* Red for Qualifying Winner (Pole) */
-.session-item.highlight .result-text {
-    color: #e10600 !important;
-}
 
 /* Make sure the details grid stays aligned */
 .details-grid {
@@ -684,14 +608,7 @@ body {
 }
 
 /* Result Styling */
-.result-text {
-    color: #00ff88 !important;
-    text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
-}
 
-.session-item.highlight .result-text {
-    color: #ff3e3e !important; /* Red for Pole Sitter */
-} 
 
 /* Link Styling */
 .session-link {
@@ -722,20 +639,24 @@ body {
 /* Result specific colors */
 .result-text {
     color: #00ff88;
+    font-weight: 900;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
 }
 
 .session-item.highlight .result-text {
-    color: #ff1e1e; /* Red for Pole position */
+    color: #ff1e1e;
 }
 /* 1. Base Row Container Styling */
 .schedule-row-container {
     background: rgba(255, 255, 255, 0.03);
-    margin-bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 6px;
-    border-left: 4px solid transparent; /* Hidden by default */
+    margin-bottom: 8px;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    cursor: pointer;
     overflow: hidden;
+    border-left: 4px solid transparent;
+    cursor: pointer;
 }
 
 /* 2. The Hover Effect */
@@ -781,6 +702,9 @@ body {
 }
 /* Force all tab contents to be hidden by default */
 .tab-content {
+    overflow-x: hidden;
+    max-width: 100vw;
+    position: relative;
     display: none !important;
     width: 100%;
     animation: fadeIn 0.4s ease;
@@ -829,34 +753,9 @@ body {
 .track-highlight .big-value { color: #e10600; }
 
 /* Pulse Animation */
-.pulse-dot {
-    height: 8px;
-    width: 8px;
-    background-color: #e10600;
-    border-radius: 50%;
-    display: inline-block;
-    margin-right: 8px;
-    animation: pulse 1.5s infinite;
-}
 
-@keyframes pulse {
-    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 6, 0, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(225, 6, 0, 0); }
-    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 6, 0, 0); }
-}
 
 /* Timer Button Styling */
-.live-btn {
-    background: #e10600;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 4px;
-    text-decoration: none;
-    font-weight: bold;
-    display: inline-block;
-    margin-top: 10px;
-    transition: background 0.3s;
-}
 .live-btn:hover { background: #ff1e1e; }
 
 /* Container for the Live Tower */
@@ -945,15 +844,16 @@ body {
 }
 
 .live-btn {
-    display: inline-block;
     background: white;
     color: var(--f1-red);
     padding: 15px 40px;
     border-radius: 50px;
     text-decoration: none;
     font-weight: 900;
-    text-transform: uppercase;
+    display: inline-block;
     margin-top: 20px;
+    transition: background 0.3s;
+    text-transform: uppercase;
     animation: pulse-white 2s infinite;
 }
 
@@ -1140,36 +1040,7 @@ body {
   font-size: 0.9rem;
   color: #fff;
 }
-.rule-box p {
-  font-size: 0.8rem;
-  color: #aaa;
-  margin-top: 5px;
-  line-height: 1.4;
-}
-.rule-box.override {
-  border-left-color: #e10600; /* Red highlight for override rules */
-  background: rgba(225, 6, 0, 0.05);
-}
-.rule-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 /* Layout fix for columns side-by-side */
-.home-layout {
-  display: flex;
-  gap: 25px;
-  align-items: flex-start;
-  margin-top: 20px;
-  padding-bottom: 50px; /* Space above footer */
-}
-.main-col {
-  flex: 3;
-}
-.side-col {
-  flex: 1;
-  min-width: 320px;
-}
 /* Tech card container styling */
 .tech-card-container {
   background: rgba(255, 255, 255, 0.05);
@@ -1189,14 +1060,14 @@ body {
 }
 /* Override style for last rule box */
 .rule-box.override {
-  border-left-color: #e10600;
-  background: rgba(225, 6, 0, 0.08);
+    border-left-color: #e10600;
+    background: rgba(225, 6, 0, 0.08);
 }
 .rule-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
 }
 .rule-header h4 {
   font-size: 0.8rem;
@@ -1204,25 +1075,9 @@ body {
   margin: 0;
 }
 /* Text style for rule box */
-.rule-box p {
-  font-size: 0.75rem;
-  color: #bbb;
-  line-height: 1.4;
-  margin: 0;
-}
 
 /* 1. The 2-Column Layout */
-.home-layout {
-    display: flex;
-    gap: 20px;
-    max-width: 1300px;
-    margin: 0 auto;
-    padding: 20px;
-    align-items: flex-start;
-}
 
-.main-col { flex: 3; }
-.side-col { flex: 1; min-width: 300px; }
 
 /* 2. The News Grid (Fixes the giant image) */
 
@@ -1304,12 +1159,15 @@ body {
 
 
 .pulse-dot {
-    width: 10px;
     height: 10px;
-    background: #ff0000;
+    width: 10px;
+    background-color: #e10600;
     border-radius: 50%;
-    box-shadow: 0 0 0 rgba(255, 0, 0, 0.4);
+    display: inline-block;
+    margin-right: 8px;
     animation: pulse 1.5s infinite;
+    background: #ff0000;
+    box-shadow: 0 0 0 rgba(255, 0, 0, 0.4);
 }
 
 @keyframes pulse {
@@ -1345,27 +1203,8 @@ body {
 
 
 /* 5. LIVE STATUS & REFRESH */
-#weather-widget {
-    min-height: 200px;
-    background: radial-gradient(circle at top left, #121214, #050505);
-    padding: 50px 40px 30px 40px;
-    border-radius: 12px;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
-}
 
 /* Distribution Grid */
-.weather-data-wrapper {
-    display: grid;
-    grid-template-columns: 1fr 1.5fr 1fr; /* Distributes weight across the tab */
-    align-items: center;
-    gap: 20px;
-    z-index: 2;
-}
 
 /* Side Zones (Left & Right) */
 .side-zone {
@@ -1422,16 +1261,19 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.6);
     justify-content: center;
 }
 
 /* Three-Zone Distribution */
 .weather-data-wrapper {
     display: flex;
-    justify-content: space-between;
+    grid-template-columns: 1fr 1.5fr 1fr;
     align-items: center;
-    width: 100%;
+    gap: 20px;
     z-index: 2;
+    justify-content: space-between;
+    width: 100%;
 }
 
 .tel-wing {
@@ -1522,25 +1364,7 @@ body {
 }
 
 /* Fixed Watermark Ignite */
-.track-watermark {
-    position: absolute;
-    bottom: -15px;
-    right: -5px;
-    font-size: 5.5rem;
-    font-weight: 900;
-    font-style: italic;
-    color: rgba(255, 255, 255, 0.015);
-    letter-spacing: -4px;
-    pointer-events: none;
-    z-index: 1;
-    transition: color 0.5s ease;
-}
 
-#weather-widget:hover .track-watermark {
-    color: rgba(225, 6, 0, 0.4) !important;
-    text-shadow: 0 0 20px rgba(225, 6, 0, 0.3);
-    transform: scale(1) !important; /* Strictly no zoom */
-}
 
 .weather-label { color: #666; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; }
 .weather-value { color: #fff; font-weight: 900; font-size: 1.1rem; }
@@ -1570,12 +1394,16 @@ body {
     font-weight: 900;
     font-style: italic;
     color: rgba(255, 255, 255, 0.01);
+    letter-spacing: -4px;
     pointer-events: none;
+    z-index: 1;
     transition: 0.5s;
 }
 
 #weather-widget:hover .track-watermark {
     color: rgba(225, 6, 0, 0.3) !important;
+    text-shadow: 0 0 20px rgba(225, 6, 0, 0.3);
+    transform: scale(1) !important;
 }
 
 /* Grid Setup */
@@ -1657,16 +1485,6 @@ body {
 .stat-val { font-size: 1.4rem; font-weight: 900; color: #fff; display: block; }
 .stat-lab { font-size: 0.6rem; color: #666; text-transform: uppercase; }
 
-.driver-pill {
-    background: #222;
-    padding: 4px 12px;
-    font-size: 0.75rem;
-    font-weight: 800;
-    margin-bottom: 5px;
-    border-right: 4px solid; /* Color is set in JS */
-    color: #fff;
-    display: inline-block;
-}
 
 .principal-link {
     color: #ff0000;
@@ -1677,9 +1495,6 @@ body {
     cursor: pointer;
 }
 
-.principal-link:hover {
-    color: #fff;
-}
 /* Remove all default link underlines */
 .clickable-name, .principal-link, .driver-pill {
     text-decoration: none !important;
@@ -1706,7 +1521,6 @@ body {
     color: var(--team-color);
 }
 .driver-pill {
-    text-decoration: none !important;
     background: rgba(255, 255, 255, 0.05);
     padding: 6px 15px;
     font-size: 0.75rem;
@@ -1715,6 +1529,7 @@ body {
     border-right: 4px solid var(--team-color);
     color: #fff;
     display: inline-block;
+    text-decoration: none !important;
     transition: all 0.2s ease;
 }
 
@@ -1898,13 +1713,6 @@ body {
 }
 
 /* --- FOOTER: PREVIOUS LARGE ICON DESIGN --- */
-.f1-footer {
-    background: #050505;
-    padding: 80px 20px 40px;
-    border-top: 2px solid rgba(255, 255, 255, 0.05);
-    text-align: center;
-    margin-top: 100px;
-}
 
 .footer-content {
     max-width: 1200px;
@@ -1912,21 +1720,8 @@ body {
 }
 
 /* THE CONTAINER FOR ICONS */
-.social-links {
-    display: flex;
-    justify-content: center;
-    gap: 40px; /* Big spacing between big icons */
-    margin-bottom: 40px;
-}
 
 /* THE ANCHOR TAGS */
-.social-links a {
-    text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 /* THE ACTUAL ICONS (FontAwesome) */
 .social-links a i {
@@ -1936,9 +1731,6 @@ body {
 }
 
 /* --- THE HOVER EFFECTS --- */
-.social-links a:hover {
-    transform: translateY(-15px); /* Big float-up effect */
-}
 
 /* Different Glow Colors for each platform on hover */
 .social-links a[title="Gmail"]:hover i { 
@@ -1967,20 +1759,8 @@ body {
 }
 
 /* THE SEPARATOR LINE */
-.footer-line {
-    border: 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, #333, transparent);
-    margin: 30px 0;
-}
 
 /* COPYRIGHT TEXT */
-.copyright-text {
-    font-size: 0.8rem;
-    color: #555;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
 
 /* STANDINGS MASTER CONTAINER */
 .standings-wrapper {
@@ -2125,50 +1905,14 @@ body {
     margin-right: 8px;
 }
 
-.home-layout {
-    display: flex;
-    gap: 40px;
-    align-items: flex-start;
-    margin-top: 30px;
-}
 
-.main-col {
-    flex: 3; /* News takes up more space */
-}
 
-.side-col {
-    flex: 1.2; /* Sidebox is narrower */
-    position: sticky;
-    top: 20px; /* Stays on screen when you scroll */
-}
 
 /* Ensure images don't break the layout */
 /* --- HOME COMMAND LAYOUT --- */
-.home-layout {
-    display: flex;
-    gap: 30px;
-    margin-top: 30px;
-    align-items: stretch; /* Aligns top of news and rules */
-}
 
-.main-col {
-    flex: 3;
-    min-width: 0;
-}
 
 /* --- DESIGNED LATEST NEWS TEXT + RED BAR --- */
-.section-title {
-    font-family: 'Formula1-Bold', sans-serif;
-    font-size: 1.8rem;
-    color: #ffffff;
-    text-transform: uppercase;
-    margin: 0 0 25px 0;
-    padding-left: 20px;
-    border-left: 6px solid #e10600; /* The Red Bar beside text */
-    display: flex;
-    align-items: center;
-    line-height: 1;
-}
 
 /* --- GLOWING NEWS CARDS --- */
 .news-card {
@@ -2188,51 +1932,35 @@ body {
     transform: translateY(-5px);
 }
 
-.news-img-container {
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-    position: relative;
-}
 
-.news-pic {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
 
 /* --- NEWS SOURCE TAG --- */
-.news-source-tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 0.65rem;
-    color: #e10600;
-    background: rgba(225, 6, 0, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    font-weight: 800;
-    margin-top: 10px;
-    display: inline-block;
-}
 /* --- 1. THE LAYOUT & SYMMETRICAL OFFSET --- */
 .home-layout {
     display: flex;
     gap: 40px;
-    margin-top: 50px;
     align-items: flex-start;
+    margin-top: 50px;
+    padding-bottom: 50px;
     max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
     margin-left: auto;
     margin-right: auto;
-    padding: 0 20px;
 }
 
-.main-col { flex: 3; min-width: 0; }
+.main-col {
+    flex: 3;
+    min-width: 0;
+}
 
 /* The downward offset for the Rules column to start lower */
-.side-col { 
-    flex: 1.2; 
-    min-width: 320px; 
-    padding-top: 65px; 
+.side-col {
+    flex: 1.2;
+    min-width: 320px;
+    position: sticky;
+    top: 20px;
+    padding-top: 65px;
 }
 
 /* --- 2. THE REALISTIC HUD HEADERS (UNIFIED) --- */
@@ -2263,7 +1991,6 @@ body {
 }
 
 /* Technical Telemetry Metadata */
-.section-title::before { content: "STRAT.FEED // NWS.026"; position: absolute; right: 0; bottom: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: #444; letter-spacing: 1px; }
 .tech-header::before { content: "TECH.DIR // REGS.V2"; position: absolute; right: 0; bottom: 8px; font-family: 'JetBrains Mono', monospace; font-size: 0.5rem; color: #444; letter-spacing: 1px; }
 
 /* --- 3. THE UNIFIED 2-COLUMN NEWS GRID --- */
@@ -2318,8 +2045,9 @@ body {
 .news-img-container {
     width: 100%;
     aspect-ratio: 16/9;
-    border-bottom: 1px solid #1a1a1a;
     overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid #1a1a1a;
 }
 
 .news-pic {
@@ -2339,8 +2067,9 @@ body {
 .rule-box p {
     font-size: 0.7rem;
     color: #888;
-    line-height: 1.5;
     margin-top: 5px;
+    line-height: 1.5;
+    margin: 0;
 }
 
 /* Source Tag Meta */
@@ -2351,6 +2080,7 @@ body {
     background: rgba(225, 6, 0, 0.1);
     padding: 2px 6px;
     border-radius: 2px;
+    text-transform: uppercase;
     font-weight: 800;
     margin-top: 10px;
     display: inline-block;
@@ -2364,22 +2094,29 @@ body {
     text-transform: uppercase;
     margin: 0 0 25px 0;
     padding-left: 20px;
-    position: relative;
+    border-left: 6px solid #e10600;
     display: flex;
     align-items: center;
     line-height: 1;
+    position: relative;
 }
 
 /* The Main Glowing Red Bar */
 .section-title::before {
     content: "";
     position: absolute;
+    right: 0;
+    bottom: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.5rem;
+    color: #444;
+    letter-spacing: 1px;
     left: 0;
     top: 0;
-    width: 4px; /* Slightly thinner for elegance */
+    width: 4px;
     height: 100%;
     background: #e10600;
-    box-shadow: 0 0 12px rgba(225, 6, 0, 0.8); /* High-Intensity Glow */
+    box-shadow: 0 0 12px rgba(225, 6, 0, 0.8);
     border-radius: 1px;
     z-index: 2;
 }
@@ -2403,6 +2140,8 @@ body {
     background: #050505;
     padding: 80px 6% 40px 6%;
     border-top: 1px solid #1a1a1a;
+    text-align: center;
+    margin-top: 100px;
 }
 
 /* --- PARTNERS SECTION --- */
@@ -2470,18 +2209,24 @@ body {
 
 .social-links {
     display: flex;
+    justify-content: center;
     gap: 45px;
+    margin-bottom: 40px;
 }
 
 .social-links a {
+    text-decoration: none;
+    transition: 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     color: #666;
     font-size: 1.8rem;
-    transition: 0.3s ease;
 }
 
 .social-links a:hover {
-    color: #ffffff;
     transform: translateY(-5px);
+    color: #ffffff;
 }
 
 /* --- FOOTER ELEMENTS --- */
@@ -2493,11 +2238,11 @@ body {
 }
 
 .copyright-text {
-    color: #444;
     font-size: 0.75rem;
-    text-align: center;
+    color: #444;
     letter-spacing: 2px;
     text-transform: uppercase;
+    text-align: center;
 }
 
 /* Hides empty white boxes if images are missing */
@@ -2540,4 +2285,3 @@ html, body {
     }
 
 }
-
