@@ -61,7 +61,7 @@ const f1Calendar2026 = [
     { gp: "Italian Grand Prix",             circuit: "Monza Circuit",                    date: "2026-09-06", time: "18:00:00", lat:  45.62, lon:   9.28, Qualifying: { date: "2026-09-05", time: "19:00:00" } },
     { gp: "Spanish Grand Prix",             circuit: "Madrid Street Circuit",            date: "2026-09-13", time: "18:00:00", lat:  40.41, lon:  -3.70, Qualifying: { date: "2026-09-12", time: "19:00:00" } },
     { gp: "Azerbaijan Grand Prix",          circuit: "Baku City Circuit",                date: "2026-09-26", time: "16:00:00", lat:  40.37, lon:  49.85, Qualifying: { date: "2026-09-25", time: "17:00:00" } },
-    { gp: "Bahrain Grand Prix in Malaysia", circuit: "Sepang International Circuit", date: "2026-10-04", time: "12:00:00", lat:   2.76, lon: 101.74, Qualifying: { date: "2026-10-03", time: "13:00:00" } },
+    { gp: "Bahrain Grand Prix", circuit: "Sepang International Circuit", date: "2026-10-04", time: "12:00:00", lat:   2.76, lon: 101.74, Qualifying: { date: "2026-10-03", time: "13:00:00" } },
     { gp: "Singapore Grand Prix",           circuit: "Marina Bay Street Circuit",        date: "2026-10-11", time: "17:00:00", lat:   1.29, lon: 103.86, Qualifying: { date: "2026-10-10", time: "17:00:00" } },
     { gp: "United States Grand Prix",       circuit: "Circuit of the Americas",          date: "2026-10-25", time: "00:00:00", lat:  30.13, lon: -97.64, Qualifying: { date: "2026-10-24", time: "01:00:00" } },
     { gp: "Mexico City Grand Prix",         circuit: "Autódromo Hermanos Rodríguez",     date: "2026-11-01", time: "01:00:00", lat:  19.40, lon: -99.09, Qualifying: { date: "2026-10-31", time: "02:00:00" } },
@@ -412,7 +412,7 @@ const zenithRaceSchedule = [
     // Quali Sat 16:00 MYT = 13:00 PKT
     // Race Sun 15:00 MYT = 12:00 PKT
     {
-        round: 16, gp: "Gulf Air Bahrain Grand Prix in Malaysia",
+        round: 16, gp: "Bahrain Grand Prix",
         FP1:   { iso: "2026-10-02T09:30:00+05:00" },
         FP2:   { iso: "2026-10-02T13:00:00+05:00" },
         FP3:   { iso: "2026-10-03T09:30:00+05:00" },
