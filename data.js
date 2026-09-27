@@ -404,6 +404,18 @@ const zenithRaceSchedule = [
         Race:  { iso: "2026-09-26T16:00:00+05:00" },
         hubUrl: "race-hub-aze.html"
     },
+// Bahrain gp in malaysia
+
+  
+  {
+        round: 11, gp: "Bahrain Grand Prix",
+        FP1:   { iso: "2026-10-02T09:30:00+05:00" },
+        FP2:   { iso: "2026-07-24T20:00:00+05:00" },
+        FP3:   { iso: "2026-07-25T15:30:00+05:00" },
+        Qualifying: { iso: "2026-10-03T13:00:00+05:00" },
+        Race:  { iso: "2026-07-26T18:00:00+05:00" },
+        hubUrl: "race-hub-hun.html"
+    },
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     // R18 SINGAPORE ★SPRINT — Marina Bay (SGT = UTC+8)
