@@ -61,8 +61,7 @@ const f1Calendar2026 = [
     { gp: "Italian Grand Prix",             circuit: "Monza Circuit",                    date: "2026-09-06", time: "18:00:00", lat:  45.62, lon:   9.28, Qualifying: { date: "2026-09-05", time: "19:00:00" } },
     { gp: "Spanish Grand Prix",             circuit: "Madrid Street Circuit",            date: "2026-09-13", time: "18:00:00", lat:  40.41, lon:  -3.70, Qualifying: { date: "2026-09-12", time: "19:00:00" } },
     { gp: "Azerbaijan Grand Prix",          circuit: "Baku City Circuit",                date: "2026-09-26", time: "16:00:00", lat:  40.37, lon:  49.85, Qualifying: { date: "2026-09-25", time: "17:00:00" } },
-    { gp: "Bahrain Grand Prix Malaysia",    circuit: "Sepang Ring  Circuit",             date: "2026-10-04", time: "12:00:00", lat:  26.03, lon:  50.51, Qualifying: { date: "2026-10-03", time: "13:00:00" } },    
-   
+    { gp: "Gulf Air Bahrain Grand Prix in Malaysia", circuit: "Sepang International Circuit", date: "2026-10-04", time: "12:00:00", lat:   2.76, lon: 101.74, Qualifying: { date: "2026-10-03", time: "13:00:00" } },
     { gp: "Singapore Grand Prix",           circuit: "Marina Bay Street Circuit",        date: "2026-10-11", time: "17:00:00", lat:   1.29, lon: 103.86, Qualifying: { date: "2026-10-10", time: "17:00:00" } },
     { gp: "United States Grand Prix",       circuit: "Circuit of the Americas",          date: "2026-10-25", time: "00:00:00", lat:  30.13, lon: -97.64, Qualifying: { date: "2026-10-24", time: "01:00:00" } },
     { gp: "Mexico City Grand Prix",         circuit: "Autódromo Hermanos Rodríguez",     date: "2026-11-01", time: "01:00:00", lat:  19.40, lon: -99.09, Qualifying: { date: "2026-10-31", time: "02:00:00" } },
@@ -404,28 +403,33 @@ const zenithRaceSchedule = [
         Race:  { iso: "2026-09-26T16:00:00+05:00" },
         hubUrl: "race-hub-aze.html"
     },
-// Bahrain gp in malaysia
 
-  
-  {
-        round: 11, gp: "Bahrain Grand Prix",
+    // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    // R16 BAHRAIN GP IN MALAYSIA — Sepang (MYT = UTC+8)
+    // FP1 Fri 12:30 MYT = 09:30 PKT
+    // FP2 Fri 16:00 MYT = 13:00 PKT
+    // FP3 Sat 12:30 MYT = 09:30 PKT
+    // Quali Sat 16:00 MYT = 13:00 PKT
+    // Race Sun 15:00 MYT = 12:00 PKT
+    {
+        round: 16, gp: "Gulf Air Bahrain Grand Prix in Malaysia",
         FP1:   { iso: "2026-10-02T09:30:00+05:00" },
-        FP2:   { iso: "2026-07-24T20:00:00+05:00" },
-        FP3:   { iso: "2026-07-25T15:30:00+05:00" },
+        FP2:   { iso: "2026-10-02T13:00:00+05:00" },
+        FP3:   { iso: "2026-10-03T09:30:00+05:00" },
         Qualifying: { iso: "2026-10-03T13:00:00+05:00" },
-        Race:  { iso: "2026-07-26T18:00:00+05:00" },
-        hubUrl: "race-hub-hun.html"
+        Race:  { iso: "2026-10-04T12:00:00+05:00" },
+        hubUrl: "race-hub-mal.html"
     },
 
     // ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    // R18 SINGAPORE ★SPRINT — Marina Bay (SGT = UTC+8)
+    // R17 SINGAPORE ★SPRINT — Marina Bay (SGT = UTC+8)
     // FP1 Fri 18:30 SGT = 15:30 PKT
     // SprintQuali Fri 22:30 SGT = 19:30 PKT
     // Sprint Sat 16:00 SGT = 13:00 PKT
     // Quali Sat 20:00 SGT = 17:00 PKT
     // Race Sun 20:00 SGT = 17:00 PKT
     {
-        round: 16, gp: "Singapore Grand Prix", sprint: true,
+        round: 17, gp: "Singapore Grand Prix", sprint: true,
         FP1:         { iso: "2026-10-09T15:30:00+05:00" },
         SprintQuali: { iso: "2026-10-09T19:30:00+05:00" },
         Sprint:      { iso: "2026-10-10T13:00:00+05:00" },
@@ -442,7 +446,7 @@ const zenithRaceSchedule = [
     // Quali Sat 15:00 CDT = 01:00 PKT Sun
     // Race Sun 14:00 CDT = 00:00 PKT Mon
     {
-        round: 17, gp: "United States Grand Prix",
+        round: 18, gp: "United States Grand Prix",
         FP1:   { iso: "2026-10-23T23:30:00+05:00" },
         FP2:   { iso: "2026-10-24T03:00:00+05:00" },
         FP3:   { iso: "2026-10-24T21:30:00+05:00" },
@@ -459,7 +463,7 @@ const zenithRaceSchedule = [
     // Quali Sat 15:00 CST = 02:00 PKT Sun
     // Race Sun 14:00 CST = 01:00 PKT Mon
     {
-        round: 18, gp: "Mexico City Grand Prix",
+        round: 19, gp: "Mexico City Grand Prix",
         FP1:   { iso: "2026-10-31T00:30:00+05:00" },
         FP2:   { iso: "2026-10-31T04:00:00+05:00" },
         FP3:   { iso: "2026-10-31T22:00:00+05:00" },
@@ -476,7 +480,7 @@ const zenithRaceSchedule = [
     // Quali Sat 15:00 BRT = 23:00 PKT
     // Race Sun 14:00 BRT = 22:00 PKT
     {
-        round: 19, gp: "São Paulo Grand Prix",
+        round: 20, gp: "São Paulo Grand Prix",
         FP1:   { iso: "2026-11-06T22:30:00+05:00" },
         FP2:   { iso: "2026-11-07T02:00:00+05:00" },
         FP3:   { iso: "2026-11-07T19:30:00+05:00" },
@@ -493,7 +497,7 @@ const zenithRaceSchedule = [
     // Quali Fri 22:00 PDT = 10:00 PKT Sat
     // Race SAT 22:00 PDT = 10:00 PKT Sun
     {
-        round: 20, gp: "Las Vegas Grand Prix",
+        round: 21, gp: "Las Vegas Grand Prix",
         FP1:   { iso: "2026-11-20T07:00:00+05:00" },
         FP2:   { iso: "2026-11-20T11:00:00+05:00" },
         FP3:   { iso: "2026-11-21T07:00:00+05:00" },
@@ -510,7 +514,7 @@ const zenithRaceSchedule = [
     // Quali Sat 18:00 AST = 20:00 PKT
     // Race Sun 19:00 AST = 21:00 PKT
     {
-        round: 21, gp: "Qatar Grand Prix",
+        round: 22, gp: "Qatar Grand Prix",
         FP1:   { iso: "2026-11-27T17:30:00+05:00" },
         FP2:   { iso: "2026-11-27T21:00:00+05:00" },
         FP3:   { iso: "2026-11-28T16:30:00+05:00" },
@@ -527,7 +531,7 @@ const zenithRaceSchedule = [
     // Quali Sat 17:00 GST = 18:00 PKT
     // Race Sun 17:00 GST = 18:00 PKT
     {
-        round: 22, gp: "Abu Dhabi Grand Prix",
+        round: 23, gp: "Abu Dhabi Grand Prix",
         FP1:   { iso: "2026-12-04T15:30:00+05:00" },
         FP2:   { iso: "2026-12-04T19:00:00+05:00" },
         FP3:   { iso: "2026-12-05T14:30:00+05:00" },
