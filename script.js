@@ -1043,7 +1043,7 @@ async function fetchLiveF1News() {
     if (!el) return;
     el.innerHTML = `<div style="color:#444;padding:20px;">FETCHING SATELLITE FEED...</div>`;
     try {
-        const res  = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://www.autosport.com/rss/f1/news/')}`);
+        const res  = await fetchWithTimeout(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent('https://www.autosport.com/rss/f1/news/')}`);
         const data = await res.json();
         if (!data.items?.length) throw new Error();
         el.innerHTML = data.items.slice(0,8).map(item => {
@@ -1086,7 +1086,7 @@ async function updateF1Weather() {
             + `&current=temperature_2m,apparent_temperature,precipitation,precipitation_probability,`
             + `weather_code,wind_speed_10m,wind_gusts_10m,surface_pressure,`
             + `soil_temperature_0cm,shortwave_radiation&timezone=auto`;
-        const res  = await fetch(url);
+        const res  = await fetchWithTimeout(url);
         const data = await res.json();
         const live = data.current;
         setTimeout(() => {
